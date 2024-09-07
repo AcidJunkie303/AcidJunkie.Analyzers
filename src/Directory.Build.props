@@ -1,0 +1,93 @@
+<Project>
+  <PropertyGroup>
+    <!-- CA1014: CLS compliance is no longer a must, even some MS .NET Core is not anymore enforcing it -->
+    <!-- CA1032: There should be no dead code, that applies to exception classes too -->
+    <!-- CA1034: Public nested types is a preference, many folks at MS, or even Jimmy Boggard acknowledge that -->
+    <!-- CA1303: All our tools are English only, we don't need to localize any string -->
+    <!-- CA1062: does not recognize scenarios where arguments are not null, see: https://github.com/dotnet/roslyn-analyzers/issues/2877 -->
+    <!-- CA1848: we are not there yet: .NET6 offers LoggerMessage delegates which offer a performance gain compared to LogDebug, LogInformation, ... -->
+    <!-- CA2007: ASP.NET Core apps and console apps don't have a synchronization context, thus we can remove all the noise introduced by .ConfigureAwait(false) -->
+    <!-- CA2234: Pass System.Uri objects instead of strings, this is a problem with HttpClients utilizing base address and relative path -->
+    <!-- CA2254: Current release of .NET6 wrongly pops it, see issue: https://github.com/dotnet/roslyn-analyzers/issues/5626 -->
+    <!-- /!\ to check CA5399: HttpClient is created without enabling CheckCertificateRevocationList, not sure if this would work in UBS environment, to be checked separately -->
+    <!-- *** Roslynator analyzers (currently not added to any project or globally) *** -->
+    <!-- RCS1090: same reason as CA2007 -->
+    <!-- RCS1194: we should only implement exception constructors we use, we don't want dead code -->
+    <!-- *** Meziantou analyzers *** -->
+    <!-- MA0004: same reason as CA2007 -->
+    <!-- MA0015: for settings/configuration we always have a Raw class which is then converted to the proper one, considering MA0015 makes it more complicated -->
+    <!-- MA0048: this is a preference: we may want to have multiple types in the same file -->
+    <!-- MA0051: most of the time 60 lines is definitely too long, however there are exceptions, we don't want to block ourselves -->
+    <NoWarn>CA1014;CA1032;CA1034;CA1062;CA1303;CA1848;CA2007;CA2234;CA2254;CA5399;RCS1090;RCS1194;MA0004;MA0015;MA0048;MA0051;</NoWarn>
+
+    <!-- MA0025: NotImplementedException are like TODOs they should be warning only -->
+    <!-- MA0026: we know TODO items should be tackled, let's not create Errors for them -->
+    <WarningsNotAsErrors>MA0025;MA0026</WarningsNotAsErrors>
+
+    <WarningLevel>9999</WarningLevel>
+    <!-- Forever max warning level, see: https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/compiler-options/errors-warnings -->
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisMode>AllEnabledByDefault</AnalysisMode>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <LangVersion>12</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <IsPackable>true</IsPackable>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Meziantou.Analyzer" Version="2.0.163">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+
+    <!-- See Banned APIs documentation: https://github.com/dotnet/roslyn-analyzers/blob/5968beca1c5c6c12d4fa81a08b7b4561a3c05d6e/src/Microsoft.CodeAnalysis.BannedApiAnalyzers/BannedApiAnalyzers.Help.md -->
+    <!-- See examples: https://piraces.dev/posts/improve-your-code-using-roslyn-analyzers/ -->
+    <PackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers" Version="3.3.4">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <AdditionalFiles Include="$(SolutionDir)BannedSymbols.txt" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(IsTestProject)' == 'true'">
+    <PackageReference Include="FluentAssertions" Version="6.12.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+    <PackageReference Include="xunit" Version="2.9.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" privateAssets="all" />
+    <PackageReference Include="JunitXml.TestLogger" Version="4.0.254" />
+    <PackageReference Include="coverlet.collector" Version="6.0.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <Target Name="AddInternalsVisibleTo" BeforeTargets="BeforeCompile">
+    <!-- Add default suffix if there is no InternalsVisibleTo or InternalsVisibleToSuffix defined -->
+    <ItemGroup Condition="@(InternalsVisibleToSuffix->Count()) == 0 AND @(InternalsVisibleTo->Count()) == 0">
+      <InternalsVisibleToSuffix Include=".Tests" />
+    </ItemGroup>
+
+    <!-- Handle InternalsVisibleTo -->
+    <ItemGroup Condition="'@(InternalsVisibleTo->Count())' &gt; 0">
+      <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+        <_Parameter1>%(InternalsVisibleTo.Identity)</_Parameter1>
+      </AssemblyAttribute>
+    </ItemGroup>
+
+    <!-- Handle InternalsVisibleToSuffix -->
+    <ItemGroup Condition="@(InternalsVisibleToSuffix->Count()) &gt; 0">
+      <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+        <_Parameter1>$(AssemblyName)%(InternalsVisibleToSuffix.Identity)</_Parameter1>
+      </AssemblyAttribute>
+    </ItemGroup>
+  </Target>
+</Project>
