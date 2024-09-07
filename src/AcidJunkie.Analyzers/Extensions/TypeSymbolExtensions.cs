@@ -1,4 +1,5 @@
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 
 namespace AcidJunkie.Analyzers.Extensions;
 
@@ -35,5 +36,96 @@ internal static class TypeSymbolExtensions
         }
 
         return false;
+    }
+
+    public static bool ImplementsGenericEquatable(this ITypeSymbol symbol)
+        => symbol.AllInterfaces
+            .Where(a => a.TypeParameters.Length == 1)
+            .Where(a => a.ContainingNamespace.Name.EqualsOrdinal("System"))
+            .Any(a => a.Name.EqualsOrdinal("IEquatable"));
+
+    public static bool IsGetHashCodeOverridden(this ITypeSymbol symbol)
+        => symbol
+            .GetMembers(nameof(GetHashCode))
+            .OfType<IMethodSymbol>()
+            .Any(a => a.Parameters.Length == 0);
+
+    public static bool ImplementsOrIsInterface(this ITypeSymbol symbol, string interfaceNamespace, string interfaceName, int typeArgumentsCount)
+    {
+        if (symbol.ContainingNamespace.ToString().EqualsOrdinal(interfaceNamespace)
+            && symbol.Name.EqualsOrdinal(interfaceName))
+        {
+            if (symbol is INamedTypeSymbol typeSymbol)
+            {
+                return typeSymbol.TypeArguments.Length == typeArgumentsCount;
+            }
+
+            return typeArgumentsCount == 0;
+        }
+
+        return symbol.AllInterfaces
+            .Where(a => a.TypeParameters.Length == typeArgumentsCount)
+            .Where(a => a.ContainingNamespace.ToString().EqualsOrdinal(interfaceNamespace))
+            .Any(a => a.Name.EqualsOrdinal(interfaceName));
+    }
+
+    public static bool ImplementsOrIsInterface(this ITypeSymbol symbol, string interfaceNamespace, string interfaceName, params ITypeSymbol[] typeArguments)
+    {
+        var typeSyntax = SyntaxFactory.ParseTypeName("System.Collections.Generic.List<int>");
+
+        Console.WriteLine(typeSyntax);
+
+        if (symbol.ContainingNamespace.ToString().EqualsOrdinal(interfaceNamespace)
+            && symbol.Name.EqualsOrdinal(interfaceName))
+        {
+            if (symbol is INamedTypeSymbol typeSymbol)
+            {
+                if (typeSymbol.TypeArguments.Length == typeArguments.Length)
+                {
+                    return false;
+                }
+
+                for (var i = 0; i < typeArguments.Length; i++)
+                {
+                    var typeArgument = typeArguments[i];
+                    var typeArgument2 = typeSymbol.TypeArguments[i];
+
+                    if (!typeArgument.Equals(typeArgument2, SymbolEqualityComparer.Default))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            return typeArguments.Length == 0;
+        }
+
+        return symbol.AllInterfaces
+            .Where(a => a.TypeParameters.Length == typeArguments.Length)
+            .Where(a => a.ContainingNamespace.ToString().EqualsOrdinal(interfaceNamespace))
+            .Where(a => a.Name.EqualsOrdinal(interfaceName))
+            .Any(a =>
+            {
+                if (a.TypeArguments.Length != typeArguments.Length)
+                {
+                    return false;
+                }
+
+                for (var i = 0; i < typeArguments.Length; i++)
+                {
+                    var typeArgument = typeArguments[i];
+                    var typeArgument2 = a.TypeArguments[i];
+
+                    if (!typeArgument.Equals(typeArgument2, SymbolEqualityComparer.Default))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            })
+            ;
     }
 }

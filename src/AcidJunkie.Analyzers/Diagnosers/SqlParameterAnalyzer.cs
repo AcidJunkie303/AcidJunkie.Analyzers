@@ -20,7 +20,7 @@ public sealed class SqlParameterAnalyzer : DiagnosticAnalyzer
     private static readonly LocalizableString MessageFormat = "The first argument of SqlParameter must be a literal string and must start with '@' followed by a capital letter. Example: \"@OderId\"";
     private static readonly LocalizableString Description = "For standardization and easy search in the source code, the first argument of SqlParameter must be a literal string and must start with '@' followed by a capital letter. Example: \"@OderId\"";
     private static readonly DiagnosticDescriptor Rule = new(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Error, isEnabledByDefault: true, description: Description);
-    private static readonly ImmutableArray<DiagnosticDescriptor> Rules = ImmutableArray.Create(Rule);
+    private static readonly ImmutableArray<DiagnosticDescriptor> Rules = [Rule];
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => Rules;
 
