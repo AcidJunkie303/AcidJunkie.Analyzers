@@ -36,14 +36,16 @@ public static class InvocationExpressionSyntaxExtensions
         return actualMethodName is not null && methodNames.Contains(actualMethodName, StringComparer.Ordinal);
     }
 
-    public static (string? OwningTypeNameSpace, string? OwningTypeName, string? MethodName) GetInvokedMethod(this InvocationExpressionSyntax invocationExpression, SemanticModel semanticModel)
+    public static (string? OwningTypeNameSpace, string? OwningTypeName, string? MethodName, MemberAccessExpressionSyntax? MemberAccess) GetInvokedMethod(this InvocationExpressionSyntax invocationExpression, SemanticModel semanticModel)
     {
         var symbolInfo = semanticModel.GetSymbolInfo(invocationExpression);
         var methodSymbol = symbolInfo.Symbol as IMethodSymbol;
         var methodName = methodSymbol?.Name;
         var containingType = methodSymbol?.ContainingType;
 
-        return (containingType?.ContainingNamespace?.ToString(), containingType?.Name, methodName);
+        var memberAccess = invocationExpression.Expression as MemberAccessExpressionSyntax;
+
+        return (containingType?.ContainingNamespace?.ToString(), containingType?.Name, methodName, memberAccess);
 
         //   HandleExpression(invocationExpression.Expression);
         //

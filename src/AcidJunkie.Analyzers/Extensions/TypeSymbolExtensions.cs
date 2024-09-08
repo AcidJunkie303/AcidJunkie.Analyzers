@@ -1,5 +1,4 @@
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 
 namespace AcidJunkie.Analyzers.Extensions;
 
@@ -71,16 +70,12 @@ internal static class TypeSymbolExtensions
 
     public static bool ImplementsOrIsInterface(this ITypeSymbol symbol, string interfaceNamespace, string interfaceName, params ITypeSymbol[] typeArguments)
     {
-        var typeSyntax = SyntaxFactory.ParseTypeName("System.Collections.Generic.List<int>");
-
-        Console.WriteLine(typeSyntax);
-
         if (symbol.ContainingNamespace.ToString().EqualsOrdinal(interfaceNamespace)
             && symbol.Name.EqualsOrdinal(interfaceName))
         {
             if (symbol is INamedTypeSymbol typeSymbol)
             {
-                if (typeSymbol.TypeArguments.Length == typeArguments.Length)
+                if (typeSymbol.TypeArguments.Length != typeArguments.Length)
                 {
                     return false;
                 }

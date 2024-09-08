@@ -42,6 +42,12 @@ public sealed class MissingEqualityComparerAnalyzer : DiagnosticAnalyzer
     {
         var invocationExpression = (InvocationExpressionSyntax)context.Node;
 
+        var (owningTypeNameSpace, owningTypeName, methodName, memberAccess) = invocationExpression.GetInvokedMethod(context.SemanticModel);
+        if (memberAccess is null)
+        {
+            return;
+        }
+
         var keyTypeParameterName = GetKeyTypeParameterName();
         if (keyTypeParameterName is null)
         {
@@ -52,6 +58,11 @@ public sealed class MissingEqualityComparerAnalyzer : DiagnosticAnalyzer
         if (keyType is null)
         {
             return;
+        }
+
+        if (keyType.IsValueType)
+        {
+            return; // Value types use structural comparison
         }
 
         if (keyType.ImplementsGenericEquatable() && keyType.IsGetHashCodeOverridden())
@@ -66,8 +77,6 @@ public sealed class MissingEqualityComparerAnalyzer : DiagnosticAnalyzer
 
         string? GetKeyTypeParameterName()
         {
-            var (owningTypeNameSpace, owningTypeName, methodName) = invocationExpression.GetInvokedMethod(context.SemanticModel);
-
             return owningTypeNameSpace is not null && owningTypeName is not null && methodName is not null
                 ? GenericKeyParameterNameProvider.GetKeyParameterName(owningTypeNameSpace, owningTypeName, methodName)
                 : null;
@@ -91,8 +100,7 @@ public sealed class MissingEqualityComparerAnalyzer : DiagnosticAnalyzer
             return false;
         }
 
-        context.ReportDiagnostic(Diagnostic.Create(DiagnosticRules.MissingEqualityComparer.Rule, invocationExpression.Expression.GetLocation()));
-        Console.Write("");
+        context.ReportDiagnostic(Diagnostic.Create(DiagnosticRules.MissingEqualityComparer.Rule, memberAccess.Name.GetLocation()));
 
         /*
 

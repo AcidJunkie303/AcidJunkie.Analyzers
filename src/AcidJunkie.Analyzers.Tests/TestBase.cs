@@ -1,3 +1,4 @@
+using AcidJunkie.Analyzers.Tests.Helpers;
 using AcidJunkie.Analyzers.Tests.Runtime;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -9,7 +10,7 @@ using Microsoft.Data.SqlClient;
 namespace AcidJunkie.Analyzers.Tests;
 
 public abstract class TestBase<TAnalyzer>
-            where TAnalyzer : DiagnosticAnalyzer, new()
+    where TAnalyzer : DiagnosticAnalyzer, new()
 {
     protected static DiagnosticResult CreateExpectedDiagnostic(string diagnosticId, int startLine, int startCharacter, int endLine, int endCharacter, string? expectedMessage = null)
     {
@@ -63,4 +64,6 @@ public abstract class TestBase<TAnalyzer>
     }
 
     protected string ShowTree(SyntaxNode node) => SyntaxTreeVisualizer.GetHierarchy(node);
+
+    protected CSharpAnalyzerTestBuilder<TAnalyzer> CreateTesterBuilder() => CSharpAnalyzerTestBuilder.Create<TAnalyzer>();
 }
