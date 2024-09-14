@@ -56,6 +56,10 @@ public abstract class TestBase<TAnalyzer>
         return analyzerTest;
     }
 
+    /// <summary>
+    /// Used to traverse the code for debugging purposes
+    /// </summary>
+    /// <param name="code"></param>
     protected void Traverse(string code)
     {
         var tree = CSharpSyntaxTree.ParseText(code);
@@ -63,6 +67,10 @@ public abstract class TestBase<TAnalyzer>
         walker.Visit(tree.GetCompilationUnitRoot());
     }
 
+    /// <summary>
+    /// Returns a formatted string showing the code hierarchy
+    /// </summary>
+    /// <param name="node"></param>
     protected string ShowTree(SyntaxNode node) => SyntaxTreeVisualizer.GetHierarchy(node);
 
     protected CSharpAnalyzerTestBuilder<TAnalyzer> CreateTesterBuilder() => CSharpAnalyzerTestBuilder.Create<TAnalyzer>();

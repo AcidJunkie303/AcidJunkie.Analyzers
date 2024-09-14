@@ -105,7 +105,52 @@ public class MissingEqualityComparerAnalyzerTests : TestBase<MissingEqualityComp
     //
     [InlineData("/* 0106 */  refTypeCollection.ToImmutableDictionary( a => a, a => a, refTypeEqualityComparer );")]
     [InlineData("/* 0107 */  refTypeCollection.{|AJ0001:ToImmutableDictionary|}( a => a, a => a );")]
+    //
+    // ImmutableHashSet.Create() method for RefType
+    //
+    [InlineData("/* 0108 */  ImmutableHashSet.Create<RefType>(refTypeEqualityComparer);")]
+    [InlineData("/* 0109 */  ImmutableHashSet.{|AJ0001:Create<RefType>|}();")]
+    //
+    // ImmutableHashSet.CreateRange() method for RefType
+    //
+    [InlineData("/* 0110 */  ImmutableHashSet.CreateRange<RefType>( refTypeEqualityComparer, [] );")]
+    [InlineData("/* 0111 */  ImmutableHashSet.{|AJ0001:CreateRange<RefType>|}( [] );")]
+    //
+    // ImmutableHashSet.CreateBuilder() method for RefType
+    //
+    [InlineData("/* 0112 */  ImmutableHashSet.CreateBuilder<RefType>( refTypeEqualityComparer );")]
+    [InlineData("/* 0113 */  ImmutableHashSet.{|AJ0001:CreateBuilder<RefType>|}( );")]
+    //
+    // ImmutableHashSet.ToImmutableHashSet() for RefType
+    //
+    [InlineData("/* 0114 */  refTypeCollection.ToImmutableHashSet( refTypeEqualityComparer );")]
+    [InlineData("/* 0115 */  refTypeCollection.{|AJ0001:ToImmutableHashSet|}( );")]
+    //
+    // FrozenDictionary.ToFrozenDictionary() for RefType
+    //
+    [InlineData("/* 0200 */  refTypeCollection.ToFrozenDictionary( a => a, a => a, refTypeEqualityComparer );")]
+    [InlineData("/* 0201 */  refTypeCollection.{|AJ0001:ToFrozenDictionary|}( a => a, a => a );")]
+    //
+    // FrozenSet.ToFrozenSet() for RefType
+    //
+    [InlineData("/* 0300 */  refTypeCollection.ToFrozenSet( refTypeEqualityComparer );")]
+    [InlineData("/* 0301 */  refTypeCollection.{|AJ0001:ToFrozenSet|}( );")]
     public async Task Theory_Various_Method_Invocations(string insertionCode)
+    {
+        var code = CreateCode(insertionCode);
+
+        await CreateTesterBuilder()
+            .WithTestCode(code)
+            .Build()
+            .RunAsync();
+    }
+
+    [Theory]
+    [InlineData("/* 1000 */  new Dictionary<RefType,int>( refTypeEqualityComparer );")]
+    [InlineData("/* 1001 */  {|AJ0001:new Dictionary<RefType,int>|}();")]
+    [InlineData("/* 1002 */  Dictionary<RefType,int> dict = new ( refTypeEqualityComparer );")] // implicit creation
+    [InlineData("/* 1003 */  Dictionary<RefType,int> dict = {|AJ0001:new|} ( );")] // implicit creation
+    public async Task Theory_DictionaryCreation(string insertionCode)
     {
         var code = CreateCode(insertionCode);
 
@@ -120,7 +165,7 @@ public class MissingEqualityComparerAnalyzerTests : TestBase<MissingEqualityComp
     [InlineData("/* 9002 */  refTypeCollection.ToHashSet( (IEqualityComparer<RefType>) refTypeEqualityComparer );")] // variable with cast
     [InlineData("/* 9003 */  refTypeCollection.ToHashSet( RefType.EqualityComparers.Default );")] // property
     [InlineData("/* 9004 */  refTypeCollection.ToHashSet( GetRefTypeEqualityComparer() );")] // method
-    [InlineData("/* 9005 */  refTypeCollection.{|AJ0001:ToHashSet|}( null );")] // method
+    [InlineData("/* 9005 */  refTypeCollection.{|AJ0001:ToHashSet|}( null );")] // null reference
     public async Task Theory_CheckVariousWaysOfPassingEqualityComparer(string insertionCode)
     {
         var code = CreateCode(insertionCode);
@@ -135,9 +180,7 @@ public class MissingEqualityComparerAnalyzerTests : TestBase<MissingEqualityComp
     public async Task WhenInvocationOnValueType_ThenOk()
     {
         // value types perform structural comparison by default -> no equality comparer required
-        const string insertionCode = "valueTypeCollection.ToHashSet();";
-
-        var code = CreateCode(insertionCode);
+        var code = CreateCode("valueTypeCollection.ToHashSet();");
 
         await CreateTesterBuilder()
             .WithTestCode(code)
@@ -149,9 +192,8 @@ public class MissingEqualityComparerAnalyzerTests : TestBase<MissingEqualityComp
     public async Task WhenPassingNullEqualityComparer_ThenDiagnose()
     {
         // value types perform structural comparison by default -> no equality comparer required
-        const string insertionCode = "refTypeCollection.{|AJ0001:ToHashSet|}( );";
 
-        var code = CreateCode(insertionCode);
+        var code = CreateCode("refTypeCollection.{|AJ0001:ToHashSet|}( );");
 
         await CreateTesterBuilder()
             .WithTestCode(code)
@@ -163,9 +205,8 @@ public class MissingEqualityComparerAnalyzerTests : TestBase<MissingEqualityComp
     public async Task WhenFullyEquatableRefType_ThenOk()
     {
         // FullEquatableRefType implements IEquatable<T> and overrides GetHashCode() => no equality comparer required
-        const string insertionCode = "fullEquatableRefTypeCollection.Distinct();";
 
-        var code = CreateCode(insertionCode);
+        var code = CreateCode("fullEquatableRefTypeCollection.Distinct();");
 
         await CreateTesterBuilder()
             .WithTestCode(code)
@@ -177,9 +218,8 @@ public class MissingEqualityComparerAnalyzerTests : TestBase<MissingEqualityComp
     public async Task WhenPartialEquatableRefType_ThenOk()
     {
         // PartialEquatableRefType implements IEquatable<T> but does not override GetHashCode() => equality comparer required
-        const string insertionCode = "partialEquatableRefTypeCollection.{|AJ0001:Distinct|}();";
 
-        var code = CreateCode(insertionCode);
+        var code = CreateCode("partialEquatableRefTypeCollection.{|AJ0001:Distinct|}();");
 
         await CreateTesterBuilder()
             .WithTestCode(code)
@@ -191,9 +231,8 @@ public class MissingEqualityComparerAnalyzerTests : TestBase<MissingEqualityComp
     public async Task WhenNonEquatableRefType_ThenOk()
     {
         // RefType does not implement IEquatable<T> and does not override GetHashCode() => equality comparer required
-        const string insertionCode = "partialEquatableRefTypeCollection.{|AJ0001:Distinct|}();";
 
-        var code = CreateCode(insertionCode);
+        var code = CreateCode("partialEquatableRefTypeCollection.{|AJ0001:Distinct|}();");
 
         await CreateTesterBuilder()
             .WithTestCode(code)
@@ -208,6 +247,7 @@ public class MissingEqualityComparerAnalyzerTests : TestBase<MissingEqualityComp
                 using System.Collections;
                 using System.Collections.Generic;
                 using System.Collections.Immutable;
+                using System.Collections.Frozen;
                 using System.Linq;
                
                 namespace Tests;

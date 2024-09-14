@@ -4,16 +4,22 @@
 - Type Member Ordering Analyzer
 - Missing IEqualityComparer Argument
 
-# Analyzers
+# Analyzers to Create
 
-## Namespace Using Ordering Analyzer
-Ensures that the namespace using directives are ordered accodring to rules.
-These rules can be configured in a .globalconfig file.
+| Analyzer | Status | Description |
+|----------|--------|-------------|
+| Missing Equality Comparer | Complete | For various LINQ methods (ToDictionary etc.), check if the underlying type of TKey does implement IEquatable<T> as well as override GetHashCode() |
+| Logger parameter should be first parameter | TODO | In constructors, parameters of type `ILogger` or `ILogger<T>` should be the first parameter |
+| Namespace using order | TODO | Namespace usings should be ordered by System, System.* and then all the other namespaces. Also provide a code-fix feature to automatically fix it. |
+| Member Ordering | TODO | Ensure type members are ordered like (default): const, static fields, readonly fields, fields, properties, events, delegates, static constructors, public constructors, other constructors, public methods, protected methods, internal methods, private methods, types. Order should be configurable through `.globalconfig`  file |
+| Object not disposed | TODO | There are already analyzers to check that for direct object creation, the object is being disposed in all execution paths like: `using var stream = new MemoryStream(...)`. However, if a disposable object is returned from a method (e.g. `sqlConnection.CreateCommand()`), these analyzers don't check for that. Therefore, it would be good to have such an analyzer. It should also be configurable through `.globalconfig` which types to ignore (e.g. `System.Threading.Tasks.Task`) as well as which methods to ignore. |
+| String interpolation is not necessary | TODO | Check for interpolated string where interpolation is not  required. e.g.: `var whatever = $"bla bla";` |
+| Verbatim string is not necessary | TODO | Sometimes, verbatim string literals are used but are not required. e.g.: `const string whatever = @"bla bla";` |
+| Awaiting completed task not necessary (1) | TODO | In async methods, where there is already an await statement, the following code would raise this warning: `await Task.CompletedTask`. Same applies to `await Task.FromResult()`. |
+| Awaiting completed task not necessary (2) | TODO | In async methods, where the only statatement with the `await` keyword is `await Task.CompletedTask`, raise a suggestion to remove the await keyword and return `Task.CompletedTask`. Same applies to `await Task.FromResult()`.
 
-## Type Member Ordering Analyzer
-Ensures that type members (fields, properties, methods, constructors) appear in a configurable order.
-
-## Missing IEqualityComparer Argument
-Ensures that method invocations, dictionary or hash-set creation use a compatible IEqualityComparer parameter in the following cases:
-- The type used for the key does not implement IEquatable<T> and/or GetHashCode() is not implemented.
-- The type used for a HashSet<T> does not implement IEquatable<T> and/or GetHashCode() is not implemented. 
+# Other Open Points
+| Summary | Status | Description |
+|---------|--------|-------------|
+| Build pipeline and upload to NuGet server | TODO | |
+| Unified settings handling | TODO | Create an easy way to retrieve the config for every analyzer diagnostic separately |

@@ -47,4 +47,10 @@ internal static class SyntaxNodeExtensions
 
         return topmostClass;
     }
+
+    public static Location CreateLocationSpan(this SyntaxNode node, SyntaxNode otherNode)
+        => node.SyntaxTree.CreateLocationSpan(node.GetLocation(), otherNode.GetLocation());
+
+    public static Location CreateLocationSpan(this SyntaxNode node, Location otherLocation)
+        => node.SyntaxTree.CreateLocationSpan(node.GetLocation(), otherLocation);
 }

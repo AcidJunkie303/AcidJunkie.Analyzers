@@ -31,10 +31,149 @@ public sealed class MissingEqualityComparerAnalyzer : DiagnosticAnalyzer
 
     private void AnalyzeImplicitObjectCreation(SyntaxNodeAnalysisContext context)
     {
+        var implicitObjectCreation = (ImplicitObjectCreationExpressionSyntax)context.Node;
+
+        var namedTypeSymbol = context.SemanticModel.GetTypeInfo(implicitObjectCreation).Type as INamedTypeSymbol;
+        if (namedTypeSymbol is null)
+        {
+            return;
+        }
+
+        AnalyzeObjectCreationCore(context, implicitObjectCreation.ArgumentList, implicitObjectCreation.NewKeyword.GetLocation(), namedTypeSymbol);
+
     }
 
     private void AnalyzeObjectCreation(SyntaxNodeAnalysisContext context)
     {
+        var objectCreation = (ObjectCreationExpressionSyntax)context.Node;
+
+        var namedTypeSymbol = context.SemanticModel.GetSymbolInfo(objectCreation.Type).Symbol as INamedTypeSymbol;
+        if (namedTypeSymbol is null)
+        {
+            return;
+        }
+
+        var nameNode = objectCreation.ChildNodes().OfType<NameSyntax>().FirstOrDefault();
+        var location = nameNode is null
+            ? objectCreation.NewKeyword.GetLocation()
+            : context.Node.SyntaxTree.CreateLocationSpan(objectCreation.NewKeyword.GetLocation(), nameNode.GetLocation());
+
+        AnalyzeObjectCreationCore(context, objectCreation.ArgumentList, location, namedTypeSymbol);
+
+        /*
+        var keyTypeParameterName = GetKeyTypeParameterName();
+        if (keyTypeParameterName is null)
+        {
+            return;
+        }
+
+        var keyParameterIndex = namedTypeSymbol.TypeParameters.IndexOf(a => a.Name.EqualsOrdinal(keyTypeParameterName));
+        if (keyParameterIndex < 0)
+        {
+            return;
+        }
+
+        if (namedTypeSymbol.TypeArguments.Length != namedTypeSymbol.TypeParameters.Length)
+        {
+            return;
+        }
+
+        var keyType = namedTypeSymbol.TypeArguments[keyParameterIndex];
+        if (keyType.IsValueType)
+        {
+            return; // Value types use structural comparison
+        }
+
+        if (keyType.ImplementsGenericEquatable() && keyType.IsGetHashCodeOverridden())
+        {
+            return;
+        }
+
+        if (IsAnyParameterEqualityComparer(context, keyType, objectCreation.ArgumentList))
+        {
+            return;
+        }
+
+        context.ReportDiagnostic(Diagnostic.Create(DiagnosticRules.MissingEqualityComparer.Rule, objectCreation.GetLocation()));
+
+        string? GetKeyTypeParameterName()
+        {
+            var ns = namedTypeSymbol.ContainingNamespace?.ToString() ?? string.Empty;
+
+            return GenericKeyParameterNameProvider.GetKeyParameterNameForCreation(ns, namedTypeSymbol.Name, namedTypeSymbol.TypeParameters.Length);
+        }
+        */
+    }
+
+    private static void AnalyzeObjectCreationCore(SyntaxNodeAnalysisContext context, ArgumentListSyntax? argumentList, Location locationToReport, INamedTypeSymbol objectTypeBeingCreated)
+    {
+        var keyTypeParameterName = GetKeyTypeParameterName();
+        if (keyTypeParameterName is null)
+        {
+            return;
+        }
+
+        var keyParameterIndex = objectTypeBeingCreated.TypeParameters.IndexOf(a => a.Name.EqualsOrdinal(keyTypeParameterName));
+        if (keyParameterIndex < 0)
+        {
+            return;
+        }
+
+        if (objectTypeBeingCreated.TypeArguments.Length != objectTypeBeingCreated.TypeParameters.Length)
+        {
+            return;
+        }
+
+        var keyType = objectTypeBeingCreated.TypeArguments[keyParameterIndex];
+        if (keyType.IsValueType)
+        {
+            return; // Value types use structural comparison
+        }
+
+        if (keyType.ImplementsGenericEquatable() && keyType.IsGetHashCodeOverridden())
+        {
+            return;
+        }
+
+        if (IsAnyParameterEqualityComparer(context, keyType, argumentList))
+        {
+            return;
+        }
+
+        context.ReportDiagnostic(Diagnostic.Create(DiagnosticRules.MissingEqualityComparer.Rule, locationToReport));
+
+        string? GetKeyTypeParameterName()
+        {
+            var ns = objectTypeBeingCreated.ContainingNamespace?.ToString() ?? string.Empty;
+
+            return GenericKeyParameterNameProvider.GetKeyParameterNameForCreation(ns, objectTypeBeingCreated.Name, objectTypeBeingCreated.TypeParameters.Length);
+        }
+
+#pragma warning disable S125
+        /*
+        var (owningTypeNameSpace, owningTypeName, methodName, memberAccess) = invocationExpression.GetInvokedMethod(context.SemanticModel);
+        if (memberAccess is null)
+        {
+            return;
+        }
+
+        var keyTypeParameterName = GetKeyTypeParameterName();
+        if (keyTypeParameterName is null)
+        {
+            return;
+        }
+
+        var keyType = invocationExpression.GetTypeForTypeParameter(context.SemanticModel, keyTypeParameterName);
+        if (keyType is null)
+        {
+            return;
+        }
+
+        if (keyType.IsValueType)
+        {
+            return; // Value types use structural comparison
+        }
+        */
 
     }
 
@@ -70,7 +209,7 @@ public sealed class MissingEqualityComparerAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        if (IsAnyParameterEqualityComparer())
+        if (IsAnyParameterEqualityComparer(context, keyType, invocationExpression.ArgumentList))
         {
             return;
         }
@@ -78,27 +217,8 @@ public sealed class MissingEqualityComparerAnalyzer : DiagnosticAnalyzer
         string? GetKeyTypeParameterName()
         {
             return owningTypeNameSpace is not null && owningTypeName is not null && methodName is not null
-                ? GenericKeyParameterNameProvider.GetKeyParameterName(owningTypeNameSpace, owningTypeName, methodName)
+                ? GenericKeyParameterNameProvider.GetKeyParameterNameForInvocation(owningTypeNameSpace, owningTypeName, methodName)
                 : null;
-        }
-
-        bool IsAnyParameterEqualityComparer()
-        {
-            foreach (var argument in invocationExpression.ArgumentList.Arguments)
-            {
-                var argumentType = argument.GetArgumentType(context.SemanticModel);
-                if (argumentType is null)
-                {
-                    continue;
-                }
-
-                if (argumentType.ImplementsOrIsInterface("System.Collections.Generic", "IEqualityComparer", keyType))
-                {
-                    return true;
-                }
-            }
-
-            return false;
         }
 
         context.ReportDiagnostic(Diagnostic.Create(DiagnosticRules.MissingEqualityComparer.Rule, memberAccess.Name.GetLocation()));
@@ -141,6 +261,30 @@ public sealed class MissingEqualityComparerAnalyzer : DiagnosticAnalyzer
         context.ReportDiagnostic(Diagnostic.Create(DiagnosticRules.MissingEqualityComparer.Rule, firstArgumentChild.GetLocation()));
     }
     */
+    }
+
+    private static bool IsAnyParameterEqualityComparer(SyntaxNodeAnalysisContext context, ITypeSymbol keyType, ArgumentListSyntax? argumentList)
+    {
+        if (argumentList is null)
+        {
+            return false;
+        }
+
+        foreach (var argument in argumentList.Arguments)
+        {
+            var argumentType = argument.GetArgumentType(context.SemanticModel);
+            if (argumentType is null)
+            {
+                continue;
+            }
+
+            if (argumentType.ImplementsOrIsInterface("System.Collections.Generic", "IEqualityComparer", keyType))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     internal static class DiagnosticRules

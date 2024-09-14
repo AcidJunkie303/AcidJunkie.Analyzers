@@ -47,66 +47,7 @@ public static class InvocationExpressionSyntaxExtensions
 
         return (containingType?.ContainingNamespace?.ToString(), containingType?.Name, methodName, memberAccess);
 
-        //   HandleExpression(invocationExpression.Expression);
-        //
-        //   return result;
-        //
-        //   void HandleExpression(SyntaxNode node)
-        //   {
-        //       if (node is IdentifierNameSyntax identifierName )
-        //       {
-        //           var methodName = identifierName.Identifier.Text;
-        //           var methodSymbolInfo = semanticModel.GetSymbolInfo(identifierName);
-        //           var methodSymbol = methodSymbolInfo.Symbol as IMethodSymbol;
-        //
-        //           var containingTypeNamespace = methodSymbol?.ContainingNamespace.Name;
-        //           var containingTypeName = methodSymbol?.Name;
-        //
-        //           if (containingTypeNamespace is not null && containingTypeName is not null)
-        //           {
-        //               result.Add((containingTypeNamespace, containingTypeName, methodName));
-        //           }
-        //       }
-        //
-        //       foreach (var child in node.ChildNodes())
-        //       {
-        //           HandleExpression(child);
-        //       }
-
     }
-
-    //  var node = invocationExpression.Expression;
-    //
-    //  while (node is MemberAccessExpressionSyntax memberAccessExpression)
-    //  {
-    //      // Traverse the member access chain
-    //      node = memberAccessExpression.Expression;
-    //  }
-    //
-    //  if (node is IdentifierNameSyntax identifierName)
-    //  {
-    //      var methodName = identifierName.Identifier.Text;
-    //      var methodSymbolInfo = semanticModel.GetSymbolInfo(identifierName);
-    //      var methodSymbol = methodSymbolInfo.Symbol as IMethodSymbol;
-    //
-    //      return (methodSymbol?.ContainingNamespace?.Name, methodSymbol?.Name, methodName);
-    //
-    //      /*
-    //      var symbolInfo = semanticModel.GetSymbolInfo(identifierName.Expression).Symbol as ITypeSymbol;
-    //
-    //      */
-    //  }
-    //
-    //  return (null, null, null);
-    //  /*
-    //  if (invocationExpression.Expression is IdentifierNameSyntax identifierName)
-    //  {
-    //      IdentifierNameSyntax
-    //      // Handle simple method calls without member access
-    //      var methodName = identifierName.Identifier.Text;
-    //      Console.WriteLine($"Method '{methodName}' is invoked.");
-    //  }
-    //  */
 
     public static ITypeSymbol? GetTypeForTypeParameter(this InvocationExpressionSyntax invocationExpression, SemanticModel semanticModel, string typeParameterName)
     {
