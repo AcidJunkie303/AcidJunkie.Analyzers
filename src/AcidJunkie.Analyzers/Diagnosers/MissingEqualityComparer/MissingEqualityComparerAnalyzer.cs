@@ -183,7 +183,7 @@ public sealed class MissingEqualityComparerAnalyzer : DiagnosticAnalyzer
             public const string Category = "Design";
             public const string DiagnosticId = "AJ0001";
 
-            public static readonly LocalizableString Title = "Provide an IEqualityComparer argument";
+            public static readonly LocalizableString Title = "Provide an IEqualityComparer<T> argument";
             public static readonly LocalizableString MessageFormat = "To prevent unexpected results, use a IEqualityComparer argument because the type used for hash-matching does not fully implement IEquatable<T> together with GetHashCode()";
             public static readonly LocalizableString Description = MessageFormat;
             public static readonly DiagnosticDescriptor Rule = new(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Error, isEnabledByDefault: true, description: Description);
