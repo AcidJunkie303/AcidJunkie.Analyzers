@@ -6,8 +6,6 @@ namespace AcidJunkie.Analyzers;
 
 internal static class SyntaxTreeVisualizer
 {
-    //public static string GetHierarchy(SyntaxTree tree) => GetHierarchy(tree.GetRoot());
-
     public static string GetHierarchy(SyntaxNode node)
     {
         var visitor = new Walker();

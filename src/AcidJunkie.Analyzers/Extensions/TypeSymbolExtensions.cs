@@ -49,25 +49,6 @@ internal static class TypeSymbolExtensions
             .OfType<IMethodSymbol>()
             .Any(a => a.Parameters.Length == 0);
 
-    public static bool ImplementsOrIsInterface(this ITypeSymbol symbol, string interfaceNamespace, string interfaceName, int typeArgumentsCount)
-    {
-        if (symbol.ContainingNamespace.ToString().EqualsOrdinal(interfaceNamespace)
-            && symbol.Name.EqualsOrdinal(interfaceName))
-        {
-            if (symbol is INamedTypeSymbol typeSymbol)
-            {
-                return typeSymbol.TypeArguments.Length == typeArgumentsCount;
-            }
-
-            return typeArgumentsCount == 0;
-        }
-
-        return symbol.AllInterfaces
-            .Where(a => a.TypeParameters.Length == typeArgumentsCount)
-            .Where(a => a.ContainingNamespace.ToString().EqualsOrdinal(interfaceNamespace))
-            .Any(a => a.Name.EqualsOrdinal(interfaceName));
-    }
-
     public static string GetFullNamespace(this ITypeSymbol symbol)
         => symbol.ContainingNamespace?.ToString() ?? string.Empty;
 

@@ -1,7 +1,10 @@
+using System.Diagnostics.CodeAnalysis;
 using AcidJunkie.Analyzers.Diagnosers.MissingEqualityComparer;
 
 namespace AcidJunkie.Analyzers.Tests.Diagnosers.MissingEqualityComparer;
 
+[SuppressMessage("Code Smell", "S4144:Methods should not have identical implementations", Justification = "Splitted up the test into different methods for different categories")]
+[SuppressMessage("Code Smell", "S2699:Tests should include assertions", Justification = "This is done internally by AnalyzerTest.RunAsync()")]
 public class MissingEqualityComparerAnalyzerTests : TestBase<MissingEqualityComparerAnalyzer>
 {
     [Theory]
@@ -137,7 +140,7 @@ public class MissingEqualityComparerAnalyzerTests : TestBase<MissingEqualityComp
     [InlineData("/* 0301 */  refTypeCollection.{|AJ0001:ToFrozenSet|}( );")]
     public async Task Theory_Various_Method_Invocations(string insertionCode)
     {
-        var code = CreateCode(insertionCode);
+        var code = CreateTestCode(insertionCode);
 
         await CreateTesterBuilder()
             .WithTestCode(code)
@@ -152,7 +155,7 @@ public class MissingEqualityComparerAnalyzerTests : TestBase<MissingEqualityComp
     [InlineData("/* 1003 */  Dictionary<RefType,int> dict = {|AJ0001:new|} ( );")] // implicit creation
     public async Task Theory_DictionaryCreation(string insertionCode)
     {
-        var code = CreateCode(insertionCode);
+        var code = CreateTestCode(insertionCode);
 
         await CreateTesterBuilder()
             .WithTestCode(code)
@@ -168,7 +171,7 @@ public class MissingEqualityComparerAnalyzerTests : TestBase<MissingEqualityComp
     [InlineData("/* 9005 */  refTypeCollection.{|AJ0001:ToHashSet|}( null );")] // null reference
     public async Task Theory_CheckVariousWaysOfPassingEqualityComparer(string insertionCode)
     {
-        var code = CreateCode(insertionCode);
+        var code = CreateTestCode(insertionCode);
 
         await CreateTesterBuilder()
             .WithTestCode(code)
@@ -180,7 +183,7 @@ public class MissingEqualityComparerAnalyzerTests : TestBase<MissingEqualityComp
     public async Task WhenInvocationOnValueType_ThenOk()
     {
         // value types perform structural comparison by default -> no equality comparer required
-        var code = CreateCode("valueTypeCollection.ToHashSet();");
+        var code = CreateTestCode("valueTypeCollection.ToHashSet();");
 
         await CreateTesterBuilder()
             .WithTestCode(code)
@@ -193,7 +196,7 @@ public class MissingEqualityComparerAnalyzerTests : TestBase<MissingEqualityComp
     {
         // value types perform structural comparison by default -> no equality comparer required
 
-        var code = CreateCode("refTypeCollection.{|AJ0001:ToHashSet|}( );");
+        var code = CreateTestCode("refTypeCollection.{|AJ0001:ToHashSet|}( );");
 
         await CreateTesterBuilder()
             .WithTestCode(code)
@@ -206,7 +209,7 @@ public class MissingEqualityComparerAnalyzerTests : TestBase<MissingEqualityComp
     {
         // FullEquatableRefType implements IEquatable<T> and overrides GetHashCode() => no equality comparer required
 
-        var code = CreateCode("fullEquatableRefTypeCollection.Distinct();");
+        var code = CreateTestCode("fullEquatableRefTypeCollection.Distinct();");
 
         await CreateTesterBuilder()
             .WithTestCode(code)
@@ -219,7 +222,7 @@ public class MissingEqualityComparerAnalyzerTests : TestBase<MissingEqualityComp
     {
         // PartialEquatableRefType implements IEquatable<T> but does not override GetHashCode() => equality comparer required
 
-        var code = CreateCode("partialEquatableRefTypeCollection.{|AJ0001:Distinct|}();");
+        var code = CreateTestCode("partialEquatableRefTypeCollection.{|AJ0001:Distinct|}();");
 
         await CreateTesterBuilder()
             .WithTestCode(code)
@@ -232,7 +235,7 @@ public class MissingEqualityComparerAnalyzerTests : TestBase<MissingEqualityComp
     {
         // RefType does not implement IEquatable<T> and does not override GetHashCode() => equality comparer required
 
-        var code = CreateCode("partialEquatableRefTypeCollection.{|AJ0001:Distinct|}();");
+        var code = CreateTestCode("partialEquatableRefTypeCollection.{|AJ0001:Distinct|}();");
 
         await CreateTesterBuilder()
             .WithTestCode(code)
@@ -240,126 +243,124 @@ public class MissingEqualityComparerAnalyzerTests : TestBase<MissingEqualityComp
             .RunAsync();
     }
 
-    private static string CreateCode(string insertionCode)
-    {
-        return $$"""
-                using System;
-                using System.Collections;
-                using System.Collections.Generic;
-                using System.Collections.Immutable;
-                using System.Collections.Frozen;
-                using System.Linq;
-               
-                namespace Tests;
+    private static string CreateTestCode(string insertionCode) =>
+        $$"""
+          using System;
+          using System.Collections;
+          using System.Collections.Generic;
+          using System.Collections.Immutable;
+          using System.Collections.Frozen;
+          using System.Linq;
 
-                public static class Test
-                {
-                    public static void TestMethod()
-                    {
-                        var refTypeCollection = new RefType[0];
-                        var refTypeEqualityComparer = new RefTypeEqualityComparer();
-        
-                        var partialEquatableRefTypeCollection = new PartialEquatableRefType[0];
-                        var partialEquatableRefTypeEqualityComparer = new PartialEquatableRefTypeEqualityComparer();
+          namespace Tests;
 
-                        var fullEquatableRefTypeCollection = new FullEquatableRefType[0];
-                        var fullEquatableRefTypeEqualityComparer = new FullEquatableRefTypeEqualityComparer();
+          public static class Test
+          {
+              public static void TestMethod()
+              {
+                  var refTypeCollection = new RefType[0];
+                  var refTypeEqualityComparer = new RefTypeEqualityComparer();
+          
+                  var partialEquatableRefTypeCollection = new PartialEquatableRefType[0];
+                  var partialEquatableRefTypeEqualityComparer = new PartialEquatableRefTypeEqualityComparer();
+          
+                  var fullEquatableRefTypeCollection = new FullEquatableRefType[0];
+                  var fullEquatableRefTypeEqualityComparer = new FullEquatableRefTypeEqualityComparer();
+          
+                  var valueTypeCollection = new ValueType[0];
+                  
+                  {{insertionCode}}
+              }
+              
+              private static IEqualityComparer<RefType> GetRefTypeEqualityComparer() => new RefTypeEqualityComparer();
+              private static IEqualityComparer<PartialEquatableRefType> GePartialEquatableRefTypeEqualityComparer() => new PartialEquatableRefTypeEqualityComparer();
+              private static IEqualityComparer<FullEquatableRefType> GetFullEquatableRefTypeEqualityComparer() => new FullEquatableRefTypeEqualityComparer();
+              
+          }
 
-                        var valueTypeCollection = new ValueType[0];
-                        
-                        {{insertionCode}}
-                    }
-                    
-                    private static IEqualityComparer<RefType> GetRefTypeEqualityComparer() => new RefTypeEqualityComparer();
-                    private static IEqualityComparer<PartialEquatableRefType> GePartialEquatableRefTypeEqualityComparer() => new PartialEquatableRefTypeEqualityComparer();
-                    private static IEqualityComparer<FullEquatableRefType> GetFullEquatableRefTypeEqualityComparer() => new FullEquatableRefTypeEqualityComparer();
-                    
-                }
+          ////////////////////////////////////////////////////////////////
+          // Type definitions
+          ////////////////////////////////////////////////////////////////
+          public sealed class RefType
+          {
+              public string StringValue { get; set; }
+              public int IntValue { get; set; }
+              
+              public static class EqualityComparers
+              {
+                  public static IEqualityComparer<RefType> Default { get; } = new RefTypeEqualityComparer();
+              } 
+          }
 
-                public sealed class RefType
-                {
-                    public string StringValue { get; set; }
-                    public int IntValue { get; set; }
-                    
-                    public static class EqualityComparers
-                    {
-                        public static IEqualityComparer<RefType> Default { get; } = new RefTypeEqualityComparer();
-                    } 
-                }
-                
-                public struct ValueType
-                {
-                    public string StringValue { get; set; }
-                    public int IntValue { get; set; }
-                }
+          public struct ValueType
+          {
+              public string StringValue { get; set; }
+              public int IntValue { get; set; }
+          }
 
-                public sealed class PartialEquatableRefType : IEquatable<PartialEquatableRefType>
-                {
-                    public string StringValue { get; set; }
-                    public int IntValue { get; set; }
-                    
-                    public bool Equals(PartialEquatableRefType? other)
-                    {
-                        return other is not null
-                            && IntValue == other.IntValue
-                            && StringValue == other.StringValue;
-                    }
-                    
-                    public static class EqualityComparers
-                    {
-                        public static IEqualityComparer<PartialEquatableRefType> Default { get; } = new PartialEquatableRefTypeEqualityComparer();
-                    }
-                }
-                
-                public sealed class FullEquatableRefType : IEquatable<FullEquatableRefType>
-                {
-                    public string StringValue { get; set; }
-                    public int IntValue { get; set; }
-                    
-                    public bool Equals(FullEquatableRefType? other)
-                    {
-                        return other is not null
-                            && IntValue == other.IntValue
-                            && StringValue == other.StringValue;
-                    }
-                    
-                    public override int GetHashCode()
-                    {
-                        return StringComparer.Ordinal.GetHashCode(StringValue) ^ IntValue;
-                    }
-                    
-                    public static class EqualityComparers
-                    {
-                        public static IEqualityComparer<FullEquatableRefType> Default { get; } = new FullEquatableRefTypeEqualityComparer();
-                    }
-                }
-                
-                //////////////////////////////////
-                
-                public sealed class RefTypeEqualityComparer : IEqualityComparer<RefType>
-                {
-                    // we don't care about the actual correct implementation
-                    public bool Equals(RefType? x, RefType? y) => true;
-                    public int GetHashCode(RefType item) => 0;
-                }
-                
-                public sealed class PartialEquatableRefTypeEqualityComparer : IEqualityComparer<PartialEquatableRefType>
-                {
-                    // we don't care about the actual correct implementation
-                    public bool Equals(PartialEquatableRefType? x, PartialEquatableRefType? y) => true;
-                    public int GetHashCode(PartialEquatableRefType item) => 0;
-                }
+          public sealed class PartialEquatableRefType : IEquatable<PartialEquatableRefType>
+          {
+              public string StringValue { get; set; }
+              public int IntValue { get; set; }
+              
+              public bool Equals(PartialEquatableRefType? other)
+              {
+                  return other is not null
+                      && IntValue == other.IntValue
+                      && StringValue == other.StringValue;
+              }
+              
+              public static class EqualityComparers
+              {
+                  public static IEqualityComparer<PartialEquatableRefType> Default { get; } = new PartialEquatableRefTypeEqualityComparer();
+              }
+          }
 
-                public sealed class FullEquatableRefTypeEqualityComparer : IEqualityComparer<FullEquatableRefType>
-                {
-                    // we don't care about the actual correct implementation
-                    public bool Equals(FullEquatableRefType? x, FullEquatableRefType? y) => true;
-                    public int GetHashCode(FullEquatableRefType item) => 0;
-                }
+          public sealed class FullEquatableRefType : IEquatable<FullEquatableRefType>
+          {
+              public string StringValue { get; set; }
+              public int IntValue { get; set; }
+              
+              public bool Equals(FullEquatableRefType? other)
+              {
+                  return other is not null
+                      && IntValue == other.IntValue
+                      && StringValue == other.StringValue;
+              }
+              
+              public override int GetHashCode()
+              {
+                  return StringComparer.Ordinal.GetHashCode(StringValue) ^ IntValue;
+              }
+              
+              public static class EqualityComparers
+              {
+                  public static IEqualityComparer<FullEquatableRefType> Default { get; } = new FullEquatableRefTypeEqualityComparer();
+              }
+          }
 
-                //////////////////////////////////
-                
+          ////////////////////////////////////////////////////////////////
+          // EqualityComparer definitions
+          ////////////////////////////////////////////////////////////////
+          public sealed class RefTypeEqualityComparer : IEqualityComparer<RefType>
+          {
+              // we don't care about the actual correct implementation
+              public bool Equals(RefType? x, RefType? y) => true;
+              public int GetHashCode(RefType item) => 0;
+          }
 
-                """;
-    }
+          public sealed class PartialEquatableRefTypeEqualityComparer : IEqualityComparer<PartialEquatableRefType>
+          {
+              // we don't care about the actual correct implementation
+              public bool Equals(PartialEquatableRefType? x, PartialEquatableRefType? y) => true;
+              public int GetHashCode(PartialEquatableRefType item) => 0;
+          }
+
+          public sealed class FullEquatableRefTypeEqualityComparer : IEqualityComparer<FullEquatableRefType>
+          {
+              // we don't care about the actual correct implementation
+              public bool Equals(FullEquatableRefType? x, FullEquatableRefType? y) => true;
+              public int GetHashCode(FullEquatableRefType item) => 0;
+          }
+          """;
 }

@@ -17,3 +17,4 @@
 |---------|--------|-------------|
 | Build pipeline and upload to NuGet server | 🔵 | |
 | Unified settings handling | 🔵 | Create an easy way to retrieve the config for every analyzer diagnostic separately |
+| Logging | 🔵 | Create a simple logger which logs to a temporary directory. Since analyzers can run in parallel, file access need to be synchronized (e.g. throgh a named mutex). Logging should only be used to log fatal errors  |

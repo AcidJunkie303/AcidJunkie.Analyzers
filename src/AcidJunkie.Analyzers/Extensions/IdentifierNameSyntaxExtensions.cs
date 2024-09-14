@@ -17,32 +17,31 @@ internal static class IdentifierNameSyntaxExtensions
 
     public static VariableDeclaratorSyntax? FindLocalDeclaratorAndCreation(this IdentifierNameSyntax node, params Type[] stoppingTypes)
     {
-        SyntaxNode? n = node;
+        SyntaxNode? currentNode = node;
 
         var variableName = node.GetVariableName();
 
-        while (n is not null)
+        while (currentNode is not null)
         {
-            foreach (var childNode in n.ChildNodes())
+            foreach (var childNode in currentNode.ChildNodes())
             {
                 if (childNode is LocalDeclarationStatementSyntax variableDeclaration)
                 {
-                    foreach (var variable in variableDeclaration.Declaration.Variables)
+                    var matchingVariable = variableDeclaration.Declaration.Variables.FirstOrDefault(a => variableName.EqualsOrdinal(a.Identifier.Text));
+
+                    if (matchingVariable is not null)
                     {
-                        if (variableName.EqualsOrdinal(variable.Identifier.Text))
-                        {
-                            return variable;
-                        }
+                        return matchingVariable;
                     }
                 }
             }
 
-            if (stoppingTypes.Contains(n.GetType()))
+            if (stoppingTypes.Contains(currentNode.GetType()))
             {
                 return null;
             }
 
-            n = n.Parent;
+            currentNode = currentNode.Parent;
         }
 
         return null;

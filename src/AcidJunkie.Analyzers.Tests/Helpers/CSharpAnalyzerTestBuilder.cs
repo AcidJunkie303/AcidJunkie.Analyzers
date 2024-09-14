@@ -8,7 +8,7 @@ using Microsoft.Data.SqlClient;
 
 namespace AcidJunkie.Analyzers.Tests.Helpers;
 
-public sealed class CSharpAnalyzerTestBuilder
+public static class CSharpAnalyzerTestBuilder
 {
     public static CSharpAnalyzerTestBuilder<TAnalyzer> Create<TAnalyzer>()
         where TAnalyzer : DiagnosticAnalyzer, new()

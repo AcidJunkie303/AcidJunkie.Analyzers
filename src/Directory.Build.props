@@ -46,6 +46,10 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="SonarAnalyzer.CSharp" Version="9.32.0.97167">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
 
     <!-- See Banned APIs documentation: https://github.com/dotnet/roslyn-analyzers/blob/5968beca1c5c6c12d4fa81a08b7b4561a3c05d6e/src/Microsoft.CodeAnalysis.BannedApiAnalyzers/BannedApiAnalyzers.Help.md -->
     <!-- See examples: https://piraces.dev/posts/improve-your-code-using-roslyn-analyzers/ -->

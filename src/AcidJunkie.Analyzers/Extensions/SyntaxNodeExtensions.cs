@@ -14,13 +14,13 @@ internal static class SyntaxNodeExtensions
 
     public static string? GetNameSpace(this SyntaxNode node, SyntaxNodeAnalysisContext context)
     {
-        var typeInfo = context.SemanticModel.GetTypeInfo(node);
+        var typeInfo = context.SemanticModel.GetTypeInfo(node, context.CancellationToken);
         return ((INamedTypeSymbol?)typeInfo.Type)?.ContainingNamespace.ToString();
     }
 
     public static ITypeSymbol? GetOwningSymbol(this InvocationExpressionSyntax node, SyntaxNodeAnalysisContext context)
     {
-        var symbolInfo = context.SemanticModel.GetSymbolInfo(node);
+        var symbolInfo = context.SemanticModel.GetSymbolInfo(node, context.CancellationToken);
         var methodSymbol = symbolInfo.Symbol as IMethodSymbol;
 
         return methodSymbol?.ReceiverType;

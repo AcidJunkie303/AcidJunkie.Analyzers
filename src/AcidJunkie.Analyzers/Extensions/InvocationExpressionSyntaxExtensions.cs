@@ -1,44 +1,13 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace AcidJunkie.Analyzers.Extensions;
 
 public static class InvocationExpressionSyntaxExtensions
 {
-    public static bool IsCalledOnTypeName(this InvocationExpressionSyntax node, string typeName, SyntaxNodeAnalysisContext context)
+    public static (string? OwningTypeNameSpace, string? OwningTypeName, string? MethodName, MemberAccessExpressionSyntax? MemberAccess) GetInvokedMethod(this InvocationExpressionSyntax invocationExpression, SemanticModel semanticModel, CancellationToken cancellationToken = default)
     {
-        var methodSymbol = node.GetOwningSymbol(context);
-        if (methodSymbol is null)
-        {
-            return false;
-        }
-
-        var owningMethodType = methodSymbol.ToString();
-
-        return owningMethodType.EqualsOrdinal(typeName);
-    }
-
-    public static SyntaxNode? GetFirstArgumentChild(this InvocationExpressionSyntax node)
-        => node.ArgumentList.Arguments.Count == 0
-            ? null
-            : node.ArgumentList.Arguments[0].ChildNodes().FirstOrDefault();
-
-    public static bool DoesMethodNameMatchAny(this InvocationExpressionSyntax node, params string[] methodNames)
-    {
-        if (node.Expression is not MemberAccessExpressionSyntax memberAccessExpression)
-        {
-            return false;
-        }
-
-        var actualMethodName = memberAccessExpression.Name.Identifier.Value?.ToString();
-
-        return actualMethodName is not null && methodNames.Contains(actualMethodName, StringComparer.Ordinal);
-    }
-
-    public static (string? OwningTypeNameSpace, string? OwningTypeName, string? MethodName, MemberAccessExpressionSyntax? MemberAccess) GetInvokedMethod(this InvocationExpressionSyntax invocationExpression, SemanticModel semanticModel)
-    {
-        var symbolInfo = semanticModel.GetSymbolInfo(invocationExpression);
+        var symbolInfo = semanticModel.GetSymbolInfo(invocationExpression, cancellationToken);
         var methodSymbol = symbolInfo.Symbol as IMethodSymbol;
         var methodName = methodSymbol?.Name;
         var containingType = methodSymbol?.ContainingType;
@@ -49,9 +18,9 @@ public static class InvocationExpressionSyntaxExtensions
 
     }
 
-    public static ITypeSymbol? GetTypeForTypeParameter(this InvocationExpressionSyntax invocationExpression, SemanticModel semanticModel, string typeParameterName)
+    public static ITypeSymbol? GetTypeForTypeParameter(this InvocationExpressionSyntax invocationExpression, SemanticModel semanticModel, string typeParameterName, CancellationToken cancellationToken = default)
     {
-        var symbolInfo = semanticModel.GetSymbolInfo(invocationExpression);
+        var symbolInfo = semanticModel.GetSymbolInfo(invocationExpression, cancellationToken);
         if (symbolInfo.Symbol is not IMethodSymbol methodSymbol)
         {
             return null;
