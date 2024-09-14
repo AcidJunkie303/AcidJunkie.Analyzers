@@ -89,7 +89,7 @@ public sealed class MissingEqualityComparerAnalyzer : DiagnosticAnalyzer
                 var argumentType = argument.GetArgumentType(context.SemanticModel);
                 if (argumentType is null)
                 {
-                    return false;
+                    continue;
                 }
 
                 if (argumentType.ImplementsOrIsInterface("System.Collections.Generic", "IEqualityComparer", keyType))
@@ -97,6 +97,7 @@ public sealed class MissingEqualityComparerAnalyzer : DiagnosticAnalyzer
                     return true;
                 }
             }
+
             return false;
         }
 

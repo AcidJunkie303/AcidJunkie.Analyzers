@@ -1,11 +1,9 @@
 using AcidJunkie.Analyzers.Extensions;
-using AcidJunkie.Analyzers.Tests.Helpers.CodeParsing;
 using AcidJunkie.Analyzers.Tests.Runtime;
-using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Testing;
-using Microsoft.CodeAnalysis.Text;
 using Microsoft.Data.SqlClient;
 
 namespace AcidJunkie.Analyzers.Tests.Helpers;
@@ -21,23 +19,18 @@ public sealed class CSharpAnalyzerTestBuilder<TAnalyzer>
     where TAnalyzer : DiagnosticAnalyzer, new()
 {
     private string? _code;
-    private string? _message;
-    private readonly List<ExpectedDiagnostic> _expectedDiagnostics = [];
     private readonly List<Type> _additionalTypes = [];
+    private readonly List<string> _messageInsertionStrings = [];
 
     public CSharpAnalyzerTestBuilder<TAnalyzer> WithTestCode(string code)
     {
-        var parserResult = TaggedSourceCodeParser.Parse(code);
-
-        _expectedDiagnostics.AddRange(parserResult.ExpectedDiagnostics);
-        _code = parserResult.PureCode;
-
+        _code = code;
         return this;
     }
 
-    public CSharpAnalyzerTestBuilder<TAnalyzer> WithMessage(string message)
+    public CSharpAnalyzerTestBuilder<TAnalyzer> WithMessageInsertionString(params string[] insertionStrings)
     {
-        _message = message;
+        _messageInsertionStrings.AddRange(insertionStrings);
         return this;
     }
 
@@ -77,39 +70,12 @@ public sealed class CSharpAnalyzerTestBuilder<TAnalyzer>
             },
         };
 
-        AddAdditionalTypes();
-        AddDiagnosticResults();
+        foreach (var additionalType in _additionalTypes)
+        {
+            var reference = MetadataReference.CreateFromFile(additionalType.Assembly.Location);
+            analyzerTest.TestState.AdditionalReferences.Add(reference);
+        }
 
         return analyzerTest;
-
-        void AddAdditionalTypes()
-        {
-            foreach (var additionalType in _additionalTypes)
-            {
-                var reference = MetadataReference.CreateFromFile(additionalType.Assembly.Location);
-                analyzerTest.TestState.AdditionalReferences.Add(reference);
-            }
-        }
-
-        void AddDiagnosticResults()
-        {
-            var analyzer = new TAnalyzer();
-            var diagnosticsById = analyzer.SupportedDiagnostics.ToDictionary(a => a.Id, a => a, StringComparer.OrdinalIgnoreCase);
-
-            foreach (var expectedDiagnostic in _expectedDiagnostics)
-            {
-                var diagnosticDescriptor = diagnosticsById.GetValueOrDefault(expectedDiagnostic.DiagnosticId)
-                    ?? throw new InvalidOperationException($"The diagnostic with ID '{expectedDiagnostic.DiagnosticId}' is not known to the analyzer of type '{typeof(TAnalyzer).Name}'!");
-                var diagnostic = new DiagnosticResult(diagnosticDescriptor)
-                    .WithSpan(expectedDiagnostic.BeginLineIndex, expectedDiagnostic.BeginCharIndex, expectedDiagnostic.EndLineIndex, expectedDiagnostic.EndCharIndex);
-
-                if (_message is not null)
-                {
-                    diagnostic = diagnostic.WithMessage(_message);
-                }
-
-                analyzerTest.ExpectedDiagnostics.Add(diagnostic);
-            }
-        }
     }
 }

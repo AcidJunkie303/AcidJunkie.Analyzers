@@ -68,10 +68,15 @@ internal static class TypeSymbolExtensions
             .Any(a => a.Name.EqualsOrdinal(interfaceName));
     }
 
+    public static string GetFullNamespace(this ITypeSymbol symbol)
+        => symbol.ContainingNamespace?.ToString() ?? string.Empty;
+
+    public static bool IsContainedInNamespace(this ITypeSymbol symbol, string ns)
+        => symbol.GetFullNamespace().EqualsOrdinal(ns);
+
     public static bool ImplementsOrIsInterface(this ITypeSymbol symbol, string interfaceNamespace, string interfaceName, params ITypeSymbol[] typeArguments)
     {
-        if (symbol.ContainingNamespace.ToString().EqualsOrdinal(interfaceNamespace)
-            && symbol.Name.EqualsOrdinal(interfaceName))
+        if (symbol.IsContainedInNamespace(interfaceNamespace) && symbol.Name.EqualsOrdinal(interfaceName))
         {
             if (symbol is INamedTypeSymbol typeSymbol)
             {

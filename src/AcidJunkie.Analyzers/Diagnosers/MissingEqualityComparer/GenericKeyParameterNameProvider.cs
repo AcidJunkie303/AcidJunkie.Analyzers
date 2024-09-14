@@ -32,6 +32,22 @@ internal static class GenericKeyParameterNameProvider
                         }
                     }
                 }
+            },
+            {
+                "System.Collections.Immutable",
+                new Dictionary<string, Dictionary<string, string>>(StringComparer.Ordinal)
+                {
+                    {
+                        "ImmutableDictionary",
+                        new Dictionary<string, string> (StringComparer.Ordinal)
+                        {
+                            {"Create", "TKey" },
+                            {"CreateRange", "TKey" },
+                            {"CreateBuilder", "TKey" },
+                            {"ToImmutableDictionary", "TKey" }
+                        }
+                    }
+                }
             }
         };
 
