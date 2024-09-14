@@ -20,17 +20,10 @@ public sealed class CSharpAnalyzerTestBuilder<TAnalyzer>
 {
     private string? _code;
     private readonly List<Type> _additionalTypes = [];
-    private readonly List<string> _messageInsertionStrings = [];
 
     public CSharpAnalyzerTestBuilder<TAnalyzer> WithTestCode(string code)
     {
         _code = code;
-        return this;
-    }
-
-    public CSharpAnalyzerTestBuilder<TAnalyzer> WithMessageInsertionString(params string[] insertionStrings)
-    {
-        _messageInsertionStrings.AddRange(insertionStrings);
         return this;
     }
 

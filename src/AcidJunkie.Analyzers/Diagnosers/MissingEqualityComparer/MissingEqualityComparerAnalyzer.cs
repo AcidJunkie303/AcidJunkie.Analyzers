@@ -161,7 +161,7 @@ public sealed class MissingEqualityComparerAnalyzer : DiagnosticAnalyzer
 
         foreach (var argument in argumentList.Arguments)
         {
-            var argumentType = argument.GetArgumentType(context.SemanticModel, context.CancellationToken);
+            var argumentType = context.SemanticModel.GetTypeInfo(argument.Expression, context.CancellationToken).Type;
             if (argumentType is null)
             {
                 continue;

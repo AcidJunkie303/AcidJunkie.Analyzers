@@ -12,8 +12,5 @@ public static class CommonRules
         public static readonly LocalizableString MessageFormat = Title;
         public static readonly LocalizableString Description = Title;
         public static readonly DiagnosticDescriptor Rule = new(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Error, isEnabledByDefault: true, description: Description);
-
-        public static DiagnosticDescriptor Create(string errorMessage)
-            => new(DiagnosticId, Title, errorMessage, Category, DiagnosticSeverity.Error, isEnabledByDefault: true, description: Description);
     }
 }
