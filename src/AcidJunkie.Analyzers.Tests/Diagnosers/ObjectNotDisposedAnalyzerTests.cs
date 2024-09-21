@@ -134,35 +134,76 @@ public class ObjectNotDisposedAnalyzerTests : TestBase<ObjectNotDisposedAnalyzer
     }
 
     [Fact]
-    public async Task? WhenAssigningToVariable_DisposedOrReturnedInAllPaths_ThenO()
+    public async Task? WhenDisposedInAllSwitchArms_ThenOk()
     {
-        continue here...
-
         const string insertionCode = """
                                      var disposable = GetDisposable();
-                                     
+
                                      switch(DateTime.UtcNow.Minute)
                                      {
-                                        case:
+                                        case 0:
+                                            disposable.Dispose();
                                             break;
                                      
                                         case 1:
                                             disposable.Dispose();
                                             break;
-                                        case 2:
+                                         
+                                        default:
+                                            disposable.Dispose();
+                                            break;
+                                     }
+
+                                     """;
+        var code = CreateTestCode(insertionCode, string.Empty);
+
+        await CreateTesterBuilder()
+            .WithTestCode(code)
+            .Build()
+            .RunAsync();
+    }
+
+    [Fact]
+    public async Task? WhenNotDisposedInAllSwitchArms_ThenDiagnose()
+    {
+        const string insertionCode = """
+                                     var disposable = {|AJ0002:GetDisposable()|};
+                                     
+                                     switch(DateTime.UtcNow.Minute)
+                                     {
+                                        case 0:
+                                            break;
+                                     
+                                        case 1:
                                             disposable.Dispose();
                                             break;
                                          
-                                         
+                                         default:
+                                            break;
                                      }
-                                     if (111 == 222)
+                                     
+                                     """;
+        var code = CreateTestCode(insertionCode, string.Empty);
+
+        await CreateTesterBuilder()
+            .WithTestCode(code)
+            .Build()
+            .RunAsync();
+    }
+
+    [Fact]
+    public async Task? WhenSwitchWithoutDefaultPath_Then()
+    {
+        const string insertionCode = """
+                                     var disposable = {|AJ0002:GetDisposable()|};
+
+                                     switch(DateTime.UtcNow.Minute)
                                      {
-                                        disposable.Dispose();
+                                        case 0:
+                                            disposable.Dispose();
+                                            break;
                                      }
-                                     else
-                                     {
-                                        return disposable;
-                                     }
+
                                      """;
         var code = CreateTestCode(insertionCode, string.Empty);
 
@@ -216,6 +257,45 @@ public class ObjectNotDisposedAnalyzerTests : TestBase<ObjectNotDisposedAnalyzer
                                      while(111 == 222)
                                      {
                                         disposable.Dispose(); // in while-do, this might never be called
+                                     };
+                                     """;
+        var code = CreateTestCode(insertionCode, string.Empty);
+
+        await CreateTesterBuilder()
+            .WithTestCode(code)
+            .Build()
+            .RunAsync();
+    }
+
+    [Theory]
+    [InlineData("true")]
+    [InlineData("1 == 1")]
+    [InlineData(@"""a"" == ""a""")]
+    public async Task? WhenAssigningToVariable_WhenInWhileLoopWithSimpleAlwaysTrueCondition1_ThenOk(string conditionCode)
+    {
+        var insertionCode = $$"""
+                                     var disposable = GetDisposable();
+                                     while({{conditionCode}})
+                                     {
+                                        disposable.Dispose();
+                                     };
+                                     """;
+        var code = CreateTestCode(insertionCode, string.Empty);
+
+        await CreateTesterBuilder()
+            .WithTestCode(code)
+            .Build()
+            .RunAsync();
+    }
+
+    [Fact]
+    public async Task? WhenAssigningToVariable_WhenInWhileLoopWithSimpleAlwaysTrueCondition2_ThenOk()
+    {
+        const string insertionCode = """
+                                     var disposable = GetDisposable();
+                                     while(1 == 1)
+                                     {
+                                        disposable.Dispose();
                                      };
                                      """;
         var code = CreateTestCode(insertionCode, string.Empty);
@@ -286,7 +366,6 @@ public class ObjectNotDisposedAnalyzerTests : TestBase<ObjectNotDisposedAnalyzer
 
         // TODO: Check all paths.
         // Statements which have an impact on the execution path:
-        // - return
         // - throw
         // When assigned to variable, find variable declaration and check when the variable goes out of scope, if it is disposed then
     }
@@ -358,15 +437,12 @@ public class ObjectNotDisposedAnalyzerTests : TestBase<ObjectNotDisposedAnalyzer
               
               public static object? ComplexTestMethod()
               {
-                  {{complexInsertionCode}}
+                  {{simpleInsertionCode}}
                   
                   return null; // fallback. Some testing methods might return something
               }
               
-              public static void SimpleTestMethod()
-              {
-                  {{simpleInsertionCode}}
-              }
+              {{complexInsertionCode}}
               
               private static DisposableRefType GetDisposableRefType() => null!;
               private static IDisposable GetDisposable() => null!;

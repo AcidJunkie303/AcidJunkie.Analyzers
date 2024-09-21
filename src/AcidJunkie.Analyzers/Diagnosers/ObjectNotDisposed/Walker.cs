@@ -20,18 +20,18 @@ internal sealed class Walker : CSharpSyntaxWalker
     private readonly SyntaxNode _assignmentNode;
     private readonly SyntaxNode _scopeNode;
     private readonly SyntaxNode _scopeEndNode;
-    private readonly Stack<Branch> _branches = new();
+    private readonly Stack<Scope> _branches = new();
+    private readonly string _variableName;
     private bool _pathFoundWhereNotDisposed;
     private bool _hasPassedAssignmentNode;
-    private bool _abort;
+    private bool _foundBranchWhereObjectIsNotDisposedOrReturned;
 
-    private bool _variableIsDisposedOnAllPaths = true;
-
-    public Walker(SemanticModel semanticModel, SyntaxNode scopeNode, VariableDeclarationSyntax variableDeclaration, SyntaxNode assignmentNode)
+    public Walker(SemanticModel semanticModel, SyntaxNode scopeNode, VariableDeclarationSyntax variableDeclaration, string variableName, SyntaxNode assignmentNode)
     {
         _semanticModel = semanticModel;
         _scopeNode = scopeNode;
         _variableDeclaration = variableDeclaration;
+        _variableName = variableName;
         _assignmentNode = assignmentNode;
 
         //        _scopeNode = scopeNode;
@@ -44,15 +44,22 @@ internal sealed class Walker : CSharpSyntaxWalker
 
         this.Visit(_scopeNode);
 
-        var isDisposedOnAllPaths = IsDisposedInAnyPath();
-
-        EndScope();
-
-        return isDisposedOnAllPaths;
+        return EndScope() && !_foundBranchWhereObjectIsNotDisposedOrReturned;
     }
 
     public override void Visit(SyntaxNode? node)
     {
+        if (IsDisposedInAnyPath)
+        {
+            // no need to pursue this any further 
+            return;
+        }
+
+        if (_foundBranchWhereObjectIsNotDisposedOrReturned)
+        {
+            return;
+        }
+
         base.Visit(node);
 
         if (ReferenceEquals(node, _assignmentNode))
@@ -73,16 +80,13 @@ internal sealed class Walker : CSharpSyntaxWalker
 
     public override void VisitWhileStatement(WhileStatementSyntax node)
     {
-        // defensive approach: We assume that this for loop never loops
-        return;
-
-        // TODO: Check if the while condition always evaluates to true like:
-        // - while(true)
-        // - while(!false)
-        // - while(1==1)
+        // if the condition is always true, we treat the loops as executed at least once
+        // otherwise we take the defensive approach: It never loops
+        if (IsSimpleAlwaysTrueCondition(node.Condition))
+        {
+            base.VisitWhileStatement(node);
+        }
     }
-
-
 
     public override void VisitIfStatement(IfStatementSyntax node)
     {
@@ -92,16 +96,14 @@ internal sealed class Walker : CSharpSyntaxWalker
 
             BeginScope();
             Visit(node.Statement);
-            var wasDisposedInStatement = IsDisposedInAnyPath();
-            EndScope();
+            var wasDisposedInStatement = EndScope();
 
             var wasDisposedInElse = false;
             if (node.Else is not null)
             {
                 BeginScope();
                 Visit(node.Else);
-                wasDisposedInElse = IsDisposedInAnyPath();
-                EndScope();
+                wasDisposedInElse = EndScope();
             }
 
             GetCurrentScope().IsDisposed |= wasDisposedInStatement && wasDisposedInElse;
@@ -112,13 +114,11 @@ internal sealed class Walker : CSharpSyntaxWalker
 
         base.Visit(node.Statement);
 
-        if (!IsDisposedInAnyPath())
+        if (!EndScope())
         {
-            AbortAndSetNotDisposedOnAllPaths();
+            _foundBranchWhereObjectIsNotDisposedOrReturned = true;
             return;
         }
-
-        EndScope();
 
         if (node.Else is not null)
         {
@@ -126,9 +126,10 @@ internal sealed class Walker : CSharpSyntaxWalker
 
             this.Visit(node.Else);
 
-            if (!IsDisposedInAnyPath())
+
+            if (!EndScope())
             {
-                AbortAndSetNotDisposedOnAllPaths();
+                _foundBranchWhereObjectIsNotDisposedOrReturned = true;
                 return;
             }
 
@@ -227,25 +228,94 @@ internal sealed class Walker : CSharpSyntaxWalker
 
     public override void VisitReturnStatement(ReturnStatementSyntax node)
     {
+        if (IsReturningOurVariable())
+        {
+            GetCurrentScope().IsDisposed = true;
+        }
+
         base.VisitReturnStatement(node);
+
+
+        bool IsReturningOurVariable()
+        {
+            var symbolInfo = _semanticModel.GetSymbolInfo(node.Expression).Symbol;
+            if (symbolInfo is null)
+            {
+                return false;
+            }
+
+            return symbolInfo.Name.EqualsOrdinal(_variableName);
+        }
     }
 
-    public override void VisitThrowStatement(ThrowStatementSyntax node)
+    public override void VisitSwitchStatement(SwitchStatementSyntax node)
     {
-        base.VisitThrowStatement(node);
+        var hasDefaultLabel = node.Sections.Any(a => a.IsDefault());
+        if (!hasDefaultLabel)
+        {
+            _foundBranchWhereObjectIsNotDisposedOrReturned = true;
+            return;
+        }
+
+        var allArmsDisposeOrReturnVariable = true;
+        foreach (var section in node.Sections)
+        {
+            BeginScope();
+
+            base.VisitSwitchSection(section);
+
+            if (!EndScope())
+            {
+                allArmsDisposeOrReturnVariable = false;
+            }
+        }
+
+        if (allArmsDisposeOrReturnVariable)
+        {
+            GetCurrentScope().IsDisposed = true;
+        }
     }
 
-    public override void VisitVariableDeclaration(VariableDeclarationSyntax node)
+    public override void VisitSwitchExpression(SwitchExpressionSyntax node)
     {
+        foreach (var arm in node.Arms)
+        {
+            BeginScope();
 
-        base.VisitVariableDeclaration(node);
+            base.VisitSwitchExpressionArm(arm);
+
+            if (!EndScope())
+            {
+                _foundBranchWhereObjectIsNotDisposedOrReturned = true;
+                return;
+            }
+        }
     }
 
-
-    private void AbortAndSetNotDisposedOnAllPaths()
+    public override void VisitTryStatement(TryStatementSyntax node)
     {
-        _variableIsDisposedOnAllPaths = false;
-        _abort = true;
+        // TODO:
+        continue here: for the properties Block, Catch and Finally, Create a scope and check
+
+
+        base.VisitTryStatement(node);
+    }
+
+    private static bool IsSimpleAlwaysTrueCondition(ExpressionSyntax node)
+    {
+        switch (node)
+        {
+            case LiteralExpressionSyntax literal:
+                return literal.IsKind(SyntaxKind.TrueLiteralExpression);
+
+            case BinaryExpressionSyntax binaryExpression:
+                var left = binaryExpression.Left.ToString();
+                var right = binaryExpression.Right.ToString();
+                return left.EqualsOrdinal(right);
+
+            default:
+                return false;
+        }
     }
 
     private void BeginScope()
@@ -253,23 +323,18 @@ internal sealed class Walker : CSharpSyntaxWalker
         _branches.Push(new());
     }
 
-    private void EndScope()
+    private bool EndScope()
     {
+        var isDisposedInAnyPath = IsDisposedInAnyPath;
         _branches.Pop();
+
+        return isDisposedInAnyPath;
     }
 
-    private int ScopeLevel => _branches.Count;
-    private Branch GetCurrentScope() => _branches.Peek();
+    private bool IsDisposedInAnyPath => _branches.Any(a => a.IsDisposed);
+    private Scope GetCurrentScope() => _branches.Peek();
 
-    private bool IsDisposedInAnyPath() => _branches.Any(a => a.IsDisposed);
-
-    private static bool IsExitNode(SyntaxNode node)
-        => node is ThrowExpressionSyntax or ReturnStatementSyntax;
-
-    private static bool IsLeaf(SyntaxNode node)
-        => !node.ChildNodes().Any();
-
-    private sealed class Branch
+    private sealed class Scope
     {
         public bool IsDisposed { get; set; }
     }

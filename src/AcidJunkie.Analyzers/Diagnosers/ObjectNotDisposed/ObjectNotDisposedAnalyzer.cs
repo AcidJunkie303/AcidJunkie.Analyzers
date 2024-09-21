@@ -74,17 +74,19 @@ public sealed class ObjectNotDisposedAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        if (firstNonMemberAccessOrInvocationExpression.IsKind(SyntaxKind.EqualsValueClause) ||
-            firstNonMemberAccessOrInvocationExpression.IsKind(SyntaxKind.SimpleAssignmentExpression))
-        {
-            Console.Write("");
-        }
-
         var (assignmentNode, variableDeclaration) = GetAssignmentAndDeclaration(context, firstNonMemberAccessOrInvocationExpression);
         if (assignmentNode is null || variableDeclaration is null)
         {
             return;
         }
+
+        var variableDeclarator = variableDeclaration.ChildNodes().OfType<VariableDeclaratorSyntax>().FirstOrDefault();
+        if (variableDeclarator is null)
+        {
+            return;
+        }
+
+        var variableName = variableDeclarator.Identifier.Text;
 
         var scopeNode = variableDeclaration.GetParents().FirstOrDefault(a => a is not LocalDeclarationStatementSyntax);
         if (scopeNode is null)
@@ -92,7 +94,7 @@ public sealed class ObjectNotDisposedAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        var walker = new Walker(context.SemanticModel, scopeNode, variableDeclaration, assignmentNode);
+        var walker = new Walker(context.SemanticModel, scopeNode, variableDeclaration, variableName, assignmentNode);
         // if assigned to a variable, then use walker with the parent declaration syntax and its parent and skill all nodes in the walker until we hit the invocation method
         //      after that, check all paths if the variable is disposed or returned (return statement or arrow operator)
         if (!walker.Evaluate())
@@ -102,8 +104,6 @@ public sealed class ObjectNotDisposedAnalyzer : DiagnosticAnalyzer
         }
 
         // if we are here, we need to check if the returned IDisposable object is assigned to a variable or returned through the return statement or by the arrow operator
-
-        Console.Write(invocationExpression);
 
         // TODO:
         // find parent of type 'LocalDeclarationStatementSyntax' and check
