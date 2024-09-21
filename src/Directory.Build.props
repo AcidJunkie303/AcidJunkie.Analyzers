@@ -22,7 +22,8 @@
 
     <!-- MA0025: NotImplementedException are like TODOs they should be warning only -->
     <!-- MA0026: we know TODO items should be tackled, let's not create Errors for them -->
-    <WarningsNotAsErrors>MA0025;MA0026</WarningsNotAsErrors>
+    <!-- S1185: we know TODO items should be tackled, let's not create Errors for them -->
+    <WarningsNotAsErrors>MA0025;MA0026;S1135</WarningsNotAsErrors>
 
     <WarningLevel>9999</WarningLevel>
     <!-- Forever max warning level, see: https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/compiler-options/errors-warnings -->
@@ -64,7 +65,7 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(IsTestProject)' == 'true'">
-    <PackageReference Include="FluentAssertions" Version="6.12.0" />
+    <PackageReference Include="FluentAssertions" Version="6.12.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
     <PackageReference Include="xunit" Version="2.9.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" privateAssets="all" />

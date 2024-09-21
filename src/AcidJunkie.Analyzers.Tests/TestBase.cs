@@ -23,8 +23,17 @@ public abstract class TestBase<TAnalyzer>
     /// <summary>
     /// Returns a formatted string showing the code hierarchy
     /// </summary>
-    /// <param name="node"></param>
     protected static string ShowTree(SyntaxNode node) => SyntaxTreeVisualizer.GetHierarchy(node);
+
+    /// <summary>
+    /// Returns a formatted string showing the code hierarchy
+    /// </summary>
+    protected static string ShowTree(string code)
+    {
+        var tree = CSharpSyntaxTree.ParseText(code);
+        var root = tree.GetCompilationUnitRoot();
+        return ShowTree(root);
+    }
 
     protected static CSharpAnalyzerTestBuilder<TAnalyzer> CreateTesterBuilder() => CSharpAnalyzerTestBuilder.Create<TAnalyzer>();
 }

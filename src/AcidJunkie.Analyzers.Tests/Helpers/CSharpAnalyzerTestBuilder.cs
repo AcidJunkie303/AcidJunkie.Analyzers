@@ -47,10 +47,10 @@ public sealed class CSharpAnalyzerTestBuilder<TAnalyzer>
                 Sources = {_code},
 #if NET8_0
                 ReferenceAssemblies = Net.Assemblies.Net80,
+#elif NET7_0
+                ReferenceAssemblies = Net.Assemblies.Net70,
 #elif NET6_0
                 ReferenceAssemblies = Net.Assemblies.Net60,
-#elif NETCOREAPP3_1_OR_GREATER
-                ReferenceAssemblies = Net.Assemblies.NetCore31,
 #else
                 .NET framework not handled!
 #endif
