@@ -422,6 +422,134 @@ public class ObjectNotDisposedAnalyzerTests : TestBase<ObjectNotDisposedAnalyzer
             .RunAsync();
     }
 
+    [Fact]
+    public async Task WhenTryCatch_AndOnlyDisposedInCatch_ThenDiagnose()
+    {
+        const string insertionCode = """
+                                     var disposable = {|AJ0002:GetDisposable()|};
+
+                                     try
+                                     {
+                                     }
+                                     catch
+                                     {
+                                        disposable.Dispose();
+                                     }
+                                     """;
+        var code = CreateTestCode(insertionCode, string.Empty);
+
+        await CreateTesterBuilder()
+            .WithTestCode(code)
+            .Build()
+            .RunAsync();
+    }
+
+    [Fact]
+    public async Task WhenTryCatch_AndNotAlwaysDisposedInCatch_ThenDiagnose()
+    {
+        const string insertionCode = """
+                                     var disposable = {|AJ0002:GetDisposable()|};
+
+                                     try
+                                     {
+                                     }
+                                     catch
+                                     {
+                                        if (false)
+                                        {
+                                            disposable.Dispose();
+                                        }
+                                     }
+                                     """;
+        var code = CreateTestCode(insertionCode, string.Empty);
+
+        await CreateTesterBuilder()
+            .WithTestCode(code)
+            .Build()
+            .RunAsync();
+    }
+
+    [Fact]
+    public async Task WhenTryFinally_AndNeverDisposedInTryAndNeverDisposedInFinally_ThenDiagnose()
+    {
+        const string insertionCode = """
+                                     var disposable = {|AJ0002:GetDisposable()|};
+
+                                     try
+                                     {
+                                        if (1==2)
+                                        {
+                                            disposable.Dispose();
+                                        }
+                                        else if (1==3)
+                                        {
+                                            throw new Exception();
+                                        }
+                                     }
+                                     finally
+                                     {
+                                     }
+                                     """;
+        var code = CreateTestCode(insertionCode, string.Empty);
+
+        await CreateTesterBuilder()
+            .WithTestCode(code)
+            .Build()
+            .RunAsync();
+    }
+
+    [Fact]
+    public async Task WhenTryFinally_AndAlwaysDisposedInFinally_ThenOk()
+    {
+        const string insertionCode = """
+                                     var disposable = GetDisposable();
+                                     
+                                     try
+                                     {
+                                        if (1==2)
+                                        {
+                                            disposable.Dispose();
+                                        }
+                                        else if (1==3)
+                                        {
+                                            throw new Exception();
+                                        }
+                                     }
+                                     finally
+                                     {
+                                        disposable.Dispose();
+                                     }
+                                     """;
+        var code = CreateTestCode(insertionCode, string.Empty);
+
+        await CreateTesterBuilder()
+            .WithTestCode(code)
+            .Build()
+            .RunAsync();
+    }
+
+    [Fact]
+    public async Task WhenTryFinally_AndAlwaysDisposedInTry_ThenOk()
+    {
+        const string insertionCode = """
+                                     var disposable = GetDisposable();
+
+                                     try
+                                     {
+                                        disposable.Dispose();
+                                     }
+                                     finally
+                                     {
+                                     }
+                                     """;
+        var code = CreateTestCode(insertionCode, string.Empty);
+
+        await CreateTesterBuilder()
+            .WithTestCode(code)
+            .Build()
+            .RunAsync();
+    }
+
     private static string CreateTestCode(string simpleInsertionCode, string complexInsertionCode) =>
         $$"""
           using System;

@@ -295,10 +295,32 @@ internal sealed class Walker : CSharpSyntaxWalker
     public override void VisitTryStatement(TryStatementSyntax node)
     {
         // TODO:
-        continue here: for the properties Block, Catch and Finally, Create a scope and check
+        //continue here: for the properties Block, Catch and Finally, Create a scope and check
 
+        var disposedInTry = VisitAndCheckIfDisposedOnAllBranches(node.Block);
+        if (disposedInTry)
+        {
+            GetCurrentScope().IsDisposed = true;
+            return;
+        }
 
-        base.VisitTryStatement(node);
+        if (node.Finally is not null)
+        {
+            if (VisitAndCheckIfDisposedOnAllBranches(node.Finally))
+            {
+                GetCurrentScope().IsDisposed = true;
+                return;
+            }
+        }
+
+        // TODO: need to check if we do really need to check all catch arms
+    }
+
+    private bool VisitAndCheckIfDisposedOnAllBranches(SyntaxNode node)
+    {
+        BeginScope();
+        this.Visit(node);
+        return EndScope();
     }
 
     private static bool IsSimpleAlwaysTrueCondition(ExpressionSyntax node)
