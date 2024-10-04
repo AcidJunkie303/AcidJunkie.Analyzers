@@ -12,6 +12,14 @@
 | Awaiting completed task not necessary (1) | 🔵 | In async methods, where there is already an await statement, the following code would raise this warning: `await Task.CompletedTask`. Same applies to `await Task.FromResult()`. |
 | Awaiting completed task not necessary (2) | 🔵 | In async methods, where the only statatement with the `await` keyword is `await Task.CompletedTask`, raise a suggestion to remove the await keyword and return `Task.CompletedTask`. Same applies to `await Task.FromResult()`. |
 | Public methods should not return materialized collections as enumerables  | 🔵 | By returning meterialized collections as `IEnumerable`, `IEnumerable<T>`, `Task<IEnumerable>` or `Task<IEnumerable<T>>`, the caller most likely will re-materialize it by calling `ToList()` or similar methods which is an overhead. Instead, return a collection abstraction like `IReadOnlyCollection<T>` or `IReadOnlyList<T>`. |
+| Awaiting `Task.CompletedTask` in an async method is not necessary | 🔵 | Either remove `await Task.CompletedTask` or replace it with `return Task.CompletedTask`. |
+| Awaiting `Task.FromResult` in an async method is not necessary | 🔵 | Either remove `await Task.FromResult` or replace it with `return Task.FromResult`. |
+| Don't inject untyped logger (`ILogger`) in construcotrs | 🔵 | Instead, use a typed logger `ILogger<TContext>`. |
+| Incorrect type parameter used for `ILogger<TContext>` | 🔵 | When injecting `ILogger<TContext>` in constructors, the type argument should be the type of the class it is injected to. |
+| The `ILogger<TContext>` parameter should be either the first or the last parameter |  When injecting `ILogger<TContext>` it must be either the first or the last parameter (default first). Provide configuration. |
+| Pragma warning suppression not restored | 🔵 | The `#pragma warning disable X` is not restored. |
+| Pragma warning suppression not restored in correct order of suppression | 🔵 | When suppressing warnings, the warning suppression restoration statement must be in the reverse order. |
+| Do not use general warning suppression | 🔵 | When suppressing warnings through `#pragma warning disable` a diagnostic ID must be provided all the time. Disallow general warning suppression.  |
 
 # Other Open Points
 | Summary | Status | Description |
