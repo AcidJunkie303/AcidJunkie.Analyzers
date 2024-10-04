@@ -5,10 +5,11 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace AcidJunkie.Analyzers.Tests;
 
+// ReSharper disable once UnusedMember.Global -> These are methods which can be used during development time to check the syntax tree
+
 public abstract class TestBase<TAnalyzer>
     where TAnalyzer : DiagnosticAnalyzer, new()
 {
-
     /// <summary>
     /// Used to traverse the code for debugging purposes
     /// </summary>
