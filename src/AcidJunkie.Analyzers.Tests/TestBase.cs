@@ -5,10 +5,11 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace AcidJunkie.Analyzers.Tests;
 
+// ReSharper disable once UnusedMember.Global -> These are methods which can be used during development time to check the syntax tree
+
 public abstract class TestBase<TAnalyzer>
     where TAnalyzer : DiagnosticAnalyzer, new()
 {
-
     /// <summary>
     /// Used to traverse the code for debugging purposes
     /// </summary>
@@ -23,8 +24,17 @@ public abstract class TestBase<TAnalyzer>
     /// <summary>
     /// Returns a formatted string showing the code hierarchy
     /// </summary>
-    /// <param name="node"></param>
     protected static string ShowTree(SyntaxNode node) => SyntaxTreeVisualizer.GetHierarchy(node);
+
+    /// <summary>
+    /// Returns a formatted string showing the code hierarchy
+    /// </summary>
+    protected static string ShowTree(string code)
+    {
+        var tree = CSharpSyntaxTree.ParseText(code);
+        var root = tree.GetCompilationUnitRoot();
+        return ShowTree(root);
+    }
 
     protected static CSharpAnalyzerTestBuilder<TAnalyzer> CreateTesterBuilder() => CSharpAnalyzerTestBuilder.Create<TAnalyzer>();
 }

@@ -9,4 +9,11 @@ internal static class StringExtensions
 
     public static bool EqualsOrdinal(this string? value1, string? value2)
         => string.Equals(value1, value2, StringComparison.Ordinal);
+
+    public static string? NullIfWhiteSpace(this string? value)
+    {
+        return value.IsNullOrWhiteSpace()
+            ? null
+            : value;
+    }
 }
