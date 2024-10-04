@@ -20,6 +20,7 @@ public sealed class CSharpAnalyzerTestBuilder<TAnalyzer>
 {
     private string? _code;
     private readonly List<Type> _additionalTypes = [];
+    private readonly List<string> _additionalGlobalOptionsLines = [];
 
     public CSharpAnalyzerTestBuilder<TAnalyzer> WithTestCode(string code)
     {
@@ -30,6 +31,12 @@ public sealed class CSharpAnalyzerTestBuilder<TAnalyzer>
     public CSharpAnalyzerTestBuilder<TAnalyzer> WithAdditionalReference<T>()
     {
         _additionalTypes.Add(typeof(T));
+        return this;
+    }
+
+    public CSharpAnalyzerTestBuilder<TAnalyzer> WithGlobalOptions(string optionsLine)
+    {
+        _additionalGlobalOptionsLines.Add(optionsLine);
         return this;
     }
 
@@ -47,8 +54,6 @@ public sealed class CSharpAnalyzerTestBuilder<TAnalyzer>
                 Sources = {_code},
 #if NET8_0
                 ReferenceAssemblies = Net.Assemblies.Net80,
-#elif NET7_0
-                ReferenceAssemblies = Net.Assemblies.Net70,
 #elif NET6_0
                 ReferenceAssemblies = Net.Assemblies.Net60,
 #else
@@ -67,6 +72,12 @@ public sealed class CSharpAnalyzerTestBuilder<TAnalyzer>
         {
             var reference = MetadataReference.CreateFromFile(additionalType.Assembly.Location);
             analyzerTest.TestState.AdditionalReferences.Add(reference);
+        }
+
+        if (_additionalGlobalOptionsLines.Count > 0)
+        {
+            var content = string.Join(Environment.NewLine, _additionalGlobalOptionsLines);
+            analyzerTest.TestState.AnalyzerConfigFiles.Add(("/.globalconfig", content));
         }
 
         return analyzerTest;

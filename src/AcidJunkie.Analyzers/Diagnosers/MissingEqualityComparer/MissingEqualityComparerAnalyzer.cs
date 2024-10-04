@@ -18,12 +18,12 @@ public sealed class MissingEqualityComparerAnalyzer : DiagnosticAnalyzer
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => Rules;
 
+#pragma warning disable RS1026
     public override void Initialize(AnalysisContext context)
+#pragma warning restore RS1026
     {
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze);
-#if !DEBUG
-        context.EnableConcurrentExecution();
-#endif
+        context.EnableConcurrentExecutionInReleaseMode();
         context.RegisterSyntaxNodeAction(AnalyzeInvocation, SyntaxKind.InvocationExpression);
         context.RegisterSyntaxNodeAction(AnalyzeObjectCreation, SyntaxKind.ObjectCreationExpression);
         context.RegisterSyntaxNodeAction(AnalyzeImplicitObjectCreation, SyntaxKind.ImplicitObjectCreationExpression);

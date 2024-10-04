@@ -57,4 +57,27 @@ public static class SyntaxNodeExtensions
     }
 
     public static IReadOnlyList<SyntaxNode> Children(this SyntaxNode node) => node.ChildNodes().ToList();
+
+    public static IEnumerable<SyntaxNode> GetSubsequentSiblings(this SyntaxNode node)
+    {
+        if (node.Parent is null)
+        {
+            yield break;
+        }
+
+        var foundSelf = false;
+        foreach (var sibling in node.Parent.ChildNodes())
+        {
+            if (!foundSelf && ReferenceEquals(sibling, node))
+            {
+                foundSelf = true;
+                continue;
+            }
+
+            if (foundSelf)
+            {
+                yield return sibling;
+            }
+        }
+    }
 }

@@ -2,7 +2,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace AcidJunkie.Analyzers.Configuration;
 
-internal interface IConfigurationProvider<out T>
+internal interface IConfigurationProvider<T>
 {
-    T GetConfiguration(AnalyzerOptions options);
+    (T Configuration, bool IsDefault) GetConfiguration(AnalyzerOptions options);
 }

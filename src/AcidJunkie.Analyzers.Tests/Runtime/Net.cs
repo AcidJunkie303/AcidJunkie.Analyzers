@@ -16,16 +16,6 @@ internal static class Net
             .WithPackages([new PackageIdentity("Microsoft.Bcl.AsyncInterfaces", "1.0.0.0")])
         );
 
-        private static readonly Lazy<ReferenceAssemblies> LazyNet70 = new(() =>
-            new ReferenceAssemblies(
-                    "net7.0",
-                    new PackageIdentity(
-                        "Microsoft.NETCore.App.Ref",
-                        "7.0.16"),
-                    Path.Combine("ref", "net6.0"))
-                .WithPackages([new PackageIdentity("Microsoft.Bcl.AsyncInterfaces", "1.0.0.0")])
-        );
-
         private static readonly Lazy<ReferenceAssemblies> LazyNet80 = new(() =>
             new ReferenceAssemblies(
                 "net8.0",
@@ -37,7 +27,6 @@ internal static class Net
         );
 
         public static ReferenceAssemblies Net60 => LazyNet60.Value;
-        public static ReferenceAssemblies Net70 => LazyNet70.Value;
         public static ReferenceAssemblies Net80 => LazyNet80.Value;
     }
 }

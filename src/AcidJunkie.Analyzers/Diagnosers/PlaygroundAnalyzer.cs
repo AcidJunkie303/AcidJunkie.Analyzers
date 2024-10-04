@@ -21,9 +21,7 @@ public sealed class PlaygroundAnalyzer : DiagnosticAnalyzer
     public override void Initialize(AnalysisContext context)
     {
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze);
-#if !DEBUG
-        context.EnableConcurrentExecution();
-#endif
+        context.EnableConcurrentExecutionInReleaseMode();
         context.RegisterSyntaxNodeAction(AnalyzeInvocation, SyntaxKind.InvocationExpression);
     }
 

@@ -8,6 +8,7 @@ public sealed class Aj0002Configuration
     public static Aj0002Configuration Disabled { get; } = new(false, ImmutableHashSet<string>.Empty);
 
     public bool IsEnabled { get; }
+
     public ImmutableHashSet<string> IgnoredObjects { get; }
 
     public Aj0002Configuration(bool isEnabled, ImmutableHashSet<string> ignoredObjects)

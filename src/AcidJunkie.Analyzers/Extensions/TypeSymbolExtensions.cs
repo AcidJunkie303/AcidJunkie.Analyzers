@@ -76,4 +76,20 @@ internal static class TypeSymbolExtensions
             })
             ;
     }
+
+    public static string GetSimplifiedName(this INamedTypeSymbol symbol)
+    {
+        var ns = symbol.GetFullNamespace();
+
+        if (ns.IsNullOrWhiteSpace())
+        {
+            return symbol.Arity == 0
+                ? symbol.Name
+                : $"{symbol.Name}`{symbol.Arity}";
+        }
+
+        return symbol.Arity == 0
+            ? $"{ns}.{symbol.Name}"
+            : $"{ns}.{symbol.Name}`{symbol.Arity}";
+    }
 }

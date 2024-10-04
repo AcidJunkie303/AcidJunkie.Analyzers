@@ -7,35 +7,142 @@ namespace AcidJunkie.Analyzers.Diagnosers.ObjectNotDisposed;
 
 // TODO: remove
 #pragma warning disable
-#pragma warning disable S125
 
-
-internal sealed class Walker : CSharpSyntaxWalker
+internal sealed class Walker : CSharpSyntaxWalker, IWalker
 {
-    // LocalDeclarationStatementSyntax is the type of variable declarations -> we need to get it's parent so we know when the variable goes out of scope.
-
     private readonly SemanticModel _semanticModel;
-    private readonly SyntaxNode _invocationWhichReturnsDisposable;
-    private readonly VariableDeclarationSyntax _variableDeclaration;
     private readonly SyntaxNode _assignmentNode;
     private readonly SyntaxNode _scopeNode;
-    private readonly SyntaxNode _scopeEndNode;
     private readonly Stack<Scope> _branches = new();
     private readonly string _variableName;
-    private bool _pathFoundWhereNotDisposed;
     private bool _hasPassedAssignmentNode;
     private bool _foundBranchWhereObjectIsNotDisposedOrReturned;
+    private int _currentTryCatchLevel;
+    private int _tryCatchLevelOfInvocation = -1;
 
-    public Walker(SemanticModel semanticModel, SyntaxNode scopeNode, VariableDeclarationSyntax variableDeclaration, string variableName, SyntaxNode assignmentNode)
+    public Walker(SemanticModel semanticModel, SyntaxNode scopeNode, string variableName, SyntaxNode assignmentNode)
     {
         _semanticModel = semanticModel;
         _scopeNode = scopeNode;
-        _variableDeclaration = variableDeclaration;
         _variableName = variableName;
         _assignmentNode = assignmentNode;
+    }
 
-        //        _scopeNode = scopeNode;
-        //        _scopeEndNode = scopeNode.Parent ?? throw new InvalidOperationException("Variable declaration found without parent node!");
+    public bool Evaluate()
+    {
+        BeginScope();
+
+        this.Visit(_scopeNode);
+
+        return EndScope() && !_foundBranchWhereObjectIsNotDisposedOrReturned;
+    }
+
+    public override void Visit(SyntaxNode? node)
+    {
+        if (!_hasPassedAssignmentNode && ReferenceEquals(node, _assignmentNode))
+        {
+            _hasPassedAssignmentNode = true;
+            _tryCatchLevelOfInvocation = _currentTryCatchLevel;
+
+            return;
+        }
+
+        if (IsDisposedInAnyPath)
+        {
+            // no need to pursue this any further 
+            return;
+        }
+
+        if (_foundBranchWhereObjectIsNotDisposedOrReturned)
+        {
+            return;
+        }
+
+        base.Visit(node);
+
+
+    }
+
+    public override void VisitLocalFunctionStatement(LocalFunctionStatementSyntax node)
+    {
+        // we don't recurse into local methods
+    }
+
+    public override void VisitTryStatement(TryStatementSyntax node)
+    {
+        try
+        {
+            _currentTryCatchLevel++;
+
+            var disposedInTry = VisitAndCheckIfDisposedOnAllBranches(node.Block);
+            if (disposedInTry)
+            {
+                GetCurrentScope().IsDisposed = true;
+                return;
+            }
+
+            if (node.Finally is not null && VisitAndCheckIfDisposedOnAllBranches(node.Finally))
+            {
+                GetCurrentScope().IsDisposed = true;
+                return;
+            }
+
+        }
+        finally
+        {
+            _currentTryCatchLevel--;
+        }
+        // TODO:
+        //continue here: for the properties Block, Catch and Finally, Create a scope and check
+
+        // TODO: To clarify: Do really need to check all catch arms
+    }
+
+    private bool VisitAndCheckIfDisposedOnAllBranches(SyntaxNode node)
+    {
+        BeginScope();
+        this.Visit(node);
+        return EndScope();
+    }
+
+    private void BeginScope()
+    {
+        _branches.Push(new());
+    }
+
+    private bool EndScope()
+    {
+        var isDisposedInAnyPath = IsDisposedInAnyPath;
+        _branches.Pop();
+
+        return isDisposedInAnyPath;
+    }
+
+    private bool IsDisposedInAnyPath => _branches.Any(a => a.IsDisposed);
+    private Scope GetCurrentScope() => _branches.Peek();
+
+    private sealed class Scope
+    {
+        public bool IsDisposed { get; set; }
+    }
+}
+
+internal sealed class PessimisticWalker : CSharpSyntaxWalker, IWalker
+{
+    private readonly SemanticModel _semanticModel;
+    private readonly SyntaxNode _assignmentNode;
+    private readonly SyntaxNode _scopeNode;
+    private readonly Stack<Scope> _branches = new();
+    private readonly string _variableName;
+    private bool _hasPassedAssignmentNode;
+    private bool _foundBranchWhereObjectIsNotDisposedOrReturned;
+
+    public PessimisticWalker(SemanticModel semanticModel, SyntaxNode scopeNode, string variableName, SyntaxNode assignmentNode)
+    {
+        _semanticModel = semanticModel;
+        _scopeNode = scopeNode;
+        _variableName = variableName;
+        _assignmentNode = assignmentNode;
     }
 
     public bool Evaluate()
@@ -139,13 +246,10 @@ internal sealed class Walker : CSharpSyntaxWalker
 
     public override void VisitInvocationExpression(InvocationExpressionSyntax node)
     {
-        if (_hasPassedAssignmentNode)
+        if (_hasPassedAssignmentNode && IsDisposeCallOnOurVariable())
         {
-            if (IsDisposeCallOnOurVariable())
-            {
-                GetCurrentScope().IsDisposed = true;
-                return;
-            }
+            GetCurrentScope().IsDisposed = true;
+            return;
         }
 
         base.VisitInvocationExpression(node);
@@ -238,6 +342,11 @@ internal sealed class Walker : CSharpSyntaxWalker
 
         bool IsReturningOurVariable()
         {
+            if (node.Expression is null)
+            {
+                return false;
+            }
+
             var symbolInfo = _semanticModel.GetSymbolInfo(node.Expression).Symbol;
             if (symbolInfo is null)
             {
@@ -304,16 +413,13 @@ internal sealed class Walker : CSharpSyntaxWalker
             return;
         }
 
-        if (node.Finally is not null)
+        if (node.Finally is not null && VisitAndCheckIfDisposedOnAllBranches(node.Finally))
         {
-            if (VisitAndCheckIfDisposedOnAllBranches(node.Finally))
-            {
-                GetCurrentScope().IsDisposed = true;
-                return;
-            }
+            GetCurrentScope().IsDisposed = true;
+            return;
         }
 
-        // TODO: need to check if we do really need to check all catch arms
+        // TODO: To clarify: Do really need to check all catch arms
     }
 
     private bool VisitAndCheckIfDisposedOnAllBranches(SyntaxNode node)

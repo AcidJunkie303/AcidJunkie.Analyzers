@@ -74,6 +74,7 @@ public sealed class ObjectNotDisposedAnalyzer : DiagnosticAnalyzer
             return;
         }
 
+
         var (assignmentNode, variableDeclaration) = GetAssignmentAndDeclaration(context, firstNonMemberAccessOrInvocationExpression);
         if (assignmentNode is null || variableDeclaration is null)
         {
@@ -94,7 +95,8 @@ public sealed class ObjectNotDisposedAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        var walker = new Walker(context.SemanticModel, scopeNode, variableDeclaration, variableName, assignmentNode);
+
+        var walker = CreateWalker(config, context.SemanticModel, scopeNode, variableName, assignmentNode);
         // if assigned to a variable, then use walker with the parent declaration syntax and its parent and skill all nodes in the walker until we hit the invocation method
         //      after that, check all paths if the variable is disposed or returned (return statement or arrow operator)
         if (!walker.Evaluate())
@@ -104,12 +106,6 @@ public sealed class ObjectNotDisposedAnalyzer : DiagnosticAnalyzer
         }
 
         // if we are here, we need to check if the returned IDisposable object is assigned to a variable or returned through the return statement or by the arrow operator
-
-        // TODO:
-        // find parent of type 'LocalDeclarationStatementSyntax' and check
-        //     if using statement -> good, no further checking
-        //     if variable assignment, use walker with scoping
-        // find parent of type 'UsingStatementSyntax' -> find variable assignment. if ok -> we're good
 
         //SymbolFinder.FindDeclarationsAsync(context)
         //context.SemanticModel.GetDeclaredSymbol
@@ -139,6 +135,11 @@ public sealed class ObjectNotDisposedAnalyzer : DiagnosticAnalyzer
 
             return (assignmentNode, variableDeclaration);
         }
+
+        static IWalker CreateWalker(Aj0002Configuration config, SemanticModel semanticModel, SyntaxNode scopeNode, string variableName, SyntaxNode assignmentNode)
+            => config.Heuristic == Heuristic.Optimistic
+                ? new OptimisticWalker(semanticModel, scopeNode, variableName, assignmentNode)
+                : new PessimisticWalker(semanticModel, scopeNode, variableName, assignmentNode);
     }
 
     private static SyntaxNode? GetDeclarationOfAssignmentTarget(SyntaxNodeAnalysisContext context, AssignmentExpressionSyntax assignmentExpression)
