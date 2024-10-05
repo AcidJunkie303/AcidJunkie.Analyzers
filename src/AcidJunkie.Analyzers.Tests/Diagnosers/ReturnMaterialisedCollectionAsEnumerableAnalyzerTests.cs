@@ -60,6 +60,33 @@ public sealed class ReturnMaterialisedCollectionAsEnumerableAnalyzerTests : Test
     }
 
     [Fact]
+    public async Task WhenReturningCollectionAsEnumerable_ThenOk()
+    {
+        const string code = """
+                            using System;
+                            using System.Collections.Generic;
+                            using System.Linq;
+                            using System.Threading.Tasks;
+
+                            namespace Tests;
+
+                            public class Test
+                            {
+                                public IEnumerable<int> TestMethod()
+                                {
+                                    var items = Enumerable.Range(0, 10).ToList();
+                                    return items.AsEnumerable();
+                                }
+                            }
+                            """;
+
+        await CreateTesterBuilder()
+            .WithTestCode(code)
+            .Build()
+            .RunAsync();
+    }
+
+    [Fact]
     public async Task WhenReturningMaterialisedCollection_ThenDiagnose()
     {
         const string code = """
