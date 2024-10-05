@@ -8,9 +8,6 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace AcidJunkie.Analyzers.Diagnosers.MissingUsingStatement;
 
-// TODO: remove
-#pragma warning disable S1144
-
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class MissingUsingStatementAnalyzer : DiagnosticAnalyzer
 {
@@ -66,9 +63,6 @@ public sealed class MissingUsingStatementAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        // TODO: get the returned type and check whether the type is ignored
-        // TODO: check if the method is ignored
-
         var firstNonMemberAccessOrInvocationExpression = invocationExpression
             .GetParents()
             .FirstOrDefault(a => a is not MemberAccessExpressionSyntax and not InvocationExpressionSyntax and not CastExpressionSyntax);
@@ -110,19 +104,20 @@ public sealed class MissingUsingStatementAnalyzer : DiagnosticAnalyzer
 
     private static bool IsEmbeddedInUsingStatement(SyntaxNode node)
     {
-        if (node is UsingStatementSyntax)
+        switch (node)
         {
-            return true;
-        }
+            case UsingStatementSyntax:
+                return true;
 
-        if (node is EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax { Parent: VariableDeclarationSyntax variableDeclaration } })
-        {
-            switch (variableDeclaration.Parent)
-            {
-                case UsingStatementSyntax:
-                case LocalDeclarationStatementSyntax localDeclarationStatement when localDeclarationStatement.UsingKeyword.Text.EqualsOrdinal("using"):
-                    return true;
-            }
+            case EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax { Parent: VariableDeclarationSyntax variableDeclaration } }:
+                switch (variableDeclaration.Parent)
+                {
+                    case UsingStatementSyntax:
+                    case LocalDeclarationStatementSyntax localDeclarationStatement when localDeclarationStatement.UsingKeyword.Text.EqualsOrdinal("using"):
+                        return true;
+                }
+
+                break;
         }
 
         return false;

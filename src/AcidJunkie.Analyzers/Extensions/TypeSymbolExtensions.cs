@@ -4,6 +4,28 @@ namespace AcidJunkie.Analyzers.Extensions;
 
 internal static class TypeSymbolExtensions
 {
+    private static readonly Dictionary<string, Dictionary<string, int>> CollectionInterfaceArityByTypeByNamespace = new(StringComparer.Ordinal)
+    {
+        {
+            "System.Collections", new(StringComparer.Ordinal)
+            {
+                { "ICollection", 0 },
+                { "IDictionary", 0 },
+                { "IList", 0 }
+            }
+        },
+        {
+            "System.Collections.Generic", new(StringComparer.Ordinal)
+            {
+                { "ICollection", 1 },
+                { "IDictionary", 1 },
+                { "IList", 1 },
+                { "ISet", 1 },
+                { "IReadOnlyCollection", 1 }
+            }
+        }
+    };
+
     public static bool ImplementsGenericEquatable(this ITypeSymbol symbol)
         => symbol.AllInterfaces
             .Where(a => a.TypeParameters.Length == 1)
@@ -91,5 +113,67 @@ internal static class TypeSymbolExtensions
         return symbol.Arity == 0
             ? $"{ns}.{symbol.Name}"
             : $"{ns}.{symbol.Name}`{symbol.Arity}";
+    }
+
+    public static bool DoesImplementWellKnownCollectionInterface(this ITypeSymbol typeSymbol)
+        => IsWellKnownCollectionInterface(typeSymbol) || typeSymbol.AllInterfaces.Any(IsWellKnownCollectionInterface);
+
+    public static bool IsWellKnownCollectionInterface(ITypeSymbol typeSymbol)
+    {
+        if (typeSymbol is not INamedTypeSymbol namedTypeSymbol)
+        {
+            return false;
+        }
+
+        var ns = namedTypeSymbol.ContainingNamespace?.ToString();
+        if (ns.IsNullOrWhiteSpace())
+        {
+            return false;
+        }
+
+        if (!CollectionInterfaceArityByTypeByNamespace.TryGetValue(ns, out var arityByType))
+        {
+            return false;
+        }
+
+        if (!arityByType.TryGetValue(typeSymbol.Name, out var arity))
+        {
+            return false;
+        }
+
+        return namedTypeSymbol.Arity == arity;
+    }
+
+    public static bool IsEqualTo(this ITypeSymbol typeSymbol, string @namespace, string typeName, int arity)
+    {
+        if (arity != 0)
+        {
+            if (typeSymbol is not INamedTypeSymbol namedTypeSymbol)
+            {
+                return false;
+            }
+
+            if (namedTypeSymbol.Arity != arity)
+            {
+                return false;
+            }
+        }
+
+        return typeSymbol.Name.EqualsOrdinal(typeName) && typeSymbol.GetFullNamespace().EqualsOrdinal(@namespace);
+    }
+
+    public static bool IsEnumerable(this ITypeSymbol typeSymbol)
+    {
+        if (typeSymbol is not INamedTypeSymbol namedTypeSymbol)
+        {
+            return false;
+        }
+
+        return namedTypeSymbol.Arity switch
+        {
+            1 when !typeSymbol.IsContainedInNamespace("System.Collections.Generic") => false,
+            0 when !typeSymbol.IsContainedInNamespace("System.Collections") => false,
+            _ => typeSymbol.Name.EqualsOrdinal("IEnumerable")
+        };
     }
 }
