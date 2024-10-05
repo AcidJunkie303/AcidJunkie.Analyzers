@@ -7,10 +7,6 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace AcidJunkie.Analyzers.Diagnosers.MissingEqualityComparer;
 
-#if DEBUG
-#pragma warning disable RS1026 // Enable concurrent execution -> for easier debugging, we disable concurrent executions
-#endif
-
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class MissingEqualityComparerAnalyzer : DiagnosticAnalyzer
 {
@@ -18,9 +14,7 @@ public sealed class MissingEqualityComparerAnalyzer : DiagnosticAnalyzer
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => Rules;
 
-#pragma warning disable RS1026
     public override void Initialize(AnalysisContext context)
-#pragma warning restore RS1026
     {
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze);
         context.EnableConcurrentExecutionInReleaseMode();
