@@ -5,7 +5,7 @@ namespace AcidJunkie.Analyzers.Tests.Diagnosers;
 
 [SuppressMessage("Code Smell", "S4144:Methods should not have identical implementations", Justification = "Splitted up the test into different methods for different categories")]
 [SuppressMessage("Code Smell", "S2699:Tests should include assertions", Justification = "This is done internally by AnalyzerTest.RunAsync()")]
-public class MissingEqualityComparerAnalyzerTests : TestBase<MissingEqualityComparerAnalyzer>
+public sealed class MissingEqualityComparerAnalyzerTests : TestBase<MissingEqualityComparerAnalyzer>
 {
     [Theory]
     //
