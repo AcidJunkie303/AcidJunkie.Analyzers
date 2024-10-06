@@ -1,1 +1,4 @@
-TODO: Overview of all analyzers
+# AcidJunkie.Analyzers Rules
+
+|Id|Category|Description|Severity|Is enabled|Code fix|
+|--|--------|-----------|:------:|:--------:|:------:|
