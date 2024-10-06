@@ -5,4 +5,3 @@
 
 Rule ID | Category      | Severity | Notes
 --------|---------------|----------|-------
-AJ0001  | Unpredictable | Warning  | Provide an `IEqualityComparer<T>` argument

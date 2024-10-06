@@ -11,7 +11,7 @@ namespace AcidJunkie.Analyzers.Diagnosers.MissingUsingStatement;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class MissingUsingStatementAnalyzer : DiagnosticAnalyzer
 {
-    private static readonly ImmutableArray<DiagnosticDescriptor> Rules = [CommonRules.UnhandledError.Rule, DiagnosticRules.ObjectNotDisposedOnAllPaths.Rule];
+    private static readonly ImmutableArray<DiagnosticDescriptor> Rules = [CommonRules.UnhandledError.Rule, DiagnosticRules.Default.Rule];
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => Rules;
 
@@ -77,7 +77,7 @@ public sealed class MissingUsingStatementAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        context.ReportDiagnostic(Diagnostic.Create(DiagnosticRules.ObjectNotDisposedOnAllPaths.Rule, invocationExpression.GetLocation()));
+        context.ReportDiagnostic(Diagnostic.Create(DiagnosticRules.Default.Rule, invocationExpression.GetLocation()));
     }
 
     private static bool IsDisposable(ITypeSymbol typeSymbol)
@@ -163,15 +163,18 @@ public sealed class MissingUsingStatementAnalyzer : DiagnosticAnalyzer
 
     internal static class DiagnosticRules
     {
-        internal static class ObjectNotDisposedOnAllPaths
+        internal static class Default
         {
-            public const string Category = "Reliability";
+            private const string Category = "Reliability";
             public const string DiagnosticId = "AJ0002";
+#pragma warning disable S1075 // Refactor your code not to use hardcoded absolution paths or URIs
+            public const string HelpLinkUri = "https://github.com/AcidJunkie303/AcidJunkie.Analyzers/blob/main/docs/Rules/AJ0002.md";
+#pragma warning restore S1075
 
-            public static readonly LocalizableString Title = "Object not disposed on all paths";
-            public static readonly LocalizableString MessageFormat = "The disposable object is not disposed on all code paths";
+            public static readonly LocalizableString Title = "Missing using statement";
+            public static readonly LocalizableString MessageFormat = "The disposable object is disposed via the using statement";
             public static readonly LocalizableString Description = MessageFormat + ".";
-            public static readonly DiagnosticDescriptor Rule = new(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Info, isEnabledByDefault: true, description: Description);
+            public static readonly DiagnosticDescriptor Rule = new(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Info, isEnabledByDefault: true, description: Description, helpLinkUri: HelpLinkUri);
         }
     }
 }
