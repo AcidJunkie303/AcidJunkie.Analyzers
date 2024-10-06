@@ -5,4 +5,3 @@
 
 Rule ID | Category      | Severity | Notes
 --------|---------------|----------|-------
-AJ0005  | Unpredictable | Warning  | TODO: Add note here 5

@@ -10,7 +10,7 @@ namespace AcidJunkie.Analyzers.Diagnosers.MissingEqualityComparer;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class MissingEqualityComparerAnalyzer : DiagnosticAnalyzer
 {
-    private static readonly ImmutableArray<DiagnosticDescriptor> Rules = [CommonRules.UnhandledError.Rule, DiagnosticRules.MissingEqualityComparer.Rule];
+    private static readonly ImmutableArray<DiagnosticDescriptor> Rules = [CommonRules.UnhandledError.Rule, DiagnosticRules.Default.Rule];
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => Rules;
 
@@ -89,7 +89,7 @@ public sealed class MissingEqualityComparerAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        context.ReportDiagnostic(Diagnostic.Create(DiagnosticRules.MissingEqualityComparer.Rule, locationToReport));
+        context.ReportDiagnostic(Diagnostic.Create(DiagnosticRules.Default.Rule, locationToReport));
 
         string? GetKeyTypeParameterName()
         {
@@ -143,7 +143,7 @@ public sealed class MissingEqualityComparerAnalyzer : DiagnosticAnalyzer
                 : null;
         }
 
-        context.ReportDiagnostic(Diagnostic.Create(DiagnosticRules.MissingEqualityComparer.Rule, memberAccess.Name.GetLocation()));
+        context.ReportDiagnostic(Diagnostic.Create(DiagnosticRules.Default.Rule, memberAccess.Name.GetLocation()));
     }
 
     private static bool IsAnyParameterEqualityComparer(SyntaxNodeAnalysisContext context, ITypeSymbol keyType, ArgumentListSyntax? argumentList)
@@ -172,15 +172,18 @@ public sealed class MissingEqualityComparerAnalyzer : DiagnosticAnalyzer
 
     internal static class DiagnosticRules
     {
-        internal static class MissingEqualityComparer
+        internal static class Default
         {
-            public const string Category = "Design";
+            private const string Category = "Predictability";
             public const string DiagnosticId = "AJ0001";
+#pragma warning disable S1075 // Refactor your code not to use hardcoded absolution paths or URIs
+            public const string HelpLinkUri = "https://github.com/AcidJunkie303/AcidJunkie.Analyzers/blob/main/docs/Rules/AJ0001.md";
+#pragma warning restore S1075
 
-            public static readonly LocalizableString Title = "Provide an IEqualityComparer<T> argument";
+            public static readonly LocalizableString Title = "Provide an equality comparer argument";
             public static readonly LocalizableString MessageFormat = "To prevent unexpected results, use a IEqualityComparer argument because the type used for hash-matching does not fully implement IEquatable<T> together with GetHashCode()";
             public static readonly LocalizableString Description = MessageFormat;
-            public static readonly DiagnosticDescriptor Rule = new(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Error, isEnabledByDefault: true, description: Description);
+            public static readonly DiagnosticDescriptor Rule = new(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Error, isEnabledByDefault: true, description: Description, helpLinkUri: HelpLinkUri);
         }
     }
 }

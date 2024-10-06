@@ -34,13 +34,16 @@ public sealed class GeneralWarningSuppressionAnalyzer : DiagnosticAnalyzer
     {
         internal static class Default
         {
-            public const string Category = "Design";
+            private const string Category = "Design";
             public const string DiagnosticId = "AJ0005";
+#pragma warning disable S1075 // Refactor your code not to use hardcoded absolution paths or URIs
+            public const string HelpLinkUri = "https://github.com/AcidJunkie303/AcidJunkie.Analyzers/blob/main/docs/Rules/AJ0005.md";
+#pragma warning restore S1075
 
             public static readonly LocalizableString Title = "Do not use general warning suppression";
             public static readonly LocalizableString MessageFormat = Title;
             public static readonly LocalizableString Description = MessageFormat;
-            public static readonly DiagnosticDescriptor Rule = new(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Error, isEnabledByDefault: true, description: Description);
+            public static readonly DiagnosticDescriptor Rule = new(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Error, isEnabledByDefault: true, description: Description, helpLinkUri: HelpLinkUri);
         }
     }
 }

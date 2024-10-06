@@ -107,13 +107,16 @@ public sealed class ReturnMaterialisedCollectionAsEnumerableAnalyzer : Diagnosti
     {
         internal static class Default
         {
-            public const string Category = "Design";
+            private const string Category = "Design";
             public const string DiagnosticId = "AJ0003";
+#pragma warning disable S1075 // Refactor your code not to use hardcoded absolution paths or URIs
+            public const string HelpLinkUri = "https://github.com/AcidJunkie303/AcidJunkie.Analyzers/blob/main/docs/Rules/AJ0003.md";
+#pragma warning restore S1075
 
             public static readonly LocalizableString Title = "Do not return materialised collection as enumerable";
             public static readonly LocalizableString MessageFormat = "Do not return materialised collection as enumerable";
             public static readonly LocalizableString Description = MessageFormat;
-            public static readonly DiagnosticDescriptor Rule = new(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Error, isEnabledByDefault: true, description: Description);
+            public static readonly DiagnosticDescriptor Rule = new(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Error, isEnabledByDefault: true, description: Description, helpLinkUri: HelpLinkUri);
         }
     }
 }
