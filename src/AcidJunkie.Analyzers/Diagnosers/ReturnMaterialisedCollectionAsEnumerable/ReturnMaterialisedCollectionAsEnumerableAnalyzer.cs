@@ -18,7 +18,7 @@ public sealed class ReturnMaterialisedCollectionAsEnumerableAnalyzer : Diagnosti
     {
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze);
         context.EnableConcurrentExecutionInReleaseMode();
-        context.RegisterSyntaxNodeAction(AnalyzeReturn, SyntaxKind.ReturnStatement);
+        context.RegisterSyntaxNodeActionAndCheck<ReturnMaterialisedCollectionAsEnumerableAnalyzer>(AnalyzeReturn, SyntaxKind.ReturnStatement);
     }
 
     private static void AnalyzeReturn(SyntaxNodeAnalysisContext context)
@@ -36,7 +36,7 @@ public sealed class ReturnMaterialisedCollectionAsEnumerableAnalyzer : Diagnosti
         }
 
         var realReturnExpression = returnStatement.Expression.GetFirstNonCastExpression();
-        var returnType = context.SemanticModel.GetTypeInfo(realReturnExpression).Type;
+        var returnType = context.SemanticModel.GetTypeInfo(realReturnExpression, context.CancellationToken).Type;
         if (returnType is null)
         {
             return;
@@ -75,7 +75,7 @@ public sealed class ReturnMaterialisedCollectionAsEnumerableAnalyzer : Diagnosti
             return false;
         }
 
-        var returnType = context.SemanticModel.GetTypeInfo(returnTypeSyntax).Type;
+        var returnType = context.SemanticModel.GetTypeInfo(returnTypeSyntax, context.CancellationToken).Type;
         if (returnType is null)
         {
             return false;

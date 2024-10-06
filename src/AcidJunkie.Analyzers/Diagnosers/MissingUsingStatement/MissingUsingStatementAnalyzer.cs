@@ -19,7 +19,7 @@ public sealed class MissingUsingStatementAnalyzer : DiagnosticAnalyzer
     {
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze);
         context.EnableConcurrentExecutionInReleaseMode();
-        context.RegisterSyntaxNodeAction(AnalyzeInvocation, SyntaxKind.InvocationExpression);
+        context.RegisterSyntaxNodeActionAndCheck<MissingUsingStatementAnalyzer>(AnalyzeInvocation, SyntaxKind.InvocationExpression);
     }
 
     private static void AnalyzeInvocation(SyntaxNodeAnalysisContext context)
@@ -32,13 +32,12 @@ public sealed class MissingUsingStatementAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        if (context.SemanticModel.GetSymbolInfo(invocationExpression).Symbol is not IMethodSymbol methodSymbol)
+        if (context.SemanticModel.GetSymbolInfo(invocationExpression, context.CancellationToken).Symbol is not IMethodSymbol methodSymbol)
         {
             return;
         }
 
-        var returnedType = context.SemanticModel.GetTypeInfo(invocationExpression).Type as INamedTypeSymbol;
-        if (returnedType is null)
+        if (context.SemanticModel.GetTypeInfo(invocationExpression, context.CancellationToken).Type is not INamedTypeSymbol returnedType)
         {
             return;
         }
@@ -157,7 +156,7 @@ public sealed class MissingUsingStatementAnalyzer : DiagnosticAnalyzer
             return false;
         }
 
-        var symbol = context.SemanticModel.GetSymbolInfo(assignmentTarget).Symbol;
+        var symbol = context.SemanticModel.GetSymbolInfo(assignmentTarget, context.CancellationToken).Symbol;
         return symbol is IFieldSymbol or IPropertySymbol;
     }
 

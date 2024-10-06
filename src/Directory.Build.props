@@ -6,12 +6,13 @@
     <!-- CA1062:  Does not recognize scenarios where arguments are not null, see: https://github.com/dotnet/roslyn-analyzers/issues/2877 -->
     <!-- CA1303:  All our tools are English only, we don't need to localize any string -->
     <!-- RCS1194: We should only implement exception constructors we use, we don't want dead code -->
-    <NoWarn>CA1014;CA1032;CA1034;CA1062;CA1303;RCS1194;</NoWarn>
+    <!-- S1135:   Already covered by MA0026 -->
+    <NoWarn>CA1014;CA1032;CA1034;CA1062;CA1303;RCS1194;S1135</NoWarn>
 
     <!-- MA0025: NotImplementedException are like TODOs they should be warning only -->
     <!-- MA0026: We know TODO items should be tackled, let's not create Errors for them -->
     <!-- S1185:  We know TODO items should be tackled, let's not create Errors for them -->
-    <WarningsNotAsErrors>MA0025;MA0026;S1135</WarningsNotAsErrors>
+    <WarningsNotAsErrors>MA0025;MA0026</WarningsNotAsErrors>
 
     <WarningLevel>9999</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>

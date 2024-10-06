@@ -18,7 +18,7 @@ public sealed class TaskCreationWithMaterialisedCollectionAsEnumerableAnalyzer :
     {
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze);
         context.EnableConcurrentExecutionInReleaseMode();
-        context.RegisterSyntaxNodeAction(AnalyzeInvocation, SyntaxKind.InvocationExpression);
+        context.RegisterSyntaxNodeActionAndCheck<TaskCreationWithMaterialisedCollectionAsEnumerableAnalyzer>(AnalyzeInvocation, SyntaxKind.InvocationExpression);
     }
 
     private static void AnalyzeInvocation(SyntaxNodeAnalysisContext context)
@@ -57,7 +57,7 @@ public sealed class TaskCreationWithMaterialisedCollectionAsEnumerableAnalyzer :
         }
 
         var firstNonCastExpression = argument.Expression.GetFirstNonCastExpression();
-        var actualType = context.SemanticModel.GetTypeInfo(firstNonCastExpression).Type;
+        var actualType = context.SemanticModel.GetTypeInfo(firstNonCastExpression, context.CancellationToken).Type;
         if (actualType is null)
         {
             return;
