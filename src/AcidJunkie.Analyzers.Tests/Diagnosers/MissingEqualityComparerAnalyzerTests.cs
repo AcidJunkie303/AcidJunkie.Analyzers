@@ -304,11 +304,9 @@ public sealed class MissingEqualityComparerAnalyzerTests : TestBase<MissingEqual
               public int IntValue { get; set; }
               
               public bool Equals(PartialEquatableRefType? other)
-              {
-                  return other is not null
+                  => other is not null
                       && IntValue == other.IntValue
                       && StringValue == other.StringValue;
-              }
               
               public static class EqualityComparers
               {
@@ -322,16 +320,11 @@ public sealed class MissingEqualityComparerAnalyzerTests : TestBase<MissingEqual
               public int IntValue { get; set; }
               
               public bool Equals(FullEquatableRefType? other)
-              {
-                  return other is not null
+                  => other is not null
                       && IntValue == other.IntValue
-                      && StringValue == other.StringValue;
-              }
+                      && StringValue == other.StringValue;    
               
-              public override int GetHashCode()
-              {
-                  return StringComparer.Ordinal.GetHashCode(StringValue) ^ IntValue;
-              }
+              public override int GetHashCode() => HashCode.Combine(StringValue, IntValue);
               
               public static class EqualityComparers
               {

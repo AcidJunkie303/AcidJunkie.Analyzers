@@ -174,7 +174,7 @@ public sealed class MissingUsingStatementAnalyzer : DiagnosticAnalyzer
             public static readonly LocalizableString Title = "Missing using statement";
             public static readonly LocalizableString MessageFormat = "The disposable object is disposed via the using statement";
             public static readonly LocalizableString Description = MessageFormat + ".";
-            public static readonly DiagnosticDescriptor Rule = new(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Info, isEnabledByDefault: true, description: Description, helpLinkUri: HelpLinkUri);
+            public static readonly DiagnosticDescriptor Rule = new(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description, helpLinkUri: HelpLinkUri);
         }
     }
 }

@@ -183,7 +183,7 @@ public sealed class MissingEqualityComparerAnalyzer : DiagnosticAnalyzer
             public static readonly LocalizableString Title = "Provide an equality comparer argument";
             public static readonly LocalizableString MessageFormat = "To prevent unexpected results, use a IEqualityComparer argument because the type used for hash-matching does not fully implement IEquatable<T> together with GetHashCode()";
             public static readonly LocalizableString Description = MessageFormat;
-            public static readonly DiagnosticDescriptor Rule = new(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Error, isEnabledByDefault: true, description: Description, helpLinkUri: HelpLinkUri);
+            public static readonly DiagnosticDescriptor Rule = new(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description, helpLinkUri: HelpLinkUri);
         }
     }
 }
