@@ -10,28 +10,6 @@ namespace AcidJunkie.Analyzers.Diagnosers.ReturnMaterialisedCollectionAsEnumerab
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class ReturnMaterialisedCollectionAsEnumerableAnalyzer : DiagnosticAnalyzer
 {
-    private static readonly Dictionary<string, Dictionary<string, int>> ArityByTypeByNamespace = new(StringComparer.Ordinal)
-    {
-        {
-            "System.Collections", new(StringComparer.Ordinal)
-            {
-                { "ICollection", 0 },
-                { "IDictionary", 0 },
-                { "IList", 0 }
-            }
-        },
-        {
-            "System.Collections.Generic", new(StringComparer.Ordinal)
-            {
-                { "ICollection", 1 },
-                { "IDictionary", 1 },
-                { "IList", 1 },
-                { "ISet", 1 },
-                { "IReadOnlyCollection", 1 }
-            }
-        }
-    };
-
     private static readonly ImmutableArray<DiagnosticDescriptor> Rules = [CommonRules.UnhandledError.Rule, DiagnosticRules.Default.Rule];
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => Rules;
@@ -64,7 +42,7 @@ public sealed class ReturnMaterialisedCollectionAsEnumerableAnalyzer : Diagnosti
             return;
         }
 
-        if (!DoesTypeImplementAnyWellKnownCollectionInterface(returnType))
+        if (!returnType.DoesImplementWellKnownCollectionInterface())
         {
             return;
         }
@@ -123,35 +101,6 @@ public sealed class ReturnMaterialisedCollectionAsEnumerableAnalyzer : Diagnosti
         }
 
         return false;
-    }
-
-    private static bool DoesTypeImplementAnyWellKnownCollectionInterface(ITypeSymbol typeSymbol)
-        => IsWellKnownCollectionInterface(typeSymbol) || typeSymbol.AllInterfaces.Any(IsWellKnownCollectionInterface);
-
-    private static bool IsWellKnownCollectionInterface(ITypeSymbol typeSymbol)
-    {
-        if (typeSymbol is not INamedTypeSymbol namedTypeSymbol)
-        {
-            return false;
-        }
-
-        var ns = namedTypeSymbol.ContainingNamespace?.ToString();
-        if (ns.IsNullOrWhiteSpace())
-        {
-            return false;
-        }
-
-        if (!ArityByTypeByNamespace.TryGetValue(ns, out var arityByType))
-        {
-            return false;
-        }
-
-        if (!arityByType.TryGetValue(typeSymbol.Name, out var arity))
-        {
-            return false;
-        }
-
-        return namedTypeSymbol.Arity == arity;
     }
 
     internal static class DiagnosticRules

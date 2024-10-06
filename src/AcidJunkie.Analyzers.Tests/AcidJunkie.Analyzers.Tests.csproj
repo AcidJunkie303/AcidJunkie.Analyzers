@@ -3,7 +3,11 @@
     <PropertyGroup>
         <IsPackable>false</IsPackable>
         <IsTestProject>true</IsTestProject>
-        <NoWarn>$(NoWarn);CA1707</NoWarn>
+
+        <!-- CA1707: Identifier should not contain underscores  -> OK for unit test project -->
+        <!-- MA0051: Method is too long                         -> OK for unit test project -->
+        <NoWarn>$(NoWarn);CA1707;MA0051</NoWarn>
+
     </PropertyGroup>
 
     <ItemGroup>
@@ -24,7 +28,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Extensions\" />
+        <Folder Include="Extensions\" />
     </ItemGroup>
 
 </Project>
