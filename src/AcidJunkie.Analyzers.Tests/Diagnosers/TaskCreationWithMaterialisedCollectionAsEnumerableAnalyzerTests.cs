@@ -1,5 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
-using AcidJunkie.Analyzers.Diagnosers.ReturnMaterialisedCollectionAsEnumerable;
+using AcidJunkie.Analyzers.Diagnosers.TaskCreationWithMaterialisedCollectionAsEnumerable;
 
 namespace AcidJunkie.Analyzers.Tests.Diagnosers;
 

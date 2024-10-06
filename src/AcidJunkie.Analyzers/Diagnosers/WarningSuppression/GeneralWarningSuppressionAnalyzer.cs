@@ -34,7 +34,7 @@ public sealed class GeneralWarningSuppressionAnalyzer : DiagnosticAnalyzer
     {
         internal static class Default
         {
-            private const string Category = "Design";
+            private const string Category = "Code Smell";
             public const string DiagnosticId = "AJ0005";
 #pragma warning disable S1075 // Refactor your code not to use hardcoded absolution paths or URIs
             public const string HelpLinkUri = "https://github.com/AcidJunkie303/AcidJunkie.Analyzers/blob/main/docs/Rules/AJ0005.md";
