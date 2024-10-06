@@ -22,5 +22,5 @@
 | Id  | Summary | Status | Description |
 |-----|---------|--------|-------------|
 | #O1 | Build pipeline and upload to NuGet server. | 🔵 | |
-| #O2 | Unified settings handling | 🔵 | Create an easy way to retrieve the config for every analyzer diagnostic separately. |
-| #O3 | Logging | 🔵 | Create a simple logger which logs to a temporary directory. Since analyzers can run in parallel, file access need to be synchronized (e.g. throgh a named mutex). Logging should only be used to log fatal errors. |
+| #O2 | Unified settings handling | ✔️ | Create an easy way to retrieve the config for every analyzer diagnostic separately. |
+| #O3 | Logging | 🔵 | Create a simple logger which logs to a temporary directory. Since analyzers can run in parallel, file access need to be synchronized (e.g. throgh a named mutex. Monitors might not work beacuse there might be running multiple instances of `Visual Studio` or `donet build`). Logging should only be used to log fatal errors. |
