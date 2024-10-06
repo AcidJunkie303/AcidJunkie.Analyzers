@@ -19,8 +19,8 @@ public sealed class Aj0002Configuration
 
     public static class KeyNames
     {
-        public const string IsEnabled = "AJ0002.IsEnabled";
-        public const string IgnoredObjectNames = "AJ0002.IgnoredObjectNames";
+        public const string IsEnabled = "AJ0002.is_enabled";
+        public const string IgnoredObjectNames = "AJ0002.ignored_object_types";
     }
 
     public static class Defaults

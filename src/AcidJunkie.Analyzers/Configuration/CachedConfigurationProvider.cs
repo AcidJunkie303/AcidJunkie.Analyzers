@@ -40,7 +40,7 @@ internal sealed class CachedConfigurationProvider<T> : IConfigurationProvider<T>
                 if (IsReloadRequired())
                 {
                     var (configuration, isDefault) = _innerConfigurationProvider.GetConfiguration(options);
-                    // if it is the default settings, do not cache it
+                    // if it is the default settings, do not cache it.
                     // this is because some weird behavior that at the first time the analyzer loads, there's no configuration. Therefore, we don't cache this false data
                     if (isDefault)
                     {

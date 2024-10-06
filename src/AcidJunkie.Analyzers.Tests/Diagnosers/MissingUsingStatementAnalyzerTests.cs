@@ -73,7 +73,6 @@ public sealed class MissingUsingStatementAnalyzerTests : TestBase<MissingUsingSt
 
         await CreateTesterBuilder()
             .WithTestCode(code)
-            .WithGlobalOptions($"{Aj0002Configuration.KeyNames.IgnoredObjectNames} = bla")
             .Build()
             .RunAsync();
     }
@@ -86,7 +85,6 @@ public sealed class MissingUsingStatementAnalyzerTests : TestBase<MissingUsingSt
 
         await CreateTesterBuilder()
             .WithTestCode(code)
-            .WithGlobalOptions($"{Aj0002Configuration.KeyNames.IgnoredObjectNames} = bla")
             .Build()
             .RunAsync();
     }
