@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using AcidJunkie.Analyzers.Extensions;
+using AcidJunkie.Analyzers.Logging;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -21,11 +22,12 @@ public sealed class GeneralWarningSuppressionAnalyzer : DiagnosticAnalyzer
         context.RegisterSyntaxNodeActionAndCheck<GeneralWarningSuppressionAnalyzer>(AnalyzeReturn, SyntaxKind.PragmaWarningDirectiveTrivia);
     }
 
-    private static void AnalyzeReturn(SyntaxNodeAnalysisContext context)
+    private static void AnalyzeReturn(SyntaxNodeAnalysisContext context, ILogger<GeneralWarningSuppressionAnalyzer> logger)
     {
         var directive = (PragmaWarningDirectiveTriviaSyntax)context.Node;
         if (directive.ErrorCodes.Count == 0)
         {
+            logger.LogReportDiagnostic(DiagnosticRules.Default.Rule, directive.GetLocation());
             context.ReportDiagnostic(Diagnostic.Create(DiagnosticRules.Default.Rule, directive.GetLocation()));
         }
     }

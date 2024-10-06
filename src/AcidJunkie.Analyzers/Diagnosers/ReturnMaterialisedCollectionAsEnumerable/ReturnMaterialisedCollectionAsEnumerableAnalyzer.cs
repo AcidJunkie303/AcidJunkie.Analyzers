@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using AcidJunkie.Analyzers.Extensions;
+using AcidJunkie.Analyzers.Logging;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -21,17 +22,19 @@ public sealed class ReturnMaterialisedCollectionAsEnumerableAnalyzer : Diagnosti
         context.RegisterSyntaxNodeActionAndCheck<ReturnMaterialisedCollectionAsEnumerableAnalyzer>(AnalyzeReturn, SyntaxKind.ReturnStatement);
     }
 
-    private static void AnalyzeReturn(SyntaxNodeAnalysisContext context)
+    private static void AnalyzeReturn(SyntaxNodeAnalysisContext context, ILogger<ReturnMaterialisedCollectionAsEnumerableAnalyzer> logger)
     {
         var returnStatement = (ReturnStatementSyntax)context.Node;
 
         if (returnStatement.Expression is null)
         {
+            logger.WriteLine(() => "return statement has no expression");
             return;
         }
 
         if (!DoesMethodReturnEnumerable(context, returnStatement))
         {
+            logger.WriteLine(() => "Method return type is not IEnumerable or IEnumerable<T>");
             return;
         }
 
@@ -39,14 +42,17 @@ public sealed class ReturnMaterialisedCollectionAsEnumerableAnalyzer : Diagnosti
         var returnType = context.SemanticModel.GetTypeInfo(realReturnExpression, context.CancellationToken).Type;
         if (returnType is null)
         {
+            logger.WriteLine(() => $"Unable to determine the method return type from expression {realReturnExpression}");
             return;
         }
 
         if (!returnType.DoesImplementWellKnownCollectionInterface())
         {
+            logger.WriteLine(() => $"Return type {returnType.GetFullName()} does is or does not implement any well known collection interfaces");
             return;
         }
 
+        logger.LogReportDiagnostic(DiagnosticRules.Default.Rule, returnStatement.ReturnKeyword.GetLocation());
         context.ReportDiagnostic(Diagnostic.Create(DiagnosticRules.Default.Rule, returnStatement.ReturnKeyword.GetLocation()));
     }
 

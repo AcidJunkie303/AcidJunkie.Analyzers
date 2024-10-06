@@ -14,4 +14,12 @@ internal static class MethodSymbolExtensions
 
         return buffer.ToString();
     }
+
+    public static string GetFullName(this IMethodSymbol methodSymbol)
+    {
+        var ns = methodSymbol.ContainingType.ContainingNamespace.ToString();
+        return ns.IsNullOrWhiteSpace()
+            ? $"{methodSymbol.ContainingType.Name}.{methodSymbol.Name}"
+            : $"{ns}.{methodSymbol.ContainingType.Name}.{methodSymbol.Name}";
+    }
 }

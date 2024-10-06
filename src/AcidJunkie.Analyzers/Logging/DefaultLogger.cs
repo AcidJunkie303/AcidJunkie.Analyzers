@@ -36,8 +36,8 @@ internal static class DefaultLogger
             return false;
         }
 
+        // TODO: add code fixers as well
         return type.BaseType == typeof(DiagnosticAnalyzer)
-               // TODO: add code fixers as well
                || IsAnalyzerClass(type.BaseType);
     }
 }

@@ -136,3 +136,7 @@ dotnet_diagnostic.MVC1004.severity = error
 dotnet_diagnostic.MVC1005.severity = error
 dotnet_diagnostic.RE0001.severity = error
 dotnet_diagnostic.S1135.severity = warning
+
+MA0051.maximum_lines_per_method = 80
+MA0051.maximum_statements_per_method = 60
+MA0051.skip_local_functions = true
