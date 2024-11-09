@@ -86,7 +86,7 @@ public sealed class MissingEqualityComparerAnalyzer : DiagnosticAnalyzer
 
         if (keyType.ImplementsGenericEquatable() && keyType.IsGetHashCodeOverridden())
         {
-            logger.WriteLine(() => $"Key type {keyType.GetFullName()} not not implement IEquatable<{keyType.GetFullName()}> or does not override {nameof(object.GetHashCode)}()");
+            logger.WriteLine(() => $"Key type {keyType.GetFullName()} does implement IEquatable<{keyType.GetFullName()}> and does override {nameof(object.GetHashCode)}() as well");
             return;
         }
 
