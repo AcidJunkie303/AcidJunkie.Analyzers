@@ -10,6 +10,6 @@ internal static class GeneralConfigurationManager
 
     public static class KeyNames
     {
-        public const string LoggingEnabled = "AJ.logging_enabled";
+        public const string LoggingEnabled = "AJ.is_logging_enabled";
     }
 }

@@ -5,6 +5,8 @@ namespace AcidJunkie.Analyzers.Logging;
 internal sealed class NullLogger<TContext> : ILogger<TContext>
     where TContext : class
 {
+    public bool IsLoggingEnabled => false;
+
     public void WriteLine(Func<string> messageFactory, [CallerMemberName] string memberName = "")
     {
     }

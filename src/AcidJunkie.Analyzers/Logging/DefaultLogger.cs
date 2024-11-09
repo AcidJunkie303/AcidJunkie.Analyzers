@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
@@ -10,18 +11,18 @@ namespace AcidJunkie.Analyzers.Logging;
 [SuppressMessage("MicrosoftCodeAnalysisCorrectness", "RS1035: Do not use APIs banned for analyzers.", Justification = "We need to do file system access for logging")]
 internal static class DefaultLogger
 {
-    public const string LogFileName = "AcidJunkie.Analyzers.WriteLine";
+    public const string LogFileName = "AcidJunkie.Analyzers.log";
     public static int ProcessId { get; } = GetCurrentProcessId();
     public static int MaxAnalyzerClassNameLength { get; } = GetMaxAnalyzerClassNameLength();
     public static string LogFilePath { get; } = Path.Combine(Path.GetTempPath(), LogFileName);
 
-    public static int GetCurrentProcessId()
+    private static int GetCurrentProcessId()
     {
         using var currentProcess = Process.GetCurrentProcess();
         return currentProcess.Id;
     }
 
-    public static int GetMaxAnalyzerClassNameLength()
+    private static int GetMaxAnalyzerClassNameLength()
         => Assembly
             .GetAssembly(typeof(MissingEqualityComparerAnalyzer))!
             .GetTypes()
@@ -36,15 +37,18 @@ internal static class DefaultLogger
             return false;
         }
 
+#pragma warning disable MA0026
         // TODO: add code fixers as well
-        return type.BaseType == typeof(DiagnosticAnalyzer)
-               || IsAnalyzerClass(type.BaseType);
+#pragma warning restore MA0026
+        return type.BaseType == typeof(DiagnosticAnalyzer) || IsAnalyzerClass(type.BaseType);
     }
 }
 
 internal sealed class DefaultLogger<TContext> : ILogger<TContext>
     where TContext : class
 {
+    public bool IsLoggingEnabled => true;
+
     [SuppressMessage("MicrosoftCodeAnalysisCorrectness", "RS1035: Do not use APIs banned for analyzers.", Justification = "We need to do file system access for logging")]
     public void WriteLine(Func<string> messageFactory, [CallerMemberName] string memberName = "")
     {

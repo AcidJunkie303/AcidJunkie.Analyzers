@@ -19,10 +19,10 @@ public sealed class GeneralWarningSuppressionAnalyzer : DiagnosticAnalyzer
     {
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze);
         context.EnableConcurrentExecutionInReleaseMode();
-        context.RegisterSyntaxNodeActionAndCheck<GeneralWarningSuppressionAnalyzer>(AnalyzeReturn, SyntaxKind.PragmaWarningDirectiveTrivia);
+        context.RegisterSyntaxNodeActionAndCheck<GeneralWarningSuppressionAnalyzer>(Analyze, SyntaxKind.PragmaWarningDirectiveTrivia);
     }
 
-    private static void AnalyzeReturn(SyntaxNodeAnalysisContext context, ILogger<GeneralWarningSuppressionAnalyzer> logger)
+    private static void Analyze(SyntaxNodeAnalysisContext context, ILogger<GeneralWarningSuppressionAnalyzer> logger)
     {
         var directive = (PragmaWarningDirectiveTriviaSyntax)context.Node;
         if (directive.ErrorCodes.Count == 0)

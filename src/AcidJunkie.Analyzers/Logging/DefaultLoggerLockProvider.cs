@@ -2,7 +2,9 @@ namespace AcidJunkie.Analyzers.Logging;
 
 internal static class DefaultLoggerLockProvider
 {
-    public const string MutexName = @"Global\AcidJunkie.Analyzers.Logging";
+    // TODO: Using Mutex is the only possiblity to synchronize access to a shared file from multiple processes
+    // However, bottom side of mutexes are, that they are thread-affinitive
+    private const string MutexName = @"Global\AcidJunkie.Analyzers.Logging";
 
     public static IDisposable AcquireLock()
     {

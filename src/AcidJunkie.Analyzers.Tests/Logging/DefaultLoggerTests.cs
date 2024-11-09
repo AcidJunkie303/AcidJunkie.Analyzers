@@ -24,9 +24,10 @@ public sealed class DefaultLoggerTests
         logFileContent.Should().Contain($"PID={Environment.ProcessId}");
         logFileContent.Should().Contain($"TID={Environment.CurrentManagedThreadId}");
     }
+
     private static string GetLogFileContent()
     {
-#pragma warning disable MA0045
+#pragma warning disable MA0045 // Use 'ReadAllTextAsync' instead of 'ReadAllText' and make method async -> We are in a non-async context
         return File.ReadAllText(DefaultLogger.LogFilePath);
 #pragma warning restore MA0045
     }
