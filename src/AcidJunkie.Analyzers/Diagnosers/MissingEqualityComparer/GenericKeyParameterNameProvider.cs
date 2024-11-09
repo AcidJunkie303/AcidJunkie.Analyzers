@@ -1,144 +1,141 @@
+using System.Collections.Frozen;
+
 namespace AcidJunkie.Analyzers.Diagnosers.MissingEqualityComparer;
 
 internal static class GenericKeyParameterNameProvider
 {
-    private static readonly Dictionary<string, Dictionary<string, Dictionary<string, string>>> GenericKeyByMethodNameByContainingTypeByContainingTypeNameSpace =
-        new(StringComparer.Ordinal)
+    private static readonly FrozenDictionary<string, FrozenDictionary<string, FrozenDictionary<string, string>>> GenericKeyByMethodNameByContainingTypeByContainingTypeNameSpace =
+        new[]
         {
-            {
+            (
                 "System.Linq",
-                new Dictionary<string, Dictionary<string, string>>(StringComparer.Ordinal)
+                new[]
                 {
-                    {
+                    (
                         "Enumerable",
-                        new Dictionary<string, string> (StringComparer.Ordinal)
+                        new[]
                         {
-                            {"Contains", "TSource" },
-                            {"Distinct", "TSource" },
-                            {"DistinctBy", "TKey" },
-                            {"Except", "TSource" },
-                            {"ExceptBy", "TKey" },
-                            {"GroupBy", "TKey" },
-                            {"GroupJoin", "TKey" },
-                            {"Intersect", "TSource" },
-                            {"IntersectBy", "TKey" },
-                            {"Join", "TKey" },
-                            {"SequenceEqual", "TSource" },
-                            {"ToDictionary", "TKey" },
-                            {"ToHashSet", "TSource" },
-                            {"ToLookup", "TKey" },
-                            {"Union", "TSource" },
-                            {"UnionBy", "TKey" }
-                        }
-                    }
-                }
-            },
-            {
+                            ("Contains", "TSource"),
+                            ("Distinct", "TSource"),
+                            ("DistinctBy", "TKey"),
+                            ("Except", "TSource"),
+                            ("ExceptBy", "TKey"),
+                            ("GroupBy", "TKey"),
+                            ("GroupJoin", "TKey"),
+                            ("Intersect", "TSource"),
+                            ("IntersectBy", "TKey"),
+                            ("Join", "TKey"),
+                            ("SequenceEqual", "TSource"),
+                            ("ToDictionary", "TKey"),
+                            ("ToHashSet", "TSource"),
+                            ("ToLookup", "TKey"),
+                            ("Union", "TSource"),
+                            ("UnionBy", "TKey")
+                        }.ToFrozenDictionary(a => a.Item1, a => a.Item2, StringComparer.Ordinal)
+                    )
+                }.ToFrozenDictionary(a => a.Item1, a => a.Item2, StringComparer.Ordinal)
+            ),
+            (
                 "System.Collections.Immutable",
-                new Dictionary<string, Dictionary<string, string>>(StringComparer.Ordinal)
+                new[]
                 {
-                    {
+                    (
                         "ImmutableDictionary",
-                        new Dictionary<string, string> (StringComparer.Ordinal)
+                        new[]
                         {
-                            {"Create", "TKey" },
-                            {"CreateRange", "TKey" },
-                            {"CreateBuilder", "TKey" },
-                            {"ToImmutableDictionary", "TKey" }
-                        }
-                    },
-                    {
+                            ("Create", "TKey"),
+                            ("CreateRange", "TKey"),
+                            ("CreateBuilder", "TKey"),
+                            ("ToImmutableDictionary", "TKey")
+                        }.ToFrozenDictionary(a => a.Item1, a => a.Item2, StringComparer.Ordinal)
+                    ),
+                    (
                         "ImmutableHashSet",
-                        new Dictionary<string, string> (StringComparer.Ordinal)
+                        new[]
                         {
-                            {"Create", "T" },
-                            {"CreateRange", "T" },
-                            {"CreateBuilder", "T" },
-                            {"ToImmutableHashSet", "TSource" }
-                        }
-                    }
-                }
-            },
-            {
+                            ("Create", "T"),
+                            ("CreateRange", "T"),
+                            ("CreateBuilder", "T"),
+                            ("ToImmutableHashSet", "TSource")
+                        }.ToFrozenDictionary(a => a.Item1, a => a.Item2, StringComparer.Ordinal)
+                    )
+                }.ToFrozenDictionary(a => a.Item1, a => a.Item2, StringComparer.Ordinal)
+            ),
+            (
                 "System.Collections.Frozen",
-                new Dictionary<string, Dictionary<string, string>>(StringComparer.Ordinal)
+                new[]
                 {
-                    {
+                    (
                         "FrozenDictionary",
-                        new Dictionary<string, string> (StringComparer.Ordinal)
+                        new[]
                         {
-                            {"ToFrozenDictionary", "TKey" }
-                        }
-                    },
-                    {
+                            ("ToFrozenDictionary", "TKey")
+                        }.ToFrozenDictionary(a => a.Item1, a => a.Item2, StringComparer.Ordinal)
+                    ),
+                    (
                         "FrozenSet",
-                        new Dictionary<string, string> (StringComparer.Ordinal)
+                        new[]
                         {
-                            {"ToFrozenSet", "T" }
-                        }
-                    }
-                }
-            }
-        };
+                            ("ToFrozenSet", "T")
+                        }.ToFrozenDictionary(a => a.Item1, a => a.Item2, StringComparer.Ordinal)
+                    )
+                }.ToFrozenDictionary(a => a.Item1, a => a.Item2, StringComparer.Ordinal)
+            )
+        }.ToFrozenDictionary(a => a.Item1, a => a.Item2, StringComparer.Ordinal);
 
-    private static readonly Dictionary<string, Dictionary<string, Dictionary<int, string>>> GenericKeyByGenericTypeCountByTypeNameByNameSpace =
-        new(StringComparer.Ordinal)
-        {
+    private static readonly FrozenDictionary<string, FrozenDictionary<string, FrozenDictionary<int, string>>>
+        GenericKeyByGenericTypeCountByTypeNameByNameSpace =
+            new[]
             {
-                "System.Collections.Generic",
-                new (StringComparer.Ordinal)
-                {
+                (
+                    "System.Collections.Generic",
+                    new[]
                     {
-                        "Dictionary",
-                        new Dictionary<int, string>
-                        {
+                        (
+                            "Dictionary",
+                            new[]
                             {
-                                2, "TKey"
-                            }
-                        }
-
-                    },
-                    {
-                        "HashSet",
-                        new Dictionary<int, string>
-                        {
+                                (
+                                    2, "TKey"
+                                )
+                            }.ToFrozenDictionary(a => a.Item1, a => a.Item2)
+                        ),
+                        (
+                            "HashSet",
+                            new[]
                             {
-                                1, "T"
-                            }
-                        }
+                                (
+                                    1, "T"
+                                )
+                            }.ToFrozenDictionary(a => a.Item1, a => a.Item2)
+                        )
+                    }.ToFrozenDictionary(a => a.Item1, a => a.Item2, StringComparer.Ordinal)
+                )
+            }.ToFrozenDictionary(a => a.Item1, a => a.Item2, StringComparer.Ordinal);
 
-                    }
-                }
-            }
-        };
-
-    public static string? GetKeyParameterNameForInvocation(string containingTypeNamespaceName, string containingTypeName, string methodName)
+    public static string? GetKeyParameterNameForInvocation(string containingTypeNamespaceName,
+        string containingTypeName, string methodName)
     {
-        if (!GenericKeyByMethodNameByContainingTypeByContainingTypeNameSpace.TryGetValue(containingTypeNamespaceName, out var genericKeyByMethodNameByContainingType))
-        {
+        if (!GenericKeyByMethodNameByContainingTypeByContainingTypeNameSpace.TryGetValue(containingTypeNamespaceName,
+                out var genericKeyByMethodNameByContainingType))
             return null;
-        }
 
-        if (!genericKeyByMethodNameByContainingType.TryGetValue(containingTypeName, out var genericKeyByMethodName))
-        {
-            return null;
-        }
+        if (!genericKeyByMethodNameByContainingType.TryGetValue(containingTypeName, out var genericKeyByMethodName)) return null;
 
         return genericKeyByMethodName.TryGetValue(methodName, out var genericKeyName) ? genericKeyName : null;
     }
 
-    public static string? GetKeyParameterNameForCreation(string containingTypeNamespaceName, string containingTypeName, int genericParameterCount)
+    public static string? GetKeyParameterNameForCreation(string containingTypeNamespaceName, string containingTypeName,
+        int genericParameterCount)
     {
-        if (!GenericKeyByGenericTypeCountByTypeNameByNameSpace.TryGetValue(containingTypeNamespaceName, out var genericKeyByMethodNameByContainingType))
-        {
+        if (!GenericKeyByGenericTypeCountByTypeNameByNameSpace.TryGetValue(containingTypeNamespaceName,
+                out var genericKeyByMethodNameByContainingType))
             return null;
-        }
 
-        if (!genericKeyByMethodNameByContainingType.TryGetValue(containingTypeName, out var genericKeyByMethodName))
-        {
-            return null;
-        }
+        if (!genericKeyByMethodNameByContainingType.TryGetValue(containingTypeName, out var genericKeyByMethodName)) return null;
 
-        return genericKeyByMethodName.TryGetValue(genericParameterCount, out var genericKeyName) ? genericKeyName : null;
+        return genericKeyByMethodName.TryGetValue(genericParameterCount, out var genericKeyName)
+            ? genericKeyName
+            : null;
     }
 }
