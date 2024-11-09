@@ -4,6 +4,10 @@ charset = utf-8
 trim_trailing_whitespace = true
 insert_final_newline = true
 
+# ReSharper properties
+resharper_csharp_max_line_length = 999
+resharper_csharp_wrap_lines = false
+
 
 [*.cs]
 indent_size = 4
@@ -11,10 +15,10 @@ dotnet_sort_system_directives_first = true
 
 # Enforce file-scoped namespaces
 csharp_style_namespace_declarations = file_scoped:error
-dotnet_diagnostic.IDE0161.severity = error
+dotnet_diagnostic.ide0161.severity = error
 
 # Seal internal types
-dotnet_diagnostic.CA1852.severity = error
+dotnet_diagnostic.ca1852.severity = error
 
 # Don't use this. qualifier
 dotnet_style_qualification_for_field = false:suggestion
@@ -43,12 +47,12 @@ csharp_new_line_before_members_in_anonymous_types = true
 resharper_place_simple_initializer_on_single_line = false
 
 # Constant fields should be PascalCase
-dotnet_naming_symbols.constant_fields.applicable_kinds   = field
+dotnet_naming_symbols.constant_fields.applicable_kinds = field
 dotnet_naming_symbols.constant_fields.required_modifiers = const
 dotnet_naming_style.pascal_case_style.capitalization = pascal_case
 dotnet_naming_rule.constant_fields_should_be_pascal_case.severity = error
-dotnet_naming_rule.constant_fields_should_be_pascal_case.symbols  = constant_fields
-dotnet_naming_rule.constant_fields_should_be_pascal_case.style    = pascal_case_style
+dotnet_naming_rule.constant_fields_should_be_pascal_case.symbols = constant_fields
+dotnet_naming_rule.constant_fields_should_be_pascal_case.style = pascal_case_style
 
 # Private instance fields should be _camelCase
 dotnet_naming_symbols.private_instance_fields.applicable_kinds = field
@@ -56,87 +60,87 @@ dotnet_naming_symbols.private_instance_fields.applicable_accessibilities = priva
 dotnet_naming_style.camel_case_underscore_style.required_prefix = _
 dotnet_naming_style.camel_case_underscore_style.capitalization = camel_case
 dotnet_naming_rule.camel_case_for_private_instance_fields.severity = error
-dotnet_naming_rule.camel_case_for_private_instance_fields.symbols  = private_instance_fields
-dotnet_naming_rule.camel_case_for_private_instance_fields.style    = camel_case_underscore_style
+dotnet_naming_rule.camel_case_for_private_instance_fields.symbols = private_instance_fields
+dotnet_naming_rule.camel_case_for_private_instance_fields.style = camel_case_underscore_style
 
 # Private static fields should be PascalCase
 dotnet_naming_symbols.private_static_fields.applicable_kinds = field
 dotnet_naming_symbols.private_static_fields.applicable_accessibilities = private
 dotnet_naming_symbols.private_static_fields.required_modifiers = static
 dotnet_naming_rule.camel_case_for_private_static_fields.severity = error
-dotnet_naming_rule.camel_case_for_private_static_fields.symbols  = private_static_fields
-dotnet_naming_rule.camel_case_for_private_static_fields.style    = pascal_case_style
+dotnet_naming_rule.camel_case_for_private_static_fields.symbols = private_static_fields
+dotnet_naming_rule.camel_case_for_private_static_fields.style = pascal_case_style
 
 # Space before/after any operator
-csharp_space_around_binary_operators=before_and_after
+csharp_space_around_binary_operators = before_and_after
 
 # New line preferences
 dotnet_style_allow_multiple_blank_lines = false
 dotnet_style_allow_multiple_blank_lines_experimental = false:warning
 
-dotnet_diagnostic.ASP0000.severity = error
-dotnet_diagnostic.ASP0001.severity = error
-dotnet_diagnostic.BL0002.severity = error
-dotnet_diagnostic.BL0003.severity = error
-dotnet_diagnostic.BL0005.severity = error
-dotnet_diagnostic.BL0006.severity = error
-dotnet_diagnostic.CA1001.severity = error
-dotnet_diagnostic.CA1309.severity = error
-dotnet_diagnostic.CA1507.severity = error
-dotnet_diagnostic.CA1825.severity = error
-dotnet_diagnostic.CA2016.severity = error
-dotnet_diagnostic.CA2200.severity = error
-dotnet_diagnostic.CA3076.severity = error
-dotnet_diagnostic.CA3077.severity = error
-dotnet_diagnostic.CS8019.severity = error
-dotnet_diagnostic.CS8020.severity = error
-dotnet_diagnostic.IDE0001.severity = error
-dotnet_diagnostic.IDE0002.severity = error
-dotnet_diagnostic.IDE0003.severity = error
-dotnet_diagnostic.IDE0004.severity = error
+dotnet_diagnostic.asp0000.severity = error
+dotnet_diagnostic.asp0001.severity = error
+dotnet_diagnostic.bl0002.severity = error
+dotnet_diagnostic.bl0003.severity = error
+dotnet_diagnostic.bl0005.severity = error
+dotnet_diagnostic.bl0006.severity = error
+dotnet_diagnostic.ca1001.severity = error
+dotnet_diagnostic.ca1309.severity = error
+dotnet_diagnostic.ca1507.severity = error
+dotnet_diagnostic.ca1825.severity = error
+dotnet_diagnostic.ca2016.severity = error
+dotnet_diagnostic.ca2200.severity = error
+dotnet_diagnostic.ca3076.severity = error
+dotnet_diagnostic.ca3077.severity = error
+dotnet_diagnostic.cs8019.severity = error
+dotnet_diagnostic.cs8020.severity = error
+dotnet_diagnostic.ide0001.severity = error
+dotnet_diagnostic.ide0002.severity = error
+dotnet_diagnostic.ide0003.severity = error
+dotnet_diagnostic.ide0004.severity = error
 # Workaround for https://github.com/dotnet/roslyn/issues/41640
-dotnet_diagnostic.IDE0005.severity = suggestion
-dotnet_diagnostic.IDE0028.severity = error
-dotnet_diagnostic.IDE0032.severity = error
-dotnet_diagnostic.IDE0043.severity = error
-dotnet_diagnostic.IDE0044.severity = error
-dotnet_diagnostic.IDE0047.severity = error
-dotnet_diagnostic.IDE0048.severity = error
-dotnet_diagnostic.IDE0051.severity = error
-dotnet_diagnostic.IDE0052.severity = error
-dotnet_diagnostic.IDE0059.severity = error
-dotnet_diagnostic.IDE0060.severity = error
-dotnet_diagnostic.IDE0063.severity = error
-dotnet_diagnostic.IDE0065.severity = error
-dotnet_diagnostic.IDE0070.severity = error
-dotnet_diagnostic.IDE0071.severity = error
-dotnet_diagnostic.IDE0076.severity = error
-dotnet_diagnostic.IDE0077.severity = error
-dotnet_diagnostic.IDE0080.severity = error
-dotnet_diagnostic.IDE0082.severity = error
-dotnet_diagnostic.IDE0090.severity = error
-dotnet_diagnostic.IDE0100.severity = error
-dotnet_diagnostic.IDE0110.severity = error
-dotnet_diagnostic.IDE0290.severity = none
-dotnet_diagnostic.IDE1005.severity = error
-dotnet_diagnostic.IDE1006.severity = error
-dotnet_diagnostic.IDE2000.severity = error
-dotnet_diagnostic.IDE2001.severity = error
-dotnet_diagnostic.IDE2002.severity = error
-dotnet_diagnostic.IDE2003.severity = error
-dotnet_diagnostic.IDE2004.severity = error
-dotnet_diagnostic.MA0007.severity = none
-dotnet_diagnostic.MA0042.severity = error
-dotnet_diagnostic.MA0045.severity = error
-dotnet_diagnostic.MVC1000.severity = error
-dotnet_diagnostic.MVC1001.severity = error
-dotnet_diagnostic.MVC1002.severity = error
-dotnet_diagnostic.MVC1003.severity = error
-dotnet_diagnostic.MVC1004.severity = error
-dotnet_diagnostic.MVC1005.severity = error
-dotnet_diagnostic.RE0001.severity = error
-dotnet_diagnostic.S1135.severity = warning
+dotnet_diagnostic.ide0005.severity = suggestion
+dotnet_diagnostic.ide0028.severity = error
+dotnet_diagnostic.ide0032.severity = error
+dotnet_diagnostic.ide0043.severity = error
+dotnet_diagnostic.ide0044.severity = error
+dotnet_diagnostic.ide0047.severity = error
+dotnet_diagnostic.ide0048.severity = error
+dotnet_diagnostic.ide0051.severity = error
+dotnet_diagnostic.ide0052.severity = error
+dotnet_diagnostic.ide0059.severity = error
+dotnet_diagnostic.ide0060.severity = error
+dotnet_diagnostic.ide0063.severity = error
+dotnet_diagnostic.ide0065.severity = error
+dotnet_diagnostic.ide0070.severity = error
+dotnet_diagnostic.ide0071.severity = error
+dotnet_diagnostic.ide0076.severity = error
+dotnet_diagnostic.ide0077.severity = error
+dotnet_diagnostic.ide0080.severity = error
+dotnet_diagnostic.ide0082.severity = error
+dotnet_diagnostic.ide0090.severity = error
+dotnet_diagnostic.ide0100.severity = error
+dotnet_diagnostic.ide0110.severity = error
+dotnet_diagnostic.ide0290.severity = none
+dotnet_diagnostic.ide1005.severity = error
+dotnet_diagnostic.ide1006.severity = error
+dotnet_diagnostic.ide2000.severity = error
+dotnet_diagnostic.ide2001.severity = error
+dotnet_diagnostic.ide2002.severity = error
+dotnet_diagnostic.ide2003.severity = error
+dotnet_diagnostic.ide2004.severity = error
+dotnet_diagnostic.ma0007.severity = none
+dotnet_diagnostic.ma0042.severity = error
+dotnet_diagnostic.ma0045.severity = error
+dotnet_diagnostic.mvc1000.severity = error
+dotnet_diagnostic.mvc1001.severity = error
+dotnet_diagnostic.mvc1002.severity = error
+dotnet_diagnostic.mvc1003.severity = error
+dotnet_diagnostic.mvc1004.severity = error
+dotnet_diagnostic.mvc1005.severity = error
+dotnet_diagnostic.re0001.severity = error
+dotnet_diagnostic.s1135.severity = warning
 
-MA0051.maximum_lines_per_method = 80
-MA0051.maximum_statements_per_method = 60
-MA0051.skip_local_functions = true
+ma0051.maximum_lines_per_method = 80
+ma0051.maximum_statements_per_method = 60
+ma0051.skip_local_functions = true
