@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using AcidJunkie.Analyzers.Diagnosers.ReturnMaterialisedCollectionAsEnumerable;
+using Xunit.Abstractions;
 
 namespace AcidJunkie.Analyzers.Tests.Diagnosers;
 
@@ -7,6 +8,10 @@ namespace AcidJunkie.Analyzers.Tests.Diagnosers;
 [SuppressMessage("Code Smell", "S2699:Tests should include assertions", Justification = "This is done internally by AnalyzerTest.RunAsync()")]
 public sealed class ReturnMaterialisedCollectionAsEnumerableAnalyzerTests : TestBase<ReturnMaterialisedCollectionAsEnumerableAnalyzer>
 {
+    public ReturnMaterialisedCollectionAsEnumerableAnalyzerTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+    {
+    }
+
     [Fact]
     public async Task WhenReturningPureEnumerable_ThenOk()
     {

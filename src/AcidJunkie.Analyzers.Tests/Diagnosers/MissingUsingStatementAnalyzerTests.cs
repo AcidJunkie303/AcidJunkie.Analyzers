@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using AcidJunkie.Analyzers.Configuration;
 using AcidJunkie.Analyzers.Diagnosers.MissingUsingStatement;
+using Xunit.Abstractions;
 
 namespace AcidJunkie.Analyzers.Tests.Diagnosers;
 
@@ -11,6 +12,10 @@ public sealed class MissingUsingStatementAnalyzerTests : TestBase<MissingUsingSt
     static MissingUsingStatementAnalyzerTests()
     {
         CachedConfigurationProvider.IsCachingEnabled = false;
+    }
+
+    public MissingUsingStatementAnalyzerTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+    {
     }
 
     [Theory]
@@ -128,32 +133,32 @@ public sealed class MissingUsingStatementAnalyzerTests : TestBase<MissingUsingSt
           {
               private IDisposable? _disposable;
               private IDisposable? Disposable {get; set;}
-                  
+
               public object? ComplexTestMethod()
               {
                   {{simpleInsertionCode}}
-                  
+
                   return null; // fallback. Some testing methods might return something
               }
-              
+
               {{complexInsertionCode}}
-              
+
               private static DisposableRefType GetDisposableRefType() => null!;
               private static IDisposable GetDisposable() => null!;
               private static RefStructWithDisposeMethod GetRefStructWithDisposeMethod() => new();
           }
-          
+
           public sealed class Factory
           {
               public static IDisposable GetDisposable_StaticMethod() => null!;
               public static IDisposable GetDisposableRefType_StaticMethod() => null!;
               public static RefStructWithDisposeMethod GetRefStructWithDisposeMethod_StaticMethod() => new();
               public IDisposable GetDisposable() => null!;
-              public IDisposable GetDisposable<TT>() => null!;    
+              public IDisposable GetDisposable<TT>() => null!;
               public IDisposable GetDisposableRefType() => null!;
               public RefStructWithDisposeMethod GetRefStructWithDisposeMethod() => new();
           }
-          
+
           public sealed class Factory<T>
           {
               public static DisposableRefType GetDisposable_StaticMethod() => null!;
@@ -172,17 +177,17 @@ public sealed class MissingUsingStatementAnalyzerTests : TestBase<MissingUsingSt
           {
               public void Dispose(){}
           }
-          
+
           public sealed class DisposableRefType<T> : IDisposable
           {
               public void Dispose(){}
           }
-          
+
           public ref struct RefStructWithDisposeMethod
           {
               public void Dispose(){}
           }
-          
+
           public sealed class OuterDisposableFactory
           {
               public InnerDisposableFactory GetInnerFactory() => new ();
@@ -190,7 +195,7 @@ public sealed class MissingUsingStatementAnalyzerTests : TestBase<MissingUsingSt
 
           public sealed class InnerDisposableFactory
           {
-              public IDisposable GetDisposable() => null!; 
+              public IDisposable GetDisposable() => null!;
           }
           """;
 }

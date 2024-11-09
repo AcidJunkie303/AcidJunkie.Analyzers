@@ -1,18 +1,21 @@
+using System.Collections.Immutable;
 using AcidJunkie.Analyzers.Extensions;
 using AcidJunkie.Analyzers.Tests.Runtime;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Testing;
-using Microsoft.Data.SqlClient;
+using Microsoft.CodeAnalysis.Text;
+using Xunit.Abstractions;
 
 namespace AcidJunkie.Analyzers.Tests.Helpers;
 
 public static class CSharpAnalyzerTestBuilder
 {
-    public static CSharpAnalyzerTestBuilder<TAnalyzer> Create<TAnalyzer>()
+    public static CSharpAnalyzerTestBuilder<TAnalyzer> Create<TAnalyzer>(ITestOutputHelper testOutputHelper)
         where TAnalyzer : DiagnosticAnalyzer, new()
-        => new();
+        => new(testOutputHelper);
 }
 
 public sealed class CSharpAnalyzerTestBuilder<TAnalyzer>
@@ -21,10 +24,24 @@ public sealed class CSharpAnalyzerTestBuilder<TAnalyzer>
     private string? _code;
     private readonly List<Type> _additionalTypes = [];
     private readonly List<string> _additionalGlobalOptionsLines = [];
+    private readonly List<PackageIdentity> _additionalPackages = [];
+    private readonly ITestOutputHelper _testOutputHelper;
+
+    public CSharpAnalyzerTestBuilder(ITestOutputHelper testOutputHelper)
+    {
+        _testOutputHelper = testOutputHelper;
+    }
 
     public CSharpAnalyzerTestBuilder<TAnalyzer> WithTestCode(string code)
     {
         _code = code;
+        return this;
+    }
+
+    public CSharpAnalyzerTestBuilder<TAnalyzer> WithNugetPackage(string packageName, string packageVersion)
+    {
+        var package = new PackageIdentity(packageName, packageVersion);
+        _additionalPackages.Add(package);
         return this;
     }
 
@@ -47,24 +64,20 @@ public sealed class CSharpAnalyzerTestBuilder<TAnalyzer>
             throw new InvalidOperationException("No code added!");
         }
 
+        LogSyntaxTree(_code);
+
         var analyzerTest = new CSharpAnalyzerTest<TAnalyzer, DefaultVerifier>
         {
             TestState =
             {
                 Sources = {_code},
 #if NET8_0
-                ReferenceAssemblies = Net.Assemblies.Net80,
+                ReferenceAssemblies = Net.Assemblies.Net80.AddPackages([.._additionalPackages]),
 #elif NET6_0
-                ReferenceAssemblies = Net.Assemblies.Net60,
+                ReferenceAssemblies = Net.Assemblies.Net60([.._additionalPackages]),
 #else
                 .NET framework not handled!
 #endif
-
-                AdditionalReferences =
-                {
-                    MetadataReference.CreateFromFile(typeof(SqlDataReader).Assembly.Location),
-                    MetadataReference.CreateFromFile(typeof(TestBase<>).Assembly.Location)
-                },
             },
         };
 
@@ -81,5 +94,14 @@ public sealed class CSharpAnalyzerTestBuilder<TAnalyzer>
         }
 
         return analyzerTest;
+    }
+
+    private void LogSyntaxTree(string code)
+    {
+        TestFileMarkupParser.GetSpans(code, out var markupFreeCode, out ImmutableArray<TextSpan> _);
+        var tree = CSharpSyntaxTree.ParseText(markupFreeCode);
+        var root = tree.GetCompilationUnitRoot();
+        var hierarchy =  SyntaxTreeVisualizer.VisualizeHierarchy(root);
+        _testOutputHelper.WriteLine(hierarchy);
     }
 }

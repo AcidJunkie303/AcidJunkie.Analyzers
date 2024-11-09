@@ -116,11 +116,15 @@ internal static class GenericKeyParameterNameProvider
     public static string? GetKeyParameterNameForInvocation(string containingTypeNamespaceName,
         string containingTypeName, string methodName)
     {
-        if (!GenericKeyByMethodNameByContainingTypeByContainingTypeNameSpace.TryGetValue(containingTypeNamespaceName,
-                out var genericKeyByMethodNameByContainingType))
+        if (!GenericKeyByMethodNameByContainingTypeByContainingTypeNameSpace.TryGetValue(containingTypeNamespaceName, out var genericKeyByMethodNameByContainingType))
+        {
             return null;
+        }
 
-        if (!genericKeyByMethodNameByContainingType.TryGetValue(containingTypeName, out var genericKeyByMethodName)) return null;
+        if (!genericKeyByMethodNameByContainingType.TryGetValue(containingTypeName, out var genericKeyByMethodName))
+        {
+            return null;
+        }
 
         return genericKeyByMethodName.TryGetValue(methodName, out var genericKeyName) ? genericKeyName : null;
     }
@@ -128,11 +132,15 @@ internal static class GenericKeyParameterNameProvider
     public static string? GetKeyParameterNameForCreation(string containingTypeNamespaceName, string containingTypeName,
         int genericParameterCount)
     {
-        if (!GenericKeyByGenericTypeCountByTypeNameByNameSpace.TryGetValue(containingTypeNamespaceName,
-                out var genericKeyByMethodNameByContainingType))
+        if (!GenericKeyByGenericTypeCountByTypeNameByNameSpace.TryGetValue(containingTypeNamespaceName, out var genericKeyByMethodNameByContainingType))
+        {
             return null;
+        }
 
-        if (!genericKeyByMethodNameByContainingType.TryGetValue(containingTypeName, out var genericKeyByMethodName)) return null;
+        if (!genericKeyByMethodNameByContainingType.TryGetValue(containingTypeName, out var genericKeyByMethodName))
+        {
+            return null;
+        }
 
         return genericKeyByMethodName.TryGetValue(genericParameterCount, out var genericKeyName)
             ? genericKeyName

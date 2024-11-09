@@ -1,11 +1,16 @@
 using System.Diagnostics.CodeAnalysis;
 using AcidJunkie.Analyzers.Diagnosers.TaskCreationWithMaterialisedCollectionAsEnumerable;
+using Xunit.Abstractions;
 
 namespace AcidJunkie.Analyzers.Tests.Diagnosers;
 
 [SuppressMessage("Code Smell", "S2699:Tests should include assertions", Justification = "This is done internally by AnalyzerTest.RunAsync()")]
 public sealed class TaskCreationWithMaterialisedCollectionAsEnumerableAnalyzerTests : TestBase<TaskCreationWithMaterialisedCollectionAsEnumerableAnalyzer>
 {
+    public TaskCreationWithMaterialisedCollectionAsEnumerableAnalyzerTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+    {
+    }
+
     [Fact]
     public async Task WhenCreatingEnumerableTaskWithMaterialisedCollection_ThenDiagnose()
     {
