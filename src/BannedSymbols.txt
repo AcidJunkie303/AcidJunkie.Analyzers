@@ -6,3 +6,5 @@ M:Microsoft.EntityFrameworkCore.DbSet`1.AddAsync(`0,System.Threading.Cancellatio
 M:Microsoft.EntityFrameworkCore.DbSet`1.AddRangeAsync(System.Collections.Generic.IEnumerable{`0},System.Threading.CancellationToken);Do not use EF.Core AddRangeAsync, it is meant for database sequences we will never use them
 M:FluentValidation.AbstractValidator`1.ValidateAsync(`0,System.Threading.CancellationToken);Unless the validator performs asynchronous logic you should never use ValidateAsync
 M:Microsoft.CodeAnalysis.Diagnostics.AnalysisContext.EnableConcurrentExecution;Use EnableConcurrentExecutionInReleaseMode() instead
+M:Microsoft.CodeAnalysis.Diagnostics.AnalysisContext.RegisterSyntaxNodeAction``1(System.Action{Microsoft.CodeAnalysis.Diagnostics.SyntaxNodeAnalysisContext},``0[]); Use RegisterSyntaxNodeActionAndCheck() instead
+

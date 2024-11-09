@@ -41,6 +41,14 @@ internal static class TypeSymbolExtensions
     public static string GetFullNamespace(this ITypeSymbol symbol)
         => symbol.ContainingNamespace?.ToString() ?? string.Empty;
 
+    public static string GetFullName(this ITypeSymbol symbol)
+    {
+        var ns = symbol.ContainingNamespace?.ToString();
+        return ns.IsNullOrWhiteSpace()
+            ? symbol.Name
+            : $"{ns}.{symbol.Name}";
+    }
+
     public static bool IsContainedInNamespace(this ITypeSymbol symbol, string ns)
         => symbol.GetFullNamespace().EqualsOrdinal(ns);
 

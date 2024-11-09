@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using System.Collections.Immutable;
 using AcidJunkie.Analyzers.Extensions;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -27,12 +28,12 @@ internal sealed class Aj0002ConfigurationProvider : IConfigurationProvider<Aj000
         return (configuration, false);
     }
 
-    private static ImmutableHashSet<string> GetIgnoredObjectTypes(AnalyzerOptions options)
+    private static FrozenSet<string> GetIgnoredObjectTypes(AnalyzerOptions options)
     {
         var value = options.GetGlobalOptionsValueOrDefault(Aj0002Configuration.KeyNames.IgnoredObjectNames);
         if (value.IsNullOrWhiteSpace())
         {
-            return ImmutableHashSet<string>.Empty;
+            return FrozenSet<string>.Empty;
         }
 
         return value
@@ -40,7 +41,7 @@ internal sealed class Aj0002ConfigurationProvider : IConfigurationProvider<Aj000
             .Split(IgnoredObjectNamesDelimiter, StringSplitOptions.RemoveEmptyEntries)
             .Select(a => a.Trim())
             .Where(a => a.Length > 0)
-            .ToImmutableHashSet(StringComparer.OrdinalIgnoreCase);
+            .ToFrozenSet(StringComparer.OrdinalIgnoreCase);
     }
 
     private static bool IsEnabled(AnalyzerOptions options) => options.GetGlobalOptionsBooleanValue(Aj0002Configuration.KeyNames.IsEnabled);

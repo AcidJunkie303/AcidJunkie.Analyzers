@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using AcidJunkie.Analyzers.Extensions;
+using AcidJunkie.Analyzers.Logging;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -18,12 +19,12 @@ public sealed class MissingEqualityComparerAnalyzer : DiagnosticAnalyzer
     {
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze);
         context.EnableConcurrentExecutionInReleaseMode();
-        context.RegisterSyntaxNodeAction(AnalyzeInvocation, SyntaxKind.InvocationExpression);
-        context.RegisterSyntaxNodeAction(AnalyzeObjectCreation, SyntaxKind.ObjectCreationExpression);
-        context.RegisterSyntaxNodeAction(AnalyzeImplicitObjectCreation, SyntaxKind.ImplicitObjectCreationExpression);
+        context.RegisterSyntaxNodeActionAndCheck<MissingEqualityComparerAnalyzer>(AnalyzeInvocation, SyntaxKind.InvocationExpression);
+        context.RegisterSyntaxNodeActionAndCheck<MissingEqualityComparerAnalyzer>(AnalyzeObjectCreation, SyntaxKind.ObjectCreationExpression);
+        context.RegisterSyntaxNodeActionAndCheck<MissingEqualityComparerAnalyzer>(AnalyzeImplicitObjectCreation, SyntaxKind.ImplicitObjectCreationExpression);
     }
 
-    private static void AnalyzeImplicitObjectCreation(SyntaxNodeAnalysisContext context)
+    private static void AnalyzeImplicitObjectCreation(SyntaxNodeAnalysisContext context, ILogger<MissingEqualityComparerAnalyzer> logger)
     {
         var implicitObjectCreation = (ImplicitObjectCreationExpressionSyntax)context.Node;
 
@@ -33,10 +34,10 @@ public sealed class MissingEqualityComparerAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        AnalyzeObjectCreationCore(context, implicitObjectCreation.ArgumentList, implicitObjectCreation.NewKeyword.GetLocation(), namedTypeSymbol);
+        AnalyzeObjectCreationCore(context, logger, implicitObjectCreation.ArgumentList, implicitObjectCreation.NewKeyword.GetLocation(), namedTypeSymbol);
     }
 
-    private static void AnalyzeObjectCreation(SyntaxNodeAnalysisContext context)
+    private static void AnalyzeObjectCreation(SyntaxNodeAnalysisContext context, ILogger<MissingEqualityComparerAnalyzer> logger)
     {
         var objectCreation = (ObjectCreationExpressionSyntax)context.Node;
 
@@ -51,44 +52,51 @@ public sealed class MissingEqualityComparerAnalyzer : DiagnosticAnalyzer
             ? objectCreation.NewKeyword.GetLocation()
             : context.Node.SyntaxTree.CreateLocationSpan(objectCreation.NewKeyword.GetLocation(), nameNode.GetLocation());
 
-        AnalyzeObjectCreationCore(context, objectCreation.ArgumentList, location, namedTypeSymbol);
+        AnalyzeObjectCreationCore(context, logger, objectCreation.ArgumentList, location, namedTypeSymbol);
     }
 
-    private static void AnalyzeObjectCreationCore(SyntaxNodeAnalysisContext context, ArgumentListSyntax? argumentList, Location locationToReport, INamedTypeSymbol objectTypeBeingCreated)
+    private static void AnalyzeObjectCreationCore(SyntaxNodeAnalysisContext context, ILogger<MissingEqualityComparerAnalyzer> logger, ArgumentListSyntax? argumentList, Location locationToReport, INamedTypeSymbol objectTypeBeingCreated)
     {
         var keyTypeParameterName = GetKeyTypeParameterName();
         if (keyTypeParameterName is null)
         {
+            logger.WriteLine(() => $"Unable to determine generic type parameter name for the creation of type '{objectTypeBeingCreated.GetFullName()}'");
             return;
         }
 
         var keyParameterIndex = objectTypeBeingCreated.TypeParameters.IndexOf(a => a.Name.EqualsOrdinal(keyTypeParameterName));
         if (keyParameterIndex < 0)
         {
+            logger.WriteLine(() => $"Unable to determine the index of the key type parameter for type {objectTypeBeingCreated.GetFullName()}");
             return;
         }
 
         if (objectTypeBeingCreated.TypeArguments.Length != objectTypeBeingCreated.TypeParameters.Length)
         {
+            logger.WriteLine(() => $"Found mismatch between type argument count and type parameter count for {objectTypeBeingCreated.GetFullName()} which should not be the case!");
             return;
         }
 
         var keyType = objectTypeBeingCreated.TypeArguments[keyParameterIndex];
         if (keyType.IsValueType)
         {
+            logger.WriteLine(() => $"Key type for {objectTypeBeingCreated.GetFullName()} is {keyType.GetFullName()} which is a struct.");
             return; // Value types use structural comparison
         }
 
         if (keyType.ImplementsGenericEquatable() && keyType.IsGetHashCodeOverridden())
         {
+            logger.WriteLine(() => $"Key type {keyType.GetFullName()} not not implement IEquatable<{keyType.GetFullName()}> or does not override {nameof(object.GetHashCode)}()");
             return;
         }
 
         if (IsAnyParameterEqualityComparer(context, keyType, argumentList))
         {
+            logger.WriteLine(() => "No parameter is a equality comparer");
             return;
         }
 
+        logger.LogReportDiagnostic(DiagnosticRules.Default.Rule, locationToReport);
         context.ReportDiagnostic(Diagnostic.Create(DiagnosticRules.Default.Rule, locationToReport));
 
         string? GetKeyTypeParameterName()
@@ -99,7 +107,7 @@ public sealed class MissingEqualityComparerAnalyzer : DiagnosticAnalyzer
         }
     }
 
-    private void AnalyzeInvocation(SyntaxNodeAnalysisContext context)
+    private void AnalyzeInvocation(SyntaxNodeAnalysisContext context, ILogger<MissingEqualityComparerAnalyzer> logger)
     {
         var invocationExpression = (InvocationExpressionSyntax)context.Node;
 
@@ -112,27 +120,32 @@ public sealed class MissingEqualityComparerAnalyzer : DiagnosticAnalyzer
         var keyTypeParameterName = GetKeyTypeParameterName();
         if (keyTypeParameterName is null)
         {
+            logger.WriteLine(() => $"Unable to determine generic type parameter name for invocation of '{owningTypeNameSpace}.{owningTypeName}.{methodName}'");
             return;
         }
 
         var keyType = invocationExpression.GetTypeForTypeParameter(context.SemanticModel, keyTypeParameterName, context.CancellationToken);
         if (keyType is null)
         {
+            logger.WriteLine(() => $"Unable to determine key type parameter type");
             return;
         }
 
         if (keyType.IsValueType)
         {
+            logger.WriteLine(() => $"Key type for '{owningTypeNameSpace}.{owningTypeName}.{methodName}' is {keyType.GetFullName()} which is a struct.");
             return; // Value types use structural comparison
         }
 
         if (keyType.ImplementsGenericEquatable() && keyType.IsGetHashCodeOverridden())
         {
+            logger.WriteLine(() => $"Key type {keyType.GetFullName()} not not implement IEquatable<{keyType.GetFullName()}> or does not override {nameof(object.GetHashCode)}()");
             return;
         }
 
         if (IsAnyParameterEqualityComparer(context, keyType, invocationExpression.ArgumentList))
         {
+            logger.WriteLine(() => "No parameter is a equality comparer");
             return;
         }
 
@@ -143,6 +156,7 @@ public sealed class MissingEqualityComparerAnalyzer : DiagnosticAnalyzer
                 : null;
         }
 
+        logger.LogReportDiagnostic(DiagnosticRules.Default.Rule, memberAccess.Name.GetLocation());
         context.ReportDiagnostic(Diagnostic.Create(DiagnosticRules.Default.Rule, memberAccess.Name.GetLocation()));
     }
 

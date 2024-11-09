@@ -1,6 +1,7 @@
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using AcidJunkie.Analyzers.Extensions;
+using AcidJunkie.Analyzers.Logging;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -18,56 +19,66 @@ public sealed class TaskCreationWithMaterialisedCollectionAsEnumerableAnalyzer :
     {
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze);
         context.EnableConcurrentExecutionInReleaseMode();
-        context.RegisterSyntaxNodeAction(AnalyzeInvocation, SyntaxKind.InvocationExpression);
+        context.RegisterSyntaxNodeActionAndCheck<TaskCreationWithMaterialisedCollectionAsEnumerableAnalyzer>(AnalyzeInvocation, SyntaxKind.InvocationExpression);
     }
 
-    private static void AnalyzeInvocation(SyntaxNodeAnalysisContext context)
+    private static void AnalyzeInvocation(SyntaxNodeAnalysisContext context, ILogger<TaskCreationWithMaterialisedCollectionAsEnumerableAnalyzer> logger)
     {
         var invocation = (InvocationExpressionSyntax)context.Node;
 
         if (context.SemanticModel.GetSymbolInfo(invocation, context.CancellationToken).Symbol is not IMethodSymbol methodSymbol)
         {
+            logger.WriteLine(() => $"Unable to get IMethodSymbol from invocation");
             return;
         }
 
         if (!methodSymbol.Name.EqualsOrdinal(nameof(Task.FromResult)))
         {
+            logger.WriteLine(() => $"Method name is not {nameof(Task.FromResult)}");
             return;
         }
 
         if (!IsTaskType(methodSymbol.ContainingType))
         {
+            logger.WriteLine(() => "Containing type is not Task or ValueTask");
             return;
         }
 
         if (!IsFromResultMethod(methodSymbol, out var taskType))
         {
+            logger.WriteLine(() => $"Method name is not {nameof(Task.FromResult)}");
             return;
         }
 
         if (!taskType.IsEnumerable())
         {
+            logger.WriteLine(() => $"Task generic parameter type is not or does not implement IEnumerable or IEnumerable<T>");
             return;
         }
 
         var argument = invocation.ArgumentList.Arguments.FirstOrDefault();
         if (argument is null)
         {
+            logger.WriteLine(() => "Invocation doesn't seem to have any arguments");
             return;
         }
 
         var firstNonCastExpression = argument.Expression.GetFirstNonCastExpression();
-        var actualType = context.SemanticModel.GetTypeInfo(firstNonCastExpression).Type;
+
+        var actualType = context.SemanticModel.GetTypeInfo(firstNonCastExpression, context.CancellationToken).Type;
         if (actualType is null)
         {
+            logger.WriteLine(() => "Unable to determine the expression return type");
             return;
         }
 
         if (!actualType.DoesImplementWellKnownCollectionInterface())
         {
+            logger.WriteLine(() => $"{actualType.GetFullName()} doesn't seem to be or implement a well-known collection interface");
             return;
         }
 
+        logger.LogReportDiagnostic(DiagnosticRules.Default.Rule, invocation.Expression.GetLocation());
         context.ReportDiagnostic(Diagnostic.Create(DiagnosticRules.Default.Rule, invocation.Expression.GetLocation()));
     }
 

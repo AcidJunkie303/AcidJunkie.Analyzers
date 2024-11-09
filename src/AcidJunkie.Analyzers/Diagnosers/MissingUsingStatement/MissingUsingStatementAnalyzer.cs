@@ -1,6 +1,7 @@
 using System.Collections.Immutable;
 using AcidJunkie.Analyzers.Configuration;
 using AcidJunkie.Analyzers.Extensions;
+using AcidJunkie.Analyzers.Logging;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -19,47 +20,53 @@ public sealed class MissingUsingStatementAnalyzer : DiagnosticAnalyzer
     {
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze);
         context.EnableConcurrentExecutionInReleaseMode();
-        context.RegisterSyntaxNodeAction(AnalyzeInvocation, SyntaxKind.InvocationExpression);
+        context.RegisterSyntaxNodeActionAndCheck<MissingUsingStatementAnalyzer>(AnalyzeInvocation, SyntaxKind.InvocationExpression);
     }
 
-    private static void AnalyzeInvocation(SyntaxNodeAnalysisContext context)
+    private static void AnalyzeInvocation(SyntaxNodeAnalysisContext context, ILogger<MissingUsingStatementAnalyzer> logger)
     {
         var invocationExpression = (InvocationExpressionSyntax)context.Node;
 
         var config = ConfigurationManager.GetAj0002Configuration(context.Options);
         if (!config.IsEnabled)
         {
+            logger.LogAnalyzerIsDisabled();
             return;
         }
 
-        if (context.SemanticModel.GetSymbolInfo(invocationExpression).Symbol is not IMethodSymbol methodSymbol)
+        if (context.SemanticModel.GetSymbolInfo(invocationExpression, context.CancellationToken).Symbol is not IMethodSymbol methodSymbol)
         {
+            logger.WriteLine(() => $"Unable to get {nameof(IMethodSymbol)} from invocation");
             return;
         }
 
-        var returnedType = context.SemanticModel.GetTypeInfo(invocationExpression).Type as INamedTypeSymbol;
-        if (returnedType is null)
+        if (context.SemanticModel.GetTypeInfo(invocationExpression, context.CancellationToken).Type is not INamedTypeSymbol returnedType)
         {
+            logger.WriteLine(() => $"Unable to get {nameof(INamedTypeSymbol)} from invocation");
             return;
         }
 
         if (!IsDisposable(returnedType))
         {
+            logger.WriteLine(() => $"Method return type is not or does not implement {nameof(IDisposable)}");
             return;
         }
 
         if (IsTypeIgnored(context, returnedType))
         {
+            logger.WriteLine(() => $"Type {returnedType.GetFullName()} is ignored");
             return;
         }
 
         if (IsMethodIgnored(context, methodSymbol))
         {
+            logger.WriteLine(() => $"Method {methodSymbol.GetFullName()} is ignored");
             return;
         }
 
         if (IsResultStoredInFieldOrProperty(context, invocationExpression))
         {
+            logger.WriteLine(() => $"Disposable object is stored in property or field");
             return;
         }
 
@@ -69,14 +76,17 @@ public sealed class MissingUsingStatementAnalyzer : DiagnosticAnalyzer
 
         if (firstNonMemberAccessOrInvocationExpression is null)
         {
+            logger.WriteLine(() => $"{nameof(firstNonMemberAccessOrInvocationExpression)} is null");
             return;
         }
 
         if (IsEmbeddedInUsingStatement(firstNonMemberAccessOrInvocationExpression))
         {
+            logger.WriteLine(() => "Disposable object is stored in variable with using statement");
             return;
         }
 
+        logger.LogReportDiagnostic(DiagnosticRules.Default.Rule, invocationExpression.GetLocation());
         context.ReportDiagnostic(Diagnostic.Create(DiagnosticRules.Default.Rule, invocationExpression.GetLocation()));
     }
 
@@ -157,7 +167,7 @@ public sealed class MissingUsingStatementAnalyzer : DiagnosticAnalyzer
             return false;
         }
 
-        var symbol = context.SemanticModel.GetSymbolInfo(assignmentTarget).Symbol;
+        var symbol = context.SemanticModel.GetSymbolInfo(assignmentTarget, context.CancellationToken).Symbol;
         return symbol is IFieldSymbol or IPropertySymbol;
     }
 
