@@ -10,7 +10,7 @@ namespace AcidJunkie.Analyzers.Tests.Diagnosers;
 public sealed class WrongLoggerTypeArgumentFixProviderTests(ITestOutputHelper testOutputHelper) : CodeFixTestBase<WrongLoggerTypeArgumentAnalyzer, WrongLoggerTypeArgumentFixProvider>(testOutputHelper)
 {
     [Fact]
-    public Task WhenLoggerWithDifferentTypeArgumentThanEnclosingType_ThenFix()
+    public Task WithConstructor_WhenLoggerWithDifferentTypeArgumentThanEnclosingType_ThenFix()
     {
         const string code = """
                             using Microsoft.Extensions.Logging;
@@ -31,6 +31,54 @@ public sealed class WrongLoggerTypeArgumentFixProviderTests(ITestOutputHelper te
                                      public TestClass(ILogger<TestClass> logger)
                                      {
                                      }
+                                 }
+                                 """;
+
+        return CreateTester(code, fixedCode).RunAsync();
+    }
+
+    [Fact]
+    public Task WithField_WhenLoggerWithDifferentTypeArgumentThanEnclosingType_ThenFix()
+    {
+        const string code = """
+                            using Microsoft.Extensions.Logging;
+
+                            public class TestClass
+                            {
+                                private {|AJ0006:ILogger<object>|} _logger;
+                            }
+                            """;
+
+        const string fixedCode = """
+                                 using Microsoft.Extensions.Logging;
+
+                                 public class TestClass
+                                 {
+                                     private ILogger<TestClass> _logger;
+                                 }
+                                 """;
+
+        return CreateTester(code, fixedCode).RunAsync();
+    }
+
+    [Fact]
+    public Task WithProperty_WhenLoggerWithDifferentTypeArgumentThanEnclosingType_ThenFix()
+    {
+        const string code = """
+                            using Microsoft.Extensions.Logging;
+
+                            public class TestClass
+                            {
+                                private {|AJ0006:ILogger<object>|} Logger { get; }
+                            }
+                            """;
+
+        const string fixedCode = """
+                                 using Microsoft.Extensions.Logging;
+
+                                 public class TestClass
+                                 {
+                                     private ILogger<TestClass> Logger { get; }
                                  }
                                  """;
 

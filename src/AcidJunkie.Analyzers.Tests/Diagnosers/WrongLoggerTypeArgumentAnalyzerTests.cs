@@ -40,7 +40,7 @@ public sealed class WrongLoggerTypeArgumentAnalyzerTests(ITestOutputHelper testO
     }
 
     [Fact]
-    public Task WithConstructor_WhenUntypedLogger_ThenOk() // handled by different analyzer
+    public Task WithConstructor_WhenUntypedLogger_ThenOk()
     {
         const string code = """
                             using Microsoft.Extensions.Logging;
@@ -98,6 +98,96 @@ public sealed class WrongLoggerTypeArgumentAnalyzerTests(ITestOutputHelper testO
 
                             public class TestClass(string a, {|AJ0006:ILogger<string>|} logger)
                             {
+                            }
+                            """;
+
+        return CreateTester(code).RunAsync();
+    }
+
+    [Fact]
+    public Task WithField_WhenUntypedLogger_ThenOk()
+    {
+        const string code = """
+                            using Microsoft.Extensions.Logging;
+
+                            public class TestClass
+                            {
+                                private readonly ILogger _logger;
+                            }
+                            """;
+
+        return CreateTester(code).RunAsync();
+    }
+
+    [Fact]
+    public Task WithField_WhenLoggerOfSameType_ThenOk()
+    {
+        const string code = """
+                            using Microsoft.Extensions.Logging;
+
+                            public class TestClass
+                            {
+                                private ILogger<TestClass> logger;
+                            }
+                            """;
+
+        return CreateTester(code).RunAsync();
+    }
+
+    [Fact]
+    public Task WithField_WhenLoggerOfDifferentType_ThenDiagnose()
+    {
+        const string code = """
+                            using Microsoft.Extensions.Logging;
+
+                            public class TestClass
+                            {
+                                private {|AJ0006:ILogger<string>|} _logger;
+                            }
+                            """;
+
+        return CreateTester(code).RunAsync();
+    }
+
+    [Fact]
+    public Task WithProperty_WhenUntypedLogger_ThenOk()
+    {
+        const string code = """
+                            using Microsoft.Extensions.Logging;
+
+                            public class TestClass
+                            {
+                                private ILogger Logger { get; }
+                            }
+                            """;
+
+        return CreateTester(code).RunAsync();
+    }
+
+    [Fact]
+    public Task WithProperty_WhenLoggerOfSameType_ThenOk()
+    {
+        const string code = """
+                            using Microsoft.Extensions.Logging;
+
+                            public class TestClass
+                            {
+                                private ILogger<TestClass> Logger { get; }
+                            }
+                            """;
+
+        return CreateTester(code).RunAsync();
+    }
+
+    [Fact]
+    public Task WithProperty_WhenLoggerOfDifferentType_ThenDiagnose()
+    {
+        const string code = """
+                            using Microsoft.Extensions.Logging;
+
+                            public class TestClass
+                            {
+                                private {|AJ0006:ILogger<string>|} Logger { get; }
                             }
                             """;
 

@@ -22,10 +22,53 @@ public sealed class WrongLoggerTypeArgumentAnalyzer : DiagnosticAnalyzer
     {
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze);
         context.EnableConcurrentExecutionInReleaseMode();
-        context.RegisterSyntaxNodeActionAndCheck<MissingEqualityComparerAnalyzer>(Analyze, SyntaxKind.ParameterList);
+        context.RegisterSyntaxNodeActionAndCheck<MissingEqualityComparerAnalyzer>(AnalyzeProperty, SyntaxKind.PropertyDeclaration);
+        context.RegisterSyntaxNodeActionAndCheck<MissingEqualityComparerAnalyzer>(AnalyzeField, SyntaxKind.FieldDeclaration);
+        context.RegisterSyntaxNodeActionAndCheck<MissingEqualityComparerAnalyzer>(AnalyzeParameterList, SyntaxKind.ParameterList);
     }
 
-    private static void Analyze(SyntaxNodeAnalysisContext context, ILogger<MissingEqualityComparerAnalyzer> logger)
+    private static void AnalyzeProperty(SyntaxNodeAnalysisContext context, ILogger<MissingEqualityComparerAnalyzer> logger)
+    {
+        var property = (PropertyDeclarationSyntax)context.Node;
+
+        if (context.SemanticModel.GetDeclaredSymbol(property) is not IPropertySymbol propertySymbol)
+        {
+            return;
+        }
+
+        if (propertySymbol.Type is not INamedTypeSymbol propertyType)
+        {
+            return;
+        }
+
+        var containingType = property.GetContainingType(context);
+        if (containingType is null)
+        {
+            return;
+        }
+
+        Analyze(context, propertyType, containingType, property.Type.GetLocation(), logger);
+    }
+
+    private static void AnalyzeField(SyntaxNodeAnalysisContext context, ILogger<MissingEqualityComparerAnalyzer> logger)
+    {
+        var field = (FieldDeclarationSyntax)context.Node;
+
+        if (context.SemanticModel.GetTypeInfo(field.Declaration.Type).Type is not INamedTypeSymbol fieldType)
+        {
+            return;
+        }
+
+        var containingType = field.GetContainingType(context.SemanticModel);
+        if (containingType is null)
+        {
+            return;
+        }
+
+        Analyze(context, fieldType, containingType, field.Declaration.Type.GetLocation(), logger);
+    }
+
+    private static void AnalyzeParameterList(SyntaxNodeAnalysisContext context, ILogger<MissingEqualityComparerAnalyzer> logger)
     {
         var parameterList = (ParameterListSyntax)context.Node;
 
@@ -48,11 +91,36 @@ public sealed class WrongLoggerTypeArgumentAnalyzer : DiagnosticAnalyzer
         var loggerParameters = GetTypedLoggerParameters(context, parameterList);
         foreach (var loggerParameter in loggerParameters)
         {
-            HandleParameter(context, containerType, loggerParameter);
+            HandleParameter(context, containerType, loggerParameter, logger);
         }
     }
 
-    private static void HandleParameter(SyntaxNodeAnalysisContext context, INamedTypeSymbol containerType, ParameterSyntax loggerParameter)
+    private static void Analyze(SyntaxNodeAnalysisContext context, INamedTypeSymbol nodeType, INamedTypeSymbol containerType, Location location, ILogger<MissingEqualityComparerAnalyzer> logger)
+    {
+        if (nodeType.Arity != 1)
+        {
+            logger.WriteLine(() => $"Arity for {nodeType.Name} in {containerType.Name} is {nodeType.Arity}");
+            return;
+        }
+
+        var typeParameterType = nodeType.TypeArguments.FirstOrDefault();
+        if (typeParameterType is null)
+        {
+            logger.WriteLine(() => $"Unable to get type argument for {nodeType.Name}");
+            return;
+        }
+
+        if (SymbolEqualityComparer.Default.Equals(containerType, typeParameterType))
+        {
+            logger.WriteLine(() => $"Logger type argument is the same as the enclosing type {typeParameterType.Name}");
+            return;
+        }
+
+        logger.LogReportDiagnostic(DiagnosticRules.Default.Rule, location);
+        context.ReportDiagnostic(Diagnostic.Create(DiagnosticRules.Default.Rule, location));
+    }
+
+    private static void HandleParameter(SyntaxNodeAnalysisContext context, INamedTypeSymbol containerType, ParameterSyntax loggerParameter, ILogger<MissingEqualityComparerAnalyzer> logger)
     {
         if (loggerParameter.Type is null)
         {
@@ -64,23 +132,7 @@ public sealed class WrongLoggerTypeArgumentAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        if (argumentType.Arity != 1)
-        {
-            return;
-        }
-
-        var typeParameterType = argumentType.TypeArguments.FirstOrDefault();
-        if (typeParameterType is null)
-        {
-            return;
-        }
-
-        if (SymbolEqualityComparer.Default.Equals(containerType, typeParameterType))
-        {
-            return;
-        }
-
-        context.ReportDiagnostic(Diagnostic.Create(DiagnosticRules.Default.Rule, loggerParameter.Type.GetLocation()));
+        Analyze(context, argumentType, containerType, loggerParameter.Type.GetLocation(), logger);
     }
 
     private static TypeDeclarationSyntax? GetTypeDeclaration(ParameterListSyntax parameterList)
