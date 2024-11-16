@@ -169,7 +169,7 @@ public sealed class WrongLoggerTypeArgumentAnalyzer : DiagnosticAnalyzer
             public const string HelpLinkUri = "https://github.com/AcidJunkie303/AcidJunkie.Analyzers/blob/main/docs/Rules/AJ0006.md";
 #pragma warning restore S1075
 
-            public static readonly LocalizableString Title = "Probably wrong type argument for ILogger<TContext>";
+            public static readonly LocalizableString Title = "Type argument for ILogger<TContext> should be the enclosing type";
             public static readonly LocalizableString MessageFormat = "When injecting ILogger<TContext> through the constructor, the type argument of ILogger<TContext> should be the same type as the type it is injected into";
             public static readonly LocalizableString Description = MessageFormat;
             public static readonly DiagnosticDescriptor Rule = new(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, true, Description, HelpLinkUri);
