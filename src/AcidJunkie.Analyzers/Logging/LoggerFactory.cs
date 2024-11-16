@@ -7,7 +7,9 @@ internal static class LoggerFactory
 {
     public static ILogger<TContext> CreateLogger<TContext>(SyntaxNodeAnalysisContext analysisContext)
         where TContext : class
-        => GeneralConfigurationManager.IsLoggingEnabled(analysisContext.Options)
-            ? new DefaultLogger<TContext>()
-            : NullLogger<TContext>.Default;
+    {
+        return GeneralConfigurationManager.IsLoggingEnabled(analysisContext.Options)
+                ? new DefaultLogger<TContext>()
+                : NullLogger<TContext>.Default;
+    }
 }

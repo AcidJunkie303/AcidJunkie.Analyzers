@@ -43,6 +43,9 @@ csharp_new_line_before_finally = true
 csharp_new_line_before_members_in_object_initializers = true
 csharp_new_line_before_members_in_anonymous_types = true
 
+# expression bodies preference
+csharp_style_expression_bodied_methods = when_on_single_line
+
 # ReSharper properties
 resharper_place_simple_initializer_on_single_line = false
 
@@ -100,14 +103,18 @@ dotnet_diagnostic.ide0003.severity = error
 dotnet_diagnostic.ide0004.severity = error
 # Workaround for https://github.com/dotnet/roslyn/issues/41640
 dotnet_diagnostic.ide0005.severity = suggestion
+dotnet_diagnostic.ide0010.severity = suggestion # Add missing cases to switch statement -> there are cases we don't want that
 dotnet_diagnostic.ide0028.severity = error
 dotnet_diagnostic.ide0032.severity = error
 dotnet_diagnostic.ide0043.severity = error
 dotnet_diagnostic.ide0044.severity = error
+dotnet_diagnostic.ide0046.severity = suggestion # if' statement can be simplified -> this would pollute our code with warning suppressions
+dotnet_diagnostic.ide0047.severity = error
 dotnet_diagnostic.ide0047.severity = error
 dotnet_diagnostic.ide0048.severity = error
 dotnet_diagnostic.ide0051.severity = error
 dotnet_diagnostic.ide0052.severity = error
+dotnet_diagnostic.ide0058.severity = none # this would pollute our code with warning suppressions or value discards. See https://github.com/dotnet/roslyn/issues/47832 if they come up with an ignore-list in the future
 dotnet_diagnostic.ide0059.severity = error
 dotnet_diagnostic.ide0060.severity = error
 dotnet_diagnostic.ide0063.severity = error

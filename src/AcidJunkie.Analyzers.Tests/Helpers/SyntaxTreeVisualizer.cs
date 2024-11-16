@@ -27,7 +27,7 @@ internal static class SyntaxTreeVisualizer
                 .Replace("\r\n", "\\r\\n", StringComparison.Ordinal)
                 .Replace("\n", "\\n", StringComparison.Ordinal);
 
-            buffer.Append(indentedTypeName.PadRight(maxTypeNameLength , ' '));
+            buffer.Append(indentedTypeName.PadRight(maxTypeNameLength, ' '));
             buffer.Append(" | ");
             buffer.Append(kind.PadRight(maxKindLength));
             buffer.Append(" | ");
@@ -39,9 +39,8 @@ internal static class SyntaxTreeVisualizer
 
     private sealed class Walker : CSharpSyntaxWalker
     {
-        private int _level;
-
         public readonly List<(int Level, string Kind, string TypeName, SyntaxNode Node)> Nodes = new(250);
+        private int _level;
 
         public override void Visit(SyntaxNode? node)
         {

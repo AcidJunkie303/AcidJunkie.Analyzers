@@ -11,21 +11,21 @@ using Xunit.Abstractions;
 
 namespace AcidJunkie.Analyzers.Tests.Helpers;
 
-public static class CSharpAnalyzerTestBuilder
+internal static class CSharpAnalyzerTestBuilder
 {
     public static CSharpAnalyzerTestBuilder<TAnalyzer> Create<TAnalyzer>(ITestOutputHelper testOutputHelper)
         where TAnalyzer : DiagnosticAnalyzer, new()
         => new(testOutputHelper);
 }
 
-public sealed class CSharpAnalyzerTestBuilder<TAnalyzer>
+internal sealed class CSharpAnalyzerTestBuilder<TAnalyzer>
     where TAnalyzer : DiagnosticAnalyzer, new()
 {
-    private string? _code;
-    private readonly List<Type> _additionalTypes = [];
     private readonly List<string> _additionalGlobalOptionsLines = [];
     private readonly List<PackageIdentity> _additionalPackages = [];
+    private readonly List<Type> _additionalTypes = [];
     private readonly ITestOutputHelper _testOutputHelper;
+    private string? _code;
 
     public CSharpAnalyzerTestBuilder(ITestOutputHelper testOutputHelper)
     {
@@ -70,15 +70,18 @@ public sealed class CSharpAnalyzerTestBuilder<TAnalyzer>
         {
             TestState =
             {
-                Sources = {_code},
-#if NET8_0
+                Sources =
+                {
+                    _code
+                },
+#if NET9_0
                 ReferenceAssemblies = Net.Assemblies.Net80.AddPackages([.._additionalPackages]),
-#elif NET6_0
-                ReferenceAssemblies = Net.Assemblies.Net60([.._additionalPackages]),
+#elif NET8_0
+                ReferenceAssemblies = Net.Assemblies.Net80.AddPackages([.._additionalPackages]),
 #else
                 .NET framework not handled!
 #endif
-            },
+            }
         };
 
         foreach (var additionalType in _additionalTypes)
@@ -101,7 +104,7 @@ public sealed class CSharpAnalyzerTestBuilder<TAnalyzer>
         TestFileMarkupParser.GetSpans(code, out var markupFreeCode, out ImmutableArray<TextSpan> _);
         var tree = CSharpSyntaxTree.ParseText(markupFreeCode);
         var root = tree.GetCompilationUnitRoot();
-        var hierarchy =  SyntaxTreeVisualizer.VisualizeHierarchy(root);
+        var hierarchy = SyntaxTreeVisualizer.VisualizeHierarchy(root);
         _testOutputHelper.WriteLine(hierarchy);
     }
 }

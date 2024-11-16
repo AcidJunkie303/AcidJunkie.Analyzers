@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using AcidJunkie.Analyzers.Tests.Helpers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -7,8 +8,7 @@ using Xunit.Abstractions;
 
 namespace AcidJunkie.Analyzers.Tests;
 
-// ReSharper disable once UnusedMember.Global -> These are methods which can be used during development time to check the syntax tree
-
+[SuppressMessage("Maintainability", "CA1515:Because an application's API isn't typically referenced from outside the assembly, types can be made internal", Justification = "This is the base class for our unit tests")]
 public abstract class TestBase<TAnalyzer>
     where TAnalyzer : DiagnosticAnalyzer, new()
 {
@@ -19,5 +19,5 @@ public abstract class TestBase<TAnalyzer>
         TestOutputHelper = testOutputHelper;
     }
 
-    protected  CSharpAnalyzerTestBuilder<TAnalyzer> CreateTesterBuilder() => CSharpAnalyzerTestBuilder.Create<TAnalyzer>(TestOutputHelper);
+    private protected CSharpAnalyzerTestBuilder<TAnalyzer> CreateTesterBuilder() => CSharpAnalyzerTestBuilder.Create<TAnalyzer>(TestOutputHelper);
 }

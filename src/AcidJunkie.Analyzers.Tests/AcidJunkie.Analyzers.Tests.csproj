@@ -4,10 +4,11 @@
         <IsPackable>false</IsPackable>
         <IsTestProject>true</IsTestProject>
 
-        <!-- CA1707: Identifier should not contain underscores  -> OK for unit test project -->
-        <!-- MA0051: Method is too long                         -> OK for unit test project -->
-        <NoWarn>$(NoWarn);CA1707;MA0051</NoWarn>
-
+        <!-- CA1707: Identifier should not contain underscores              -> OK for unit test project -->
+        <!-- MA0051: Method is too long                                     -> OK for unit test project -->
+        <!-- NU1903: # Package {0} has a known high severity vulnerability  -> currently because of System.Formats.Asn1. See https://github.com/advisories/GHSA-447r-wph3-92pm at (0:0)-->
+        <NoWarn>$(NoWarn);CA1707;MA0051;NU1903</NoWarn>
+        <TargetFramework>net9.0</TargetFramework>
     </PropertyGroup>
 
     <ItemGroup>

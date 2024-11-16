@@ -109,12 +109,12 @@ public sealed class WrongLoggerTypeArgumentAnalyzerTests : TestBase<WrongLoggerT
     }
 
     // TODO: continue here
-    unit tests for this are complete
-    continue with  code fixer
+    //unit tests for this are complete
+    //continue with  code fixer
 
-    private CSharpAnalyzerTest<WrongLoggerTypeArgumentAnalyzer,DefaultVerifier> CreateTester(string code)
+    private CSharpAnalyzerTest<WrongLoggerTypeArgumentAnalyzer, DefaultVerifier> CreateTester(string code)
         => CreateTesterBuilder()
             .WithTestCode(code)
-            .WithNugetPackage("Microsoft.Extensions.Logging.Abstractions","8.0.2" )
+            .WithNugetPackage("Microsoft.Extensions.Logging.Abstractions", "8.0.2")
             .Build();
 }

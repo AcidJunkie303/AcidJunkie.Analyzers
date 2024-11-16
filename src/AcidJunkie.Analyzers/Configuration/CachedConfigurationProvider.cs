@@ -21,10 +21,7 @@ internal sealed class CachedConfigurationProvider<T> : IConfigurationProvider<T>
         _innerConfigurationProvider = innerConfigurationProvider;
     }
 
-    public (T Configuration, bool IsDefault) GetConfiguration(AnalyzerOptions options)
-    {
-        return GetAndReloadIfRequired(options);
-    }
+    public (T Configuration, bool IsDefault) GetConfiguration(AnalyzerOptions options) => GetAndReloadIfRequired(options);
 
     private (T Configuration, bool IsDefault) GetAndReloadIfRequired(AnalyzerOptions options)
     {
@@ -55,6 +52,9 @@ internal sealed class CachedConfigurationProvider<T> : IConfigurationProvider<T>
 
         return (_config!, false);
 
-        bool IsReloadRequired() => _config is null || DateTime.UtcNow > _lastPublished + CachedConfigurationProvider.ValidityPeriod;
+        bool IsReloadRequired()
+        {
+            return _config is null || DateTime.UtcNow > _lastPublished + CachedConfigurationProvider.ValidityPeriod;
+        }
     }
 }

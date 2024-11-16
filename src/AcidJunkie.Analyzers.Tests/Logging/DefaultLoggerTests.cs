@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using AcidJunkie.Analyzers.Logging;
 using FluentAssertions;
 
@@ -25,12 +26,9 @@ public sealed class DefaultLoggerTests
         logFileContent.Should().Contain($"TID={Environment.CurrentManagedThreadId}");
     }
 
-    private static string GetLogFileContent()
-    {
-#pragma warning disable MA0045 // Use 'ReadAllTextAsync' instead of 'ReadAllText' and make method async -> We are in a non-async context
-        return File.ReadAllText(DefaultLogger.LogFilePath);
-#pragma warning restore MA0045
-    }
+    [SuppressMessage("Dunno", "MA0045:Do not use blocking calls in a sync method (need to make calling method async)", Justification = "We're in non-async context here")]
+    private static string GetLogFileContent() =>
+        File.ReadAllText(DefaultLogger.LogFilePath);
 
     private static void EnsureLogFileIsDeleted()
     {

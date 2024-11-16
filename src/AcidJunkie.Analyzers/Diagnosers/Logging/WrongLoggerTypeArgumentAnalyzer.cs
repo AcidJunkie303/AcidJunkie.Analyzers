@@ -52,7 +52,7 @@ public sealed class WrongLoggerTypeArgumentAnalyzer : DiagnosticAnalyzer
         }
     }
 
-    static void HandleParameter(SyntaxNodeAnalysisContext context, INamedTypeSymbol containerType, ParameterSyntax loggerParameter)
+    private static void HandleParameter(SyntaxNodeAnalysisContext context, INamedTypeSymbol containerType, ParameterSyntax loggerParameter)
     {
         if (loggerParameter.Type is null)
         {

@@ -6,16 +6,6 @@ internal static class Net
 {
     internal static class Assemblies
     {
-        private static readonly Lazy<ReferenceAssemblies> LazyNet60 = new(() =>
-            new ReferenceAssemblies(
-                "net6.0",
-                new PackageIdentity(
-                    "Microsoft.NETCore.App.Ref",
-                    "6.0.29"),
-                Path.Combine("ref", "net6.0"))
-            .WithPackages([new PackageIdentity("Microsoft.Bcl.AsyncInterfaces", "1.0.0.0")])
-        );
-
         private static readonly Lazy<ReferenceAssemblies> LazyNet80 = new(() =>
             new ReferenceAssemblies(
                 "net8.0",
@@ -26,7 +16,17 @@ internal static class Net
             .WithPackages([new PackageIdentity("Microsoft.Bcl.AsyncInterfaces", "1.0.0.0")])
         );
 
-        public static ReferenceAssemblies Net60 => LazyNet60.Value;
+        private static readonly Lazy<ReferenceAssemblies> LazyNet90 = new(() =>
+            new ReferenceAssemblies(
+                    "net9.0",
+                    new PackageIdentity(
+                        "Microsoft.NETCore.App.Ref",
+                        "9.0.9"),
+                    Path.Combine("ref", "net9.0"))
+                .WithPackages([new PackageIdentity("Microsoft.Bcl.AsyncInterfaces", "1.0.0.0")])
+        );
+
         public static ReferenceAssemblies Net80 => LazyNet80.Value;
+        public static ReferenceAssemblies Net90 => LazyNet90.Value;
     }
 }

@@ -94,9 +94,15 @@ public sealed class MissingUsingStatementAnalyzer : DiagnosticAnalyzer
     {
         return IsDirectDisposable(typeSymbol) || ImplementsDisposable(typeSymbol) || IsRefStructWithDisposeMethod(typeSymbol);
 
-        static bool IsDirectDisposable(ITypeSymbol typeSymbol) => typeSymbol.IsContainedInNamespace("System") && typeSymbol.Name.EqualsOrdinal(nameof(IDisposable));
+        static bool IsDirectDisposable(ITypeSymbol typeSymbol)
+        {
+            return typeSymbol.IsContainedInNamespace("System") && typeSymbol.Name.EqualsOrdinal(nameof(IDisposable));
+        }
 
-        static bool ImplementsDisposable(ITypeSymbol typeSymbol) => typeSymbol.AllInterfaces.Any(IsDirectDisposable);
+        static bool ImplementsDisposable(ITypeSymbol typeSymbol)
+        {
+            return typeSymbol.AllInterfaces.Any(IsDirectDisposable);
+        }
 
         static bool IsRefStructWithDisposeMethod(ITypeSymbol typeSymbol)
         {
@@ -156,13 +162,11 @@ public sealed class MissingUsingStatementAnalyzer : DiagnosticAnalyzer
 
     private static bool IsResultStoredInFieldOrProperty(SyntaxNodeAnalysisContext context, InvocationExpressionSyntax invocationExpression)
     {
-        var assignmentTarget = invocationExpression
+        if (invocationExpression
             .GetParents()
             .OfType<AssignmentExpressionSyntax>()
             .FirstOrDefault()
-            ?.Left as IdentifierNameSyntax;
-
-        if (assignmentTarget is null)
+            ?.Left is not IdentifierNameSyntax assignmentTarget)
         {
             return false;
         }
