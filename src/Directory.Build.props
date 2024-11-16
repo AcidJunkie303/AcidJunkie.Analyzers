@@ -13,7 +13,6 @@
         <!-- MA0026: We know TODO items should be tackled, let's not create Errors for them -->
         <!-- S1185:  We know TODO items should be tackled, let's not create Errors for them -->
         <WarningsNotAsErrors>MA0025;MA0026</WarningsNotAsErrors>
-
         <WarningLevel>9999</WarningLevel>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         <EnableNETAnalyzers>true</EnableNETAnalyzers>
