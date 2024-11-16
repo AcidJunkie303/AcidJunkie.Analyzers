@@ -12,11 +12,11 @@ internal static class SyntaxTreeVisualizer
         visitor.Visit(rootNode);
 
         var items = visitor.Nodes
-            .Select(a => (IndentedTypeName: new string(' ', a.Level * 2) + a.TypeName, Kind: a.Kind.ToString(), a.Node))
+            .Select(static a => (IndentedTypeName: new string(' ', a.Level * 2) + a.TypeName, Kind: a.Kind.ToString(), a.Node))
             .ToList();
 
-        var maxTypeNameLength = items.Max(a => a.IndentedTypeName.Length);
-        var maxKindLength = items.Max(a => a.Kind.Length);
+        var maxTypeNameLength = items.Max(static a => a.IndentedTypeName.Length);
+        var maxKindLength = items.Max(static a => a.Kind.Length);
 
         StringBuilder buffer = new();
 

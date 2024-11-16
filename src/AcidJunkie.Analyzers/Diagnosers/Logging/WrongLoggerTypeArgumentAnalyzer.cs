@@ -87,7 +87,7 @@ public sealed class WrongLoggerTypeArgumentAnalyzer : DiagnosticAnalyzer
         => parameterList
             .GetParents()
             .OfType<TypeDeclarationSyntax>()
-            .FirstOrDefault(a => a is ClassDeclarationSyntax or RecordDeclarationSyntax or StructDeclarationSyntax);
+            .FirstOrDefault(static a => a is ClassDeclarationSyntax or RecordDeclarationSyntax or StructDeclarationSyntax);
 
     private static IEnumerable<ParameterSyntax> GetTypedLoggerParameters(SyntaxNodeAnalysisContext context, ParameterListSyntax parameterList)
         => parameterList.Parameters

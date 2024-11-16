@@ -7,15 +7,11 @@ namespace AcidJunkie.Analyzers.Tests.Diagnosers;
 
 [SuppressMessage("Code Smell", "S4144:Methods should not have identical implementations", Justification = "Splitted up the test into different methods for different categories")]
 [SuppressMessage("Code Smell", "S2699:Tests should include assertions", Justification = "This is done internally by AnalyzerTest.RunAsync()")]
-public sealed class MissingUsingStatementAnalyzerTests : TestBase<MissingUsingStatementAnalyzer>
+public sealed class MissingUsingStatementAnalyzerTests(ITestOutputHelper testOutputHelper) : TestBase<MissingUsingStatementAnalyzer>(testOutputHelper)
 {
     static MissingUsingStatementAnalyzerTests()
     {
         CachedConfigurationProvider.IsCachingEnabled = false;
-    }
-
-    public MissingUsingStatementAnalyzerTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
-    {
     }
 
     [Theory]
@@ -59,7 +55,6 @@ public sealed class MissingUsingStatementAnalyzerTests : TestBase<MissingUsingSt
     [InlineData("/* 9107 */  var a = {|AJ0002:GetDisposable()|};")] // local static
     [InlineData("/* 9108 */  var a = {|AJ0002:GetRefStructWithDisposeMethod()|};")] // local static
     [InlineData("/* 9109 */  var a = {|AJ0002:new OuterDisposableFactory().GetInnerFactory().GetDisposable()|};")] // cascaded
-
     public async Task Theory_EnsureUsingStatementIsUsed(string insertionCode)
     {
         var code = CreateTestCode(insertionCode, string.Empty);

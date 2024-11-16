@@ -1,4 +1,3 @@
-using System.Collections.Frozen;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
@@ -11,7 +10,7 @@ namespace AcidJunkie.Analyzers.Logging;
 [SuppressMessage("MicrosoftCodeAnalysisCorrectness", "RS1035: Do not use APIs banned for analyzers.", Justification = "We need to do file system access for logging")]
 internal static class DefaultLogger
 {
-    public const string LogFileName = "AcidJunkie.Analyzers.log";
+    private const string LogFileName = "AcidJunkie.Analyzers.log";
     public static int ProcessId { get; } = GetCurrentProcessId();
     public static int MaxAnalyzerClassNameLength { get; } = GetMaxAnalyzerClassNameLength();
     public static string LogFilePath { get; } = Path.Combine(Path.GetTempPath(), LogFileName);
@@ -26,9 +25,9 @@ internal static class DefaultLogger
         => Assembly
             .GetAssembly(typeof(MissingEqualityComparerAnalyzer))!
             .GetTypes()
-            .Where(a => !a.IsAbstract)
+            .Where(static a => !a.IsAbstract)
             .Where(IsAnalyzerClass)
-            .Max(a => a.Name.Length);
+            .Max(static a => a.Name.Length);
 
     private static bool IsAnalyzerClass(Type type)
     {

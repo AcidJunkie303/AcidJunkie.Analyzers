@@ -7,12 +7,8 @@ using Xunit.Abstractions;
 namespace AcidJunkie.Analyzers.Tests.Diagnosers;
 
 [SuppressMessage("Code Smell", "S2699:Tests should include assertions", Justification = "This is done internally by AnalyzerTest.VerifyCodeFixAsync()")]
-public sealed class WrongLoggerTypeArgumentFixProviderTests : CodeFixTestBase<WrongLoggerTypeArgumentAnalyzer, WrongLoggerTypeArgumentFixProvider>
+public sealed class WrongLoggerTypeArgumentFixProviderTests(ITestOutputHelper testOutputHelper) : CodeFixTestBase<WrongLoggerTypeArgumentAnalyzer, WrongLoggerTypeArgumentFixProvider>(testOutputHelper)
 {
-    public WrongLoggerTypeArgumentFixProviderTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
-    {
-    }
-
     [Fact]
     public Task WhenLoggerWithDifferentTypeArgumentThanEnclosingType_ThenFix()
     {

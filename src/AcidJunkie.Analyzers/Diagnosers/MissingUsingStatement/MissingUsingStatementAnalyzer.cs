@@ -113,8 +113,8 @@ public sealed class MissingUsingStatementAnalyzer : DiagnosticAnalyzer
 
             return typeSymbol.GetMembers()
                 .OfType<IMethodSymbol>()
-                .Where(member => !member.IsStatic && member is { ReturnsVoid: true, Parameters.Length: 0, TypeParameters.Length: 0 })
-                .Any(member => member.Name.EqualsOrdinal("Dispose"));
+                .Where(static member => !member.IsStatic && member is { ReturnsVoid: true, Parameters.Length: 0, TypeParameters.Length: 0 })
+                .Any(static member => member.Name.EqualsOrdinal("Dispose"));
         }
     }
 

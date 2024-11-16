@@ -5,12 +5,8 @@ using Xunit.Abstractions;
 namespace AcidJunkie.Analyzers.Tests.Diagnosers;
 
 [SuppressMessage("Code Smell", "S2699:Tests should include assertions", Justification = "This is done internally by AnalyzerTest.RunAsync()")]
-public sealed class GeneralWarningSuppressionAnalyzerTests : TestBase<GeneralWarningSuppressionAnalyzer>
+public sealed class GeneralWarningSuppressionAnalyzerTests(ITestOutputHelper testOutputHelper) : TestBase<GeneralWarningSuppressionAnalyzer>(testOutputHelper)
 {
-    public GeneralWarningSuppressionAnalyzerTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
-    {
-    }
-
     [Fact]
     public async Task WhenUsingGeneralWarningSuppression_ThenDiagnose()
     {
@@ -28,8 +24,8 @@ public sealed class GeneralWarningSuppressionAnalyzerTests : TestBase<GeneralWar
         const string code = "#pragma warning disable TB303";
 
         await CreateTesterBuilder()
-                .WithTestCode(code)
-                .Build()
-                .RunAsync();
+            .WithTestCode(code)
+            .Build()
+            .RunAsync();
     }
 }

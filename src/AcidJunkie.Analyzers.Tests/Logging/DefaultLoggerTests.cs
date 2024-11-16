@@ -14,7 +14,7 @@ public sealed class DefaultLoggerTests
         EnsureLogFileIsDeleted();
 
         // act
-        sut.WriteLine(() => "test1");
+        sut.WriteLine(static () => "test1");
 
         // assert
         var logFileContent = GetLogFileContent();

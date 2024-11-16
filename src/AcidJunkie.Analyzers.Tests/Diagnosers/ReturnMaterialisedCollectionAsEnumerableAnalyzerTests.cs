@@ -6,12 +6,8 @@ namespace AcidJunkie.Analyzers.Tests.Diagnosers;
 
 [SuppressMessage("Code Smell", "S4144:Methods should not have identical implementations", Justification = "Splitted up the test into different methods for different categories")]
 [SuppressMessage("Code Smell", "S2699:Tests should include assertions", Justification = "This is done internally by AnalyzerTest.RunAsync()")]
-public sealed class ReturnMaterialisedCollectionAsEnumerableAnalyzerTests : TestBase<ReturnMaterialisedCollectionAsEnumerableAnalyzer>
+public sealed class ReturnMaterialisedCollectionAsEnumerableAnalyzerTests(ITestOutputHelper testOutputHelper) : TestBase<ReturnMaterialisedCollectionAsEnumerableAnalyzer>(testOutputHelper)
 {
-    public ReturnMaterialisedCollectionAsEnumerableAnalyzerTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
-    {
-    }
-
     [Fact]
     public async Task WhenReturningPureEnumerable_ThenOk()
     {

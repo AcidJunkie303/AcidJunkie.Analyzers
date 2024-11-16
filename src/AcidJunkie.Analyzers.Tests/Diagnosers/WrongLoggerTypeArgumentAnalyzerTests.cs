@@ -7,12 +7,8 @@ using Xunit.Abstractions;
 namespace AcidJunkie.Analyzers.Tests.Diagnosers;
 
 [SuppressMessage("Code Smell", "S2699:Tests should include assertions", Justification = "This is done internally by AnalyzerTest.RunAsync()")]
-public sealed class WrongLoggerTypeArgumentAnalyzerTests : TestBase<WrongLoggerTypeArgumentAnalyzer>
+public sealed class WrongLoggerTypeArgumentAnalyzerTests(ITestOutputHelper testOutputHelper) : TestBase<WrongLoggerTypeArgumentAnalyzer>(testOutputHelper)
 {
-    public WrongLoggerTypeArgumentAnalyzerTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
-    {
-    }
-
     [Fact]
     public Task WithConstructor_WhenNoParameters_ThenOk()
     {
@@ -107,10 +103,6 @@ public sealed class WrongLoggerTypeArgumentAnalyzerTests : TestBase<WrongLoggerT
 
         return CreateTester(code).RunAsync();
     }
-
-    // TODO: continue here
-    //unit tests for this are complete
-    //continue with  code fixer
 
     private CSharpAnalyzerTest<WrongLoggerTypeArgumentAnalyzer, DefaultVerifier> CreateTester(string code)
         => CreateTesterBuilder()

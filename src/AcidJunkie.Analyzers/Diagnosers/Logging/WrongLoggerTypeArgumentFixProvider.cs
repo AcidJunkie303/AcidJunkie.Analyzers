@@ -45,7 +45,7 @@ public sealed class WrongLoggerTypeArgumentFixProvider : CodeFixProvider
     {
         var parentTypeDeclaration = parameter
             .GetParents()
-            .FirstOrDefault(a => a is ClassDeclarationSyntax or RecordDeclarationSyntax or StructDeclarationSyntax);
+            .FirstOrDefault(static a => a is ClassDeclarationSyntax or RecordDeclarationSyntax or StructDeclarationSyntax);
 
         if (parentTypeDeclaration is null)
         {

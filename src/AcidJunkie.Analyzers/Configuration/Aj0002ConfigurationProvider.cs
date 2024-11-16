@@ -1,5 +1,4 @@
 using System.Collections.Frozen;
-using System.Collections.Immutable;
 using AcidJunkie.Analyzers.Extensions;
 using Microsoft.CodeAnalysis.Diagnostics;
 
@@ -24,7 +23,7 @@ internal sealed class Aj0002ConfigurationProvider : IConfigurationProvider<Aj000
             return (Aj0002Configuration.Default, true);
         }
 
-        var configuration = new Aj0002Configuration(isEnabled: true, ignoredObjectTypes);
+        var configuration = new Aj0002Configuration(true, ignoredObjectTypes);
         return (configuration, false);
     }
 
@@ -39,8 +38,8 @@ internal sealed class Aj0002ConfigurationProvider : IConfigurationProvider<Aj000
         return value
             .Replace("{default}", Aj0002Configuration.Defaults.IgnoredObjectsFlat)
             .Split(IgnoredObjectNamesDelimiter, StringSplitOptions.RemoveEmptyEntries)
-            .Select(a => a.Trim())
-            .Where(a => a.Length > 0)
+            .Select(static a => a.Trim())
+            .Where(static a => a.Length > 0)
             .ToFrozenSet(StringComparer.OrdinalIgnoreCase);
     }
 

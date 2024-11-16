@@ -11,5 +11,5 @@ internal static class LoggerExtensions
 
     public static void LogAnalyzerIsDisabled<TAnalyzer>(this ILogger<TAnalyzer> logger)
         where TAnalyzer : DiagnosticAnalyzer
-        => logger.WriteLine(() => "The analyzer is disabled");
+        => logger.WriteLine(static () => "The analyzer is disabled");
 }

@@ -58,7 +58,7 @@ public sealed class ReturnMaterialisedCollectionAsEnumerableAnalyzer : Diagnosti
 
     private static bool DoesMethodReturnEnumerable(SyntaxNodeAnalysisContext context, ReturnStatementSyntax returnStatement)
     {
-        var firstMatchingParent = returnStatement.GetParents().FirstOrDefault(a => a is MethodDeclarationSyntax or LocalFunctionStatementSyntax or LambdaExpressionSyntax or SimpleLambdaExpressionSyntax or ParenthesizedLambdaExpressionSyntax);
+        var firstMatchingParent = returnStatement.GetParents().FirstOrDefault(static a => a is MethodDeclarationSyntax or LocalFunctionStatementSyntax or LambdaExpressionSyntax or SimpleLambdaExpressionSyntax or ParenthesizedLambdaExpressionSyntax);
         if (firstMatchingParent is null)
         {
             return false;
