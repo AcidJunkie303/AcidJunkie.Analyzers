@@ -128,6 +128,7 @@ dotnet_diagnostic.ide0082.severity = error
 dotnet_diagnostic.ide0090.severity = error
 dotnet_diagnostic.ide0100.severity = error
 dotnet_diagnostic.ide0110.severity = error
+dotnet_diagnostic.ide0210.severity = none # enforce top-level statement
 dotnet_diagnostic.ide0290.severity = none
 dotnet_diagnostic.ide1005.severity = error
 dotnet_diagnostic.ide1006.severity = error

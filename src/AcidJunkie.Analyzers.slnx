@@ -20,4 +20,5 @@
   </Folder>
   <Project Path="AcidJunkie.Analyzers.Tests\AcidJunkie.Analyzers.Tests.csproj" />
   <Project Path="AcidJunkie.Analyzers\AcidJunkie.Analyzers.csproj" />
+  <Project Path="Playground\Playground.csproj" Type="Classic C#" />
 </Solution>
