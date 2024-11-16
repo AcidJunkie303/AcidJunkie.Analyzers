@@ -7,7 +7,7 @@ insert_final_newline = true
 # ReSharper properties
 resharper_csharp_max_line_length = 999
 resharper_csharp_wrap_lines = false
-
+resharper_braces_for_foreach = required
 
 [*.cs]
 indent_size = 4
@@ -108,7 +108,7 @@ dotnet_diagnostic.ide0028.severity = error
 dotnet_diagnostic.ide0032.severity = error
 dotnet_diagnostic.ide0043.severity = error
 dotnet_diagnostic.ide0044.severity = error
-dotnet_diagnostic.ide0046.severity = suggestion # if' statement can be simplified -> this would pollute our code with warning suppressions
+dotnet_diagnostic.ide0046.severity = none # if' statement can be simplified -> this would pollute our code with warning suppressions or suggestions
 dotnet_diagnostic.ide0047.severity = error
 dotnet_diagnostic.ide0047.severity = error
 dotnet_diagnostic.ide0048.severity = error
@@ -146,6 +146,7 @@ dotnet_diagnostic.mvc1003.severity = error
 dotnet_diagnostic.mvc1004.severity = error
 dotnet_diagnostic.mvc1005.severity = error
 dotnet_diagnostic.re0001.severity = error
+dotnet_diagnostic.RS1038.severity = none # Do not include package references to Microsoft.CodeAnalysis.Workspaces. To fix this, the code fixers have to be in a separate package. TODO....
 dotnet_diagnostic.s1135.severity = warning
 
 ma0051.maximum_lines_per_method = 80

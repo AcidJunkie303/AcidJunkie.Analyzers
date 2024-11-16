@@ -66,7 +66,7 @@ public sealed class MissingUsingStatementAnalyzer : DiagnosticAnalyzer
 
         if (IsResultStoredInFieldOrProperty(context, invocationExpression))
         {
-            logger.WriteLine(() => $"Disposable object is stored in property or field");
+            logger.WriteLine(() => "Disposable object is stored in property or field");
             return;
         }
 
@@ -163,10 +163,10 @@ public sealed class MissingUsingStatementAnalyzer : DiagnosticAnalyzer
     private static bool IsResultStoredInFieldOrProperty(SyntaxNodeAnalysisContext context, InvocationExpressionSyntax invocationExpression)
     {
         if (invocationExpression
-            .GetParents()
-            .OfType<AssignmentExpressionSyntax>()
-            .FirstOrDefault()
-            ?.Left is not IdentifierNameSyntax assignmentTarget)
+                .GetParents()
+                .OfType<AssignmentExpressionSyntax>()
+                .FirstOrDefault()
+                ?.Left is not IdentifierNameSyntax assignmentTarget)
         {
             return false;
         }
@@ -175,7 +175,7 @@ public sealed class MissingUsingStatementAnalyzer : DiagnosticAnalyzer
         return symbol is IFieldSymbol or IPropertySymbol;
     }
 
-    internal static class DiagnosticRules
+    private static class DiagnosticRules
     {
         internal static class Default
         {
@@ -188,7 +188,7 @@ public sealed class MissingUsingStatementAnalyzer : DiagnosticAnalyzer
             public static readonly LocalizableString Title = "Missing using statement";
             public static readonly LocalizableString MessageFormat = "The disposable object is disposed via the using statement";
             public static readonly LocalizableString Description = MessageFormat + ".";
-            public static readonly DiagnosticDescriptor Rule = new(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description, helpLinkUri: HelpLinkUri);
+            public static readonly DiagnosticDescriptor Rule = new(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, true, Description, HelpLinkUri);
         }
     }
 }

@@ -109,7 +109,7 @@ public sealed class ReturnMaterialisedCollectionAsEnumerableAnalyzer : Diagnosti
         return false;
     }
 
-    internal static class DiagnosticRules
+    private static class DiagnosticRules
     {
         internal static class Default
         {

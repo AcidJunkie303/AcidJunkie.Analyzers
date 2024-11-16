@@ -32,7 +32,7 @@ public sealed class GeneralWarningSuppressionAnalyzer : DiagnosticAnalyzer
         }
     }
 
-    internal static class DiagnosticRules
+    private static class DiagnosticRules
     {
         internal static class Default
         {
@@ -45,7 +45,7 @@ public sealed class GeneralWarningSuppressionAnalyzer : DiagnosticAnalyzer
             public static readonly LocalizableString Title = "Do not use general warning suppression";
             public static readonly LocalizableString MessageFormat = Title;
             public static readonly LocalizableString Description = MessageFormat;
-            public static readonly DiagnosticDescriptor Rule = new(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Error, isEnabledByDefault: true, description: Description, helpLinkUri: HelpLinkUri);
+            public static readonly DiagnosticDescriptor Rule = new(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Error, true, Description, HelpLinkUri);
         }
     }
 }

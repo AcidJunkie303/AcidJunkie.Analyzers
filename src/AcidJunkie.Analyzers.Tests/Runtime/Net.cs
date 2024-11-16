@@ -21,7 +21,7 @@ internal static class Net
                     "net9.0",
                     new PackageIdentity(
                         "Microsoft.NETCore.App.Ref",
-                        "9.0.9"),
+                        "9.0.0"),
                     Path.Combine("ref", "net9.0"))
                 .WithPackages([new PackageIdentity("Microsoft.Bcl.AsyncInterfaces", "1.0.0.0")])
         );

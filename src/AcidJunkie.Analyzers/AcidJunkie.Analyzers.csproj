@@ -19,9 +19,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Remove="Old_Stuff\**" />
-        <EmbeddedResource Remove="Old_Stuff\**" />
-        <None Remove="Old_Stuff\**" />
+        <Compile Remove="Old_Stuff\**"/>
+        <EmbeddedResource Remove="Old_Stuff\**"/>
+        <None Remove="Old_Stuff\**"/>
     </ItemGroup>
 
     <ItemGroup>
@@ -29,13 +29,14 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.11.0" />
-        <PackageReference Include="Microsoft.CodeAnalysis.RulesetToEditorconfigConverter" Version="3.3.3" />
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.11.0"/>
+        <PackageReference Include="Microsoft.CodeAnalysis.RulesetToEditorconfigConverter" Version="3.3.3"/>
+        <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.Common" Version="4.11.0"/>
     </ItemGroup>
 
     <Target Name="_AddAnalyzersToOutput">
         <ItemGroup>
-            <TfmSpecificPackageFile Include="$(OutputPath)\$(ProjectName).dll" PackagePath="analyzers/dotnet/cs" />
+            <TfmSpecificPackageFile Include="$(OutputPath)\$(ProjectName).dll" PackagePath="analyzers/dotnet/cs"/>
         </ItemGroup>
     </Target>
 

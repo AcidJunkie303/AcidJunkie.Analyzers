@@ -94,7 +94,7 @@ public sealed class WrongLoggerTypeArgumentAnalyzer : DiagnosticAnalyzer
             .Where(a => a.Type is not null)
             .Where(a =>
             {
-                if (context.SemanticModel.GetTypeInfo(a.Type!, cancellationToken: context.CancellationToken).Type is not INamedTypeSymbol typeSymbol)
+                if (context.SemanticModel.GetTypeInfo(a.Type!, context.CancellationToken).Type is not INamedTypeSymbol typeSymbol)
                 {
                     return false;
                 }
@@ -120,7 +120,7 @@ public sealed class WrongLoggerTypeArgumentAnalyzer : DiagnosticAnalyzer
             public static readonly LocalizableString Title = "Probably wrong type argument for ILogger<TContext>";
             public static readonly LocalizableString MessageFormat = "When injecting ILogger<TContext> through the constructor, the type argument of ILogger<TContext> should be the same type as the type it is injected into";
             public static readonly LocalizableString Description = MessageFormat;
-            public static readonly DiagnosticDescriptor Rule = new(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description, helpLinkUri: HelpLinkUri);
+            public static readonly DiagnosticDescriptor Rule = new(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, true, Description, HelpLinkUri);
         }
     }
 }
