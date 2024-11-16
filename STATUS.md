@@ -13,7 +13,7 @@
 | #A9  | Awaiting `Task.CompletedTask` in an async method is not necessary | 🔵 | Either remove `await Task.CompletedTask` or replace it with `return Task.CompletedTask`. |
 | #A10 | Awaiting `Task.FromResult` in an async method is not necessary | 🔵 | Either remove `await Task.FromResult` or replace it with `return Task.FromResult`. |
 | #A11 | Don't inject untyped logger (`ILogger`) in construcotrs | 🔵 | Instead, use a typed logger `ILogger<TContext>`. |
-| #A12 | Incorrect type parameter used for `ILogger<TContext>` | 🔵 | When injecting `ILogger<TContext>` in constructors, the type argument should be the type of the class it is injected to. |
+| #A12 | Incorrect type parameter used for `ILogger<TContext>` | ✔️ | When injecting `ILogger<TContext>` in constructors, the type argument should be the type of the class it is injected to. |
 | #A13 | Pragma warning suppression not restored | 🔵 | The `#pragma warning disable X` is not restored. |
 | #A14 | Pragma warning suppression not restored in correct order of suppression | 🔵 | When suppressing warnings, the warning suppression restoration statement must be in the reverse order. |
 | #A15 | Do not use general warning suppression | ✔️ | When suppressing warnings through `#pragma warning disable` a diagnostic ID must be provided all the time. Disallow general warning suppression.  |

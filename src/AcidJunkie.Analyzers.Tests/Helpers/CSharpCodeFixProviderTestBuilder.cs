@@ -2,6 +2,7 @@ using System.Collections.Immutable;
 using AcidJunkie.Analyzers.Extensions;
 using AcidJunkie.Analyzers.Tests.Runtime;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -11,69 +12,79 @@ using Xunit.Abstractions;
 
 namespace AcidJunkie.Analyzers.Tests.Helpers;
 
-internal static class CSharpAnalyzerTestBuilder
+internal static class CSharpCodeFixProviderTestBuilder
 {
-    public static CSharpAnalyzerTestBuilder<TAnalyzer> Create<TAnalyzer>(ITestOutputHelper testOutputHelper)
+    public static CSharpCodeFixProviderTestBuilder<TAnalyzer, TCodeFixProvider> Create<TAnalyzer, TCodeFixProvider>(ITestOutputHelper testOutputHelper)
         where TAnalyzer : DiagnosticAnalyzer, new()
+        where TCodeFixProvider : CodeFixProvider, new()
         => new(testOutputHelper);
 }
 
-internal sealed class CSharpAnalyzerTestBuilder<TAnalyzer>
+internal sealed class CSharpCodeFixProviderTestBuilder<TAnalyzer, TCodeFixProvider>
     where TAnalyzer : DiagnosticAnalyzer, new()
+    where TCodeFixProvider : CodeFixProvider, new()
 {
     private readonly List<string> _additionalGlobalOptionsLines = [];
     private readonly List<PackageIdentity> _additionalPackages = [];
     private readonly List<Type> _additionalTypes = [];
     private readonly ITestOutputHelper _testOutputHelper;
-    private string? _code;
+    private string? _fixedCode;
+    private string? _testCode;
 
-    public CSharpAnalyzerTestBuilder(ITestOutputHelper testOutputHelper)
+    public CSharpCodeFixProviderTestBuilder(ITestOutputHelper testOutputHelper)
     {
         _testOutputHelper = testOutputHelper;
     }
 
-    public CSharpAnalyzerTestBuilder<TAnalyzer> WithTestCode(string code)
+    public CSharpCodeFixProviderTestBuilder<TAnalyzer, TCodeFixProvider> WithTestCode(string code)
     {
-        _code = code;
+        _testCode = code;
         return this;
     }
 
-    public CSharpAnalyzerTestBuilder<TAnalyzer> WithNugetPackage(string packageName, string packageVersion)
+    public CSharpCodeFixProviderTestBuilder<TAnalyzer, TCodeFixProvider> WithFixedCode(string code)
+    {
+        _fixedCode = code;
+        return this;
+    }
+
+    public CSharpCodeFixProviderTestBuilder<TAnalyzer, TCodeFixProvider> WithNugetPackage(string packageName, string packageVersion)
     {
         var package = new PackageIdentity(packageName, packageVersion);
         _additionalPackages.Add(package);
         return this;
     }
 
-    public CSharpAnalyzerTestBuilder<TAnalyzer> WithAdditionalReference<T>()
+    public CSharpCodeFixProviderTestBuilder<TAnalyzer, TCodeFixProvider> WithAdditionalReference<T>()
     {
         _additionalTypes.Add(typeof(T));
         return this;
     }
 
-    public CSharpAnalyzerTestBuilder<TAnalyzer> WithGlobalOptions(string optionsLine)
+    public CSharpCodeFixProviderTestBuilder<TAnalyzer, TCodeFixProvider> WithGlobalOptions(string optionsLine)
     {
         _additionalGlobalOptionsLines.Add(optionsLine);
         return this;
     }
 
-    public CSharpAnalyzerTest<TAnalyzer, DefaultVerifier> Build()
+    public CSharpCodeFixTest<TAnalyzer, TCodeFixProvider, DefaultVerifier> Build()
     {
-        if (_code.IsNullOrWhiteSpace())
+        if (_testCode.IsNullOrWhiteSpace())
         {
-            throw new InvalidOperationException("No code added!");
+            throw new InvalidOperationException($"No fix code added ({nameof(WithTestCode)})!");
         }
 
-        LogSyntaxTree(_code);
+        if (_fixedCode.IsNullOrWhiteSpace())
+        {
+            throw new InvalidOperationException($"No fix code added ({nameof(WithFixedCode)})!");
+        }
 
-        var analyzerTest = new CSharpAnalyzerTest<TAnalyzer, DefaultVerifier>
+        LogSyntaxTree(_testCode);
+
+        var codeFixTest = new CSharpCodeFixTest<TAnalyzer, TCodeFixProvider, DefaultVerifier>
         {
             TestState =
             {
-                Sources =
-                {
-                    _code
-                },
 #if NET9_0
                 ReferenceAssemblies = Net.Assemblies.Net90.AddPackages([.._additionalPackages]),
 #elif NET8_0
@@ -81,22 +92,24 @@ internal sealed class CSharpAnalyzerTestBuilder<TAnalyzer>
 #else
                 .NET framework not handled!
 #endif
-            }
+            },
+            FixedCode = _fixedCode,
+            TestCode = _testCode
         };
 
         foreach (var additionalType in _additionalTypes)
         {
             var reference = MetadataReference.CreateFromFile(additionalType.Assembly.Location);
-            analyzerTest.TestState.AdditionalReferences.Add(reference);
+            codeFixTest.TestState.AdditionalReferences.Add(reference);
         }
 
         if (_additionalGlobalOptionsLines.Count > 0)
         {
             var content = string.Join(Environment.NewLine, _additionalGlobalOptionsLines);
-            analyzerTest.TestState.AnalyzerConfigFiles.Add(("/.globalconfig", content));
+            codeFixTest.TestState.AnalyzerConfigFiles.Add(("/.globalconfig", content));
         }
 
-        return analyzerTest;
+        return codeFixTest;
     }
 
     private void LogSyntaxTree(string code)

@@ -66,7 +66,7 @@ public sealed class MissingUsingStatementAnalyzer : DiagnosticAnalyzer
 
         if (IsResultStoredInFieldOrProperty(context, invocationExpression))
         {
-            logger.WriteLine(() => $"Disposable object is stored in property or field");
+            logger.WriteLine(() => "Disposable object is stored in property or field");
             return;
         }
 
@@ -94,9 +94,15 @@ public sealed class MissingUsingStatementAnalyzer : DiagnosticAnalyzer
     {
         return IsDirectDisposable(typeSymbol) || ImplementsDisposable(typeSymbol) || IsRefStructWithDisposeMethod(typeSymbol);
 
-        static bool IsDirectDisposable(ITypeSymbol typeSymbol) => typeSymbol.IsContainedInNamespace("System") && typeSymbol.Name.EqualsOrdinal(nameof(IDisposable));
+        static bool IsDirectDisposable(ITypeSymbol typeSymbol)
+        {
+            return typeSymbol.IsContainedInNamespace("System") && typeSymbol.Name.EqualsOrdinal(nameof(IDisposable));
+        }
 
-        static bool ImplementsDisposable(ITypeSymbol typeSymbol) => typeSymbol.AllInterfaces.Any(IsDirectDisposable);
+        static bool ImplementsDisposable(ITypeSymbol typeSymbol)
+        {
+            return typeSymbol.AllInterfaces.Any(IsDirectDisposable);
+        }
 
         static bool IsRefStructWithDisposeMethod(ITypeSymbol typeSymbol)
         {
@@ -107,8 +113,8 @@ public sealed class MissingUsingStatementAnalyzer : DiagnosticAnalyzer
 
             return typeSymbol.GetMembers()
                 .OfType<IMethodSymbol>()
-                .Where(member => !member.IsStatic && member is { ReturnsVoid: true, Parameters.Length: 0, TypeParameters.Length: 0 })
-                .Any(member => member.Name.EqualsOrdinal("Dispose"));
+                .Where(static member => !member.IsStatic && member is { ReturnsVoid: true, Parameters.Length: 0, TypeParameters.Length: 0 })
+                .Any(static member => member.Name.EqualsOrdinal("Dispose"));
         }
     }
 
@@ -156,13 +162,11 @@ public sealed class MissingUsingStatementAnalyzer : DiagnosticAnalyzer
 
     private static bool IsResultStoredInFieldOrProperty(SyntaxNodeAnalysisContext context, InvocationExpressionSyntax invocationExpression)
     {
-        var assignmentTarget = invocationExpression
-            .GetParents()
-            .OfType<AssignmentExpressionSyntax>()
-            .FirstOrDefault()
-            ?.Left as IdentifierNameSyntax;
-
-        if (assignmentTarget is null)
+        if (invocationExpression
+                .GetParents()
+                .OfType<AssignmentExpressionSyntax>()
+                .FirstOrDefault()
+                ?.Left is not IdentifierNameSyntax assignmentTarget)
         {
             return false;
         }
@@ -171,7 +175,7 @@ public sealed class MissingUsingStatementAnalyzer : DiagnosticAnalyzer
         return symbol is IFieldSymbol or IPropertySymbol;
     }
 
-    internal static class DiagnosticRules
+    private static class DiagnosticRules
     {
         internal static class Default
         {
@@ -184,7 +188,7 @@ public sealed class MissingUsingStatementAnalyzer : DiagnosticAnalyzer
             public static readonly LocalizableString Title = "Missing using statement";
             public static readonly LocalizableString MessageFormat = "The disposable object is disposed via the using statement";
             public static readonly LocalizableString Description = MessageFormat + ".";
-            public static readonly DiagnosticDescriptor Rule = new(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description, helpLinkUri: HelpLinkUri);
+            public static readonly DiagnosticDescriptor Rule = new(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, true, Description, HelpLinkUri);
         }
     }
 }

@@ -7,36 +7,52 @@ internal static class TypeSymbolExtensions
     private static readonly Dictionary<string, Dictionary<string, int>> CollectionInterfaceArityByTypeByNamespace = new(StringComparer.Ordinal)
     {
         {
-            "System.Collections", new(StringComparer.Ordinal)
+            "System.Collections", new Dictionary<string, int>(StringComparer.Ordinal)
             {
-                { "ICollection", 0 },
-                { "IDictionary", 0 },
-                { "IList", 0 }
+                {
+                    "ICollection", 0
+                },
+                {
+                    "IDictionary", 0
+                },
+                {
+                    "IList", 0
+                }
             }
         },
         {
-            "System.Collections.Generic", new(StringComparer.Ordinal)
+            "System.Collections.Generic", new Dictionary<string, int>(StringComparer.Ordinal)
             {
-                { "ICollection", 1 },
-                { "IDictionary", 1 },
-                { "IList", 1 },
-                { "ISet", 1 },
-                { "IReadOnlyCollection", 1 }
+                {
+                    "ICollection", 1
+                },
+                {
+                    "IDictionary", 1
+                },
+                {
+                    "IList", 1
+                },
+                {
+                    "ISet", 1
+                },
+                {
+                    "IReadOnlyCollection", 1
+                }
             }
         }
     };
 
     public static bool ImplementsGenericEquatable(this ITypeSymbol symbol)
         => symbol.AllInterfaces
-            .Where(a => a.TypeParameters.Length == 1)
-            .Where(a => a.ContainingNamespace.Name.EqualsOrdinal("System"))
-            .Any(a => a.Name.EqualsOrdinal("IEquatable"));
+            .Where(static a => a.TypeParameters.Length == 1)
+            .Where(static a => a.ContainingNamespace.Name.EqualsOrdinal("System"))
+            .Any(static a => a.Name.EqualsOrdinal("IEquatable"));
 
     public static bool IsGetHashCodeOverridden(this ITypeSymbol symbol)
         => symbol
             .GetMembers(nameof(GetHashCode))
             .OfType<IMethodSymbol>()
-            .Any(a => a.Parameters.Length == 0);
+            .Any(static a => a.Parameters.Length == 0);
 
     public static string GetFullNamespace(this ITypeSymbol symbol)
         => symbol.ContainingNamespace?.ToString() ?? string.Empty;
@@ -81,29 +97,29 @@ internal static class TypeSymbolExtensions
         }
 
         return symbol.AllInterfaces
-            .Where(a => a.TypeParameters.Length == typeArguments.Length)
-            .Where(a => a.ContainingNamespace.ToString().EqualsOrdinal(interfaceNamespace))
-            .Where(a => a.Name.EqualsOrdinal(interfaceName))
-            .Any(a =>
-            {
-                if (a.TypeArguments.Length != typeArguments.Length)
+                .Where(a => a.TypeParameters.Length == typeArguments.Length)
+                .Where(a => a.ContainingNamespace.ToString().EqualsOrdinal(interfaceNamespace))
+                .Where(a => a.Name.EqualsOrdinal(interfaceName))
+                .Any(a =>
                 {
-                    return false;
-                }
-
-                for (var i = 0; i < typeArguments.Length; i++)
-                {
-                    var typeArgument = typeArguments[i];
-                    var typeArgument2 = a.TypeArguments[i];
-
-                    if (!typeArgument.Equals(typeArgument2, SymbolEqualityComparer.Default))
+                    if (a.TypeArguments.Length != typeArguments.Length)
                     {
                         return false;
                     }
-                }
 
-                return true;
-            })
+                    for (var i = 0; i < typeArguments.Length; i++)
+                    {
+                        var typeArgument = typeArguments[i];
+                        var typeArgument2 = a.TypeArguments[i];
+
+                        if (!typeArgument.Equals(typeArgument2, SymbolEqualityComparer.Default))
+                        {
+                            return false;
+                        }
+                    }
+
+                    return true;
+                })
             ;
     }
 

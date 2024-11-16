@@ -86,7 +86,7 @@ public sealed class MissingEqualityComparerAnalyzer : DiagnosticAnalyzer
 
         if (keyType.ImplementsGenericEquatable() && keyType.IsGetHashCodeOverridden())
         {
-            logger.WriteLine(() => $"Key type {keyType.GetFullName()} not not implement IEquatable<{keyType.GetFullName()}> or does not override {nameof(object.GetHashCode)}()");
+            logger.WriteLine(() => $"Key type {keyType.GetFullName()} does implement IEquatable<{keyType.GetFullName()}> and does override {nameof(object.GetHashCode)}() as well");
             return;
         }
 
@@ -127,7 +127,7 @@ public sealed class MissingEqualityComparerAnalyzer : DiagnosticAnalyzer
         var keyType = invocationExpression.GetTypeForTypeParameter(context.SemanticModel, keyTypeParameterName, context.CancellationToken);
         if (keyType is null)
         {
-            logger.WriteLine(() => $"Unable to determine key type parameter type");
+            logger.WriteLine(() => "Unable to determine key type parameter type");
             return;
         }
 
@@ -184,7 +184,7 @@ public sealed class MissingEqualityComparerAnalyzer : DiagnosticAnalyzer
         return false;
     }
 
-    internal static class DiagnosticRules
+    private static class DiagnosticRules
     {
         internal static class Default
         {
@@ -197,7 +197,7 @@ public sealed class MissingEqualityComparerAnalyzer : DiagnosticAnalyzer
             public static readonly LocalizableString Title = "Provide an equality comparer argument";
             public static readonly LocalizableString MessageFormat = "To prevent unexpected results, use a IEqualityComparer argument because the type used for hash-matching does not fully implement IEquatable<T> together with GetHashCode()";
             public static readonly LocalizableString Description = MessageFormat;
-            public static readonly DiagnosticDescriptor Rule = new(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description, helpLinkUri: HelpLinkUri);
+            public static readonly DiagnosticDescriptor Rule = new(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, true, Description, HelpLinkUri);
         }
     }
 }

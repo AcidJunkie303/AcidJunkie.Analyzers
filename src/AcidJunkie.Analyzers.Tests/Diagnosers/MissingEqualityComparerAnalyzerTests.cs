@@ -1,11 +1,12 @@
 using System.Diagnostics.CodeAnalysis;
 using AcidJunkie.Analyzers.Diagnosers.MissingEqualityComparer;
+using Xunit.Abstractions;
 
 namespace AcidJunkie.Analyzers.Tests.Diagnosers;
 
 [SuppressMessage("Code Smell", "S4144:Methods should not have identical implementations", Justification = "Splitted up the test into different methods for different categories")]
 [SuppressMessage("Code Smell", "S2699:Tests should include assertions", Justification = "This is done internally by AnalyzerTest.RunAsync()")]
-public sealed class MissingEqualityComparerAnalyzerTests : TestBase<MissingEqualityComparerAnalyzer>
+public sealed class MissingEqualityComparerAnalyzerTests(ITestOutputHelper testOutputHelper) : TestBase<MissingEqualityComparerAnalyzer>(testOutputHelper)
 {
     [Theory]
     //
@@ -260,22 +261,22 @@ public sealed class MissingEqualityComparerAnalyzerTests : TestBase<MissingEqual
               {
                   var refTypeCollection = new RefType[0];
                   var refTypeEqualityComparer = new RefTypeEqualityComparer();
-          
+
                   var partialEquatableRefTypeCollection = new PartialEquatableRefType[0];
                   var partialEquatableRefTypeEqualityComparer = new PartialEquatableRefTypeEqualityComparer();
-          
+
                   var fullEquatableRefTypeCollection = new FullEquatableRefType[0];
                   var fullEquatableRefTypeEqualityComparer = new FullEquatableRefTypeEqualityComparer();
-          
+
                   var valueTypeCollection = new ValueType[0];
-                  
+
                   {{insertionCode}}
               }
-              
+
               private static IEqualityComparer<RefType> GetRefTypeEqualityComparer() => new RefTypeEqualityComparer();
               private static IEqualityComparer<PartialEquatableRefType> GePartialEquatableRefTypeEqualityComparer() => new PartialEquatableRefTypeEqualityComparer();
               private static IEqualityComparer<FullEquatableRefType> GetFullEquatableRefTypeEqualityComparer() => new FullEquatableRefTypeEqualityComparer();
-              
+
           }
 
           ////////////////////////////////////////////////////////////////
@@ -285,11 +286,11 @@ public sealed class MissingEqualityComparerAnalyzerTests : TestBase<MissingEqual
           {
               public string StringValue { get; set; }
               public int IntValue { get; set; }
-              
+
               public static class EqualityComparers
               {
                   public static IEqualityComparer<RefType> Default { get; } = new RefTypeEqualityComparer();
-              } 
+              }
           }
 
           public struct ValueType
@@ -302,12 +303,12 @@ public sealed class MissingEqualityComparerAnalyzerTests : TestBase<MissingEqual
           {
               public string StringValue { get; set; }
               public int IntValue { get; set; }
-              
+
               public bool Equals(PartialEquatableRefType? other)
                   => other is not null
                       && IntValue == other.IntValue
                       && StringValue == other.StringValue;
-              
+
               public static class EqualityComparers
               {
                   public static IEqualityComparer<PartialEquatableRefType> Default { get; } = new PartialEquatableRefTypeEqualityComparer();
@@ -318,14 +319,14 @@ public sealed class MissingEqualityComparerAnalyzerTests : TestBase<MissingEqual
           {
               public string StringValue { get; set; }
               public int IntValue { get; set; }
-              
+
               public bool Equals(FullEquatableRefType? other)
                   => other is not null
                       && IntValue == other.IntValue
-                      && StringValue == other.StringValue;    
-              
+                      && StringValue == other.StringValue;
+
               public override int GetHashCode() => HashCode.Combine(StringValue, IntValue);
-              
+
               public static class EqualityComparers
               {
                   public static IEqualityComparer<FullEquatableRefType> Default { get; } = new FullEquatableRefTypeEqualityComparer();

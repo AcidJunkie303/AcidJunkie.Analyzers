@@ -21,13 +21,15 @@ public static class AnalyzerOptionsExtensions
 
     public static string? GetGlobalOptionsValueOrDefault(this AnalyzerOptions options, string key)
     {
-        options.AnalyzerConfigOptionsProvider.GlobalOptions.TryGetValue(key, out var value);
+        _ = options.AnalyzerConfigOptionsProvider.GlobalOptions.TryGetValue(key, out var value);
         return value;
     }
 
     public static bool GetGlobalOptionsBooleanValue(this AnalyzerOptions options, string key, bool defaultValue = true)
     {
+#pragma warning disable IDE0046 // Use conditional expression for return -> If it is simplified, we'd have nested conditional expressions
         if (!options.AnalyzerConfigOptionsProvider.GlobalOptions.TryGetValue(key, out var value))
+#pragma warning restore IDE0046
         {
             return defaultValue;
         }

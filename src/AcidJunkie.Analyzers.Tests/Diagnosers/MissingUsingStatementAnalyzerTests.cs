@@ -1,12 +1,13 @@
 using System.Diagnostics.CodeAnalysis;
 using AcidJunkie.Analyzers.Configuration;
 using AcidJunkie.Analyzers.Diagnosers.MissingUsingStatement;
+using Xunit.Abstractions;
 
 namespace AcidJunkie.Analyzers.Tests.Diagnosers;
 
 [SuppressMessage("Code Smell", "S4144:Methods should not have identical implementations", Justification = "Splitted up the test into different methods for different categories")]
 [SuppressMessage("Code Smell", "S2699:Tests should include assertions", Justification = "This is done internally by AnalyzerTest.RunAsync()")]
-public sealed class MissingUsingStatementAnalyzerTests : TestBase<MissingUsingStatementAnalyzer>
+public sealed class MissingUsingStatementAnalyzerTests(ITestOutputHelper testOutputHelper) : TestBase<MissingUsingStatementAnalyzer>(testOutputHelper)
 {
     static MissingUsingStatementAnalyzerTests()
     {
@@ -54,7 +55,6 @@ public sealed class MissingUsingStatementAnalyzerTests : TestBase<MissingUsingSt
     [InlineData("/* 9107 */  var a = {|AJ0002:GetDisposable()|};")] // local static
     [InlineData("/* 9108 */  var a = {|AJ0002:GetRefStructWithDisposeMethod()|};")] // local static
     [InlineData("/* 9109 */  var a = {|AJ0002:new OuterDisposableFactory().GetInnerFactory().GetDisposable()|};")] // cascaded
-
     public async Task Theory_EnsureUsingStatementIsUsed(string insertionCode)
     {
         var code = CreateTestCode(insertionCode, string.Empty);
@@ -128,32 +128,32 @@ public sealed class MissingUsingStatementAnalyzerTests : TestBase<MissingUsingSt
           {
               private IDisposable? _disposable;
               private IDisposable? Disposable {get; set;}
-                  
+
               public object? ComplexTestMethod()
               {
                   {{simpleInsertionCode}}
-                  
+
                   return null; // fallback. Some testing methods might return something
               }
-              
+
               {{complexInsertionCode}}
-              
+
               private static DisposableRefType GetDisposableRefType() => null!;
               private static IDisposable GetDisposable() => null!;
               private static RefStructWithDisposeMethod GetRefStructWithDisposeMethod() => new();
           }
-          
+
           public sealed class Factory
           {
               public static IDisposable GetDisposable_StaticMethod() => null!;
               public static IDisposable GetDisposableRefType_StaticMethod() => null!;
               public static RefStructWithDisposeMethod GetRefStructWithDisposeMethod_StaticMethod() => new();
               public IDisposable GetDisposable() => null!;
-              public IDisposable GetDisposable<TT>() => null!;    
+              public IDisposable GetDisposable<TT>() => null!;
               public IDisposable GetDisposableRefType() => null!;
               public RefStructWithDisposeMethod GetRefStructWithDisposeMethod() => new();
           }
-          
+
           public sealed class Factory<T>
           {
               public static DisposableRefType GetDisposable_StaticMethod() => null!;
@@ -172,17 +172,17 @@ public sealed class MissingUsingStatementAnalyzerTests : TestBase<MissingUsingSt
           {
               public void Dispose(){}
           }
-          
+
           public sealed class DisposableRefType<T> : IDisposable
           {
               public void Dispose(){}
           }
-          
+
           public ref struct RefStructWithDisposeMethod
           {
               public void Dispose(){}
           }
-          
+
           public sealed class OuterDisposableFactory
           {
               public InnerDisposableFactory GetInnerFactory() => new ();
@@ -190,7 +190,7 @@ public sealed class MissingUsingStatementAnalyzerTests : TestBase<MissingUsingSt
 
           public sealed class InnerDisposableFactory
           {
-              public IDisposable GetDisposable() => null!; 
+              public IDisposable GetDisposable() => null!;
           }
           """;
 }

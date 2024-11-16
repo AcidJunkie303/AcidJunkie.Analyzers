@@ -28,7 +28,7 @@ public sealed class TaskCreationWithMaterialisedCollectionAsEnumerableAnalyzer :
 
         if (context.SemanticModel.GetSymbolInfo(invocation, context.CancellationToken).Symbol is not IMethodSymbol methodSymbol)
         {
-            logger.WriteLine(() => $"Unable to get IMethodSymbol from invocation");
+            logger.WriteLine(() => "Unable to get IMethodSymbol from invocation");
             return;
         }
 
@@ -52,7 +52,7 @@ public sealed class TaskCreationWithMaterialisedCollectionAsEnumerableAnalyzer :
 
         if (!taskType.IsEnumerable())
         {
-            logger.WriteLine(() => $"Task generic parameter type is not or does not implement IEnumerable or IEnumerable<T>");
+            logger.WriteLine(() => "Task generic parameter type is not or does not implement IEnumerable or IEnumerable<T>");
             return;
         }
 
@@ -114,7 +114,7 @@ public sealed class TaskCreationWithMaterialisedCollectionAsEnumerableAnalyzer :
         return typeSymbol.Name.EqualsOrdinal("Task") || typeSymbol.Name.EqualsOrdinal("ValueTask");
     }
 
-    internal static class DiagnosticRules
+    private static class DiagnosticRules
     {
         internal static class Default
         {
@@ -127,7 +127,7 @@ public sealed class TaskCreationWithMaterialisedCollectionAsEnumerableAnalyzer :
             public static readonly LocalizableString Title = "Do not create tasks of enumerable type containing a materialised collection";
             public static readonly LocalizableString MessageFormat = "Do not create tasks of type IEnumerable or IEnumerable<T> containing a materialised collection";
             public static readonly LocalizableString Description = MessageFormat;
-            public static readonly DiagnosticDescriptor Rule = new(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description, helpLinkUri: HelpLinkUri);
+            public static readonly DiagnosticDescriptor Rule = new(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, true, Description, HelpLinkUri);
         }
     }
 }
