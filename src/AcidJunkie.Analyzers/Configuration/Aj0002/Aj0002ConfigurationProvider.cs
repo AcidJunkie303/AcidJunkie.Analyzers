@@ -2,7 +2,7 @@ using System.Collections.Frozen;
 using AcidJunkie.Analyzers.Extensions;
 using Microsoft.CodeAnalysis.Diagnostics;
 
-namespace AcidJunkie.Analyzers.Configuration;
+namespace AcidJunkie.Analyzers.Configuration.Aj0002;
 
 internal sealed class Aj0002ConfigurationProvider : IConfigurationProvider<Aj0002Configuration>
 {

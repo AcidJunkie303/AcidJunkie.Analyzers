@@ -27,7 +27,7 @@ public sealed class GeneralWarningSuppressionAnalyzer : DiagnosticAnalyzer
         var directive = (PragmaWarningDirectiveTriviaSyntax)context.Node;
         if (directive.ErrorCodes.Count == 0)
         {
-            logger.LogReportDiagnostic(DiagnosticRules.Default.Rule, directive.GetLocation());
+            logger.ReportDiagnostic(DiagnosticRules.Default.Rule, directive.GetLocation());
             context.ReportDiagnostic(Diagnostic.Create(DiagnosticRules.Default.Rule, directive.GetLocation()));
         }
     }
