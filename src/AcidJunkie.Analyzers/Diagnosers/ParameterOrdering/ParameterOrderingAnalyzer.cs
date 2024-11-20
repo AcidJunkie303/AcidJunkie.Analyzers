@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using AcidJunkie.Analyzers.Configuration;
+using AcidJunkie.Analyzers.Configuration.Aj0007;
 using AcidJunkie.Analyzers.Extensions;
 using AcidJunkie.Analyzers.Logging;
 using Microsoft.CodeAnalysis;
@@ -27,9 +28,9 @@ public sealed class ParameterOrderingAnalyzer : DiagnosticAnalyzer
     private static void CompilationAction(CompilationAnalysisContext context)
     {
         var config = ConfigurationManager.GetAj0007Configuration(context.Options);
-        if (config.Validate(context..re))
+        if (config.ConfigurationError is not null)
         {
-            logger.AnalyzerIsDisabled();
+            context.ReportValidationError(config.ConfigurationError);
         }
     }
 
@@ -54,14 +55,47 @@ public sealed class ParameterOrderingAnalyzer : DiagnosticAnalyzer
             return;
         }
 
+        var fallbackIndex = config.ParameterDescriptions.IndexOf(a => a.IsOther);
+        if (fallbackIndex < 0)
+        {
+            // TODO: Should not happen when we enforce the configuration to contain '{other}'
+            return;
+        }
+
+        var previousIndex = -1;
         var parameters = GetParameters(context, parameterList);
+
+        foreach (var parameter in parameters)
+        {
+            var index = GetOrderIndex(parameter, config, fallbackIndex);
+            if (index < previousIndex)
+            {
+                context.ReportDiagnostic(Diagnostic.Create(DiagnosticRules.Default.Rule, parameter.Node.GetLocation(), config.ParameterOrderFlat));
+                return;
+            }
+
+            previousIndex = index;
+        }
     }
 
-    private static void ReportParameter(SyntaxNodeAnalysisContext context, ParameterSyntax parameter, string insertionString, ILogger<ParameterOrderingAnalyzer> logger)
+    private static int GetOrderIndex(Parameter parameter, Aj0007Configuration configuration, int fallbackIndex)
     {
-        var location = parameter.Type?.GetLocation() ?? parameter.GetLocation();
-        logger.ReportDiagnostic(DiagnosticRules.Default.Rule, location);
-        context.ReportDiagnostic(Diagnostic.Create(DiagnosticRules.Default.Rule, location, insertionString));
+        if (parameter.FullTypeName is null)
+        {
+            return fallbackIndex;
+        }
+
+#pragma warning disable S3267 // optimize LINQ usage -> cde would look ugly
+        foreach (var parameterDescription in configuration.ParameterDescriptions)
+#pragma warning restore S3267
+        {
+            if (parameterDescription.Matcher(parameter.FullTypeName))
+            {
+                return parameterDescription.Index;
+            }
+        }
+
+        return fallbackIndex;
     }
 
     private static List<Parameter> GetParameters(SyntaxNodeAnalysisContext context, ParameterListSyntax parameterList) =>
@@ -73,31 +107,11 @@ public sealed class ParameterOrderingAnalyzer : DiagnosticAnalyzer
                     return new Parameter(param, null);
                 }
 
-                if (context.SemanticModel.GetTypeInfo(param.Type).Type is not INamedTypeSymbol parameterType)
-                {
-                    return new Parameter(param, null);
-                }
-
-                if (parameterType.Name.EqualsOrdinal(nameof(CancellationToken)) && parameterType.GetFullNamespace().EqualsOrdinal("System.Threading"))
-                {
-                    return new Parameter(param, ParameterKind.CancellationToken);
-                }
-
-                if (parameterType.Name.EqualsOrdinal("ILogger") && parameterType.GetFullNamespace().EqualsOrdinal("Microsoft.Extensions.Logging"))
-                {
-                    return new Parameter(param, ParameterKind.Logger);
-                }
-
-                return new Parameter(param, ParameterKind.Other);
+                return context.SemanticModel.GetTypeInfo(param.Type).Type is not INamedTypeSymbol parameterType
+                    ? new Parameter(param, null)
+                    : new Parameter(param, parameterType.GetSimplifiedName());
             })
             .ToList();
-
-    private enum ParameterKind
-    {
-        Other,
-        Logger,
-        CancellationToken
-    }
 
     private sealed record Parameter
     {
@@ -121,8 +135,8 @@ public sealed class ParameterOrderingAnalyzer : DiagnosticAnalyzer
             public const string HelpLinkUri = "https://github.com/AcidJunkie303/AcidJunkie.Analyzers/blob/main/docs/Rules/AJ0007.md";
 #pragma warning restore S1075
 
-            public static readonly LocalizableString Title = "The ILogger parameter placement";
-            public static readonly LocalizableString MessageFormat = "The ILogger parameter should be the {0} parameter";
+            public static readonly LocalizableString Title = "Invalid parameter order";
+            public static readonly LocalizableString MessageFormat = "Parameter order should be {0}";
             public static readonly LocalizableString Description = MessageFormat;
             public static readonly DiagnosticDescriptor Rule = new(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, true, Description, HelpLinkUri);
         }

@@ -9,7 +9,7 @@ internal sealed class Aj0002Configuration : IAnalyzerConfiguration
 
     public bool IsEnabled { get; }
     public FrozenSet<string> IgnoredObjects { get; }
-    public string? ValidationError => null;
+    public ConfigurationError? ConfigurationError => null;
 
     public Aj0002Configuration(bool isEnabled, FrozenSet<string> ignoredObjects)
     {

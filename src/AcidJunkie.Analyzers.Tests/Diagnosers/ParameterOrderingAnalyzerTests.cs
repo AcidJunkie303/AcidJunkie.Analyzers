@@ -1,6 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using AcidJunkie.Analyzers.Configuration.Aj0007;
-using AcidJunkie.Analyzers.Diagnosers.Logging;
+using AcidJunkie.Analyzers.Diagnosers.ParameterOrdering;
 using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Testing;
 using Xunit.Abstractions;
@@ -10,8 +10,30 @@ namespace AcidJunkie.Analyzers.Tests.Diagnosers;
 #pragma warning disable S125 // TODO: remove
 
 [SuppressMessage("Code Smell", "S2699:Tests should include assertions", Justification = "This is done internally by AnalyzerTest.RunAsync()")]
-public sealed class LoggerParameterShouldBeAtSpecificPositionAnalyzerTests(ITestOutputHelper testOutputHelper) : TestBase<LoggerParameterShouldBeAtSpecificPositionAnalyzer>(testOutputHelper)
+public sealed class ParameterOrderingAnalyzerTests(ITestOutputHelper testOutputHelper) : TestBase<ParameterOrderingAnalyzer>(testOutputHelper)
 {
+#pragma warning disable S125
+
+    [Theory]
+    [InlineData("string value")]
+    [InlineData("ILogger logger, {|AJ00071:string value|}")]
+    public Task Theory_OnMethod(string parameters)
+    {
+        var code = $$"""
+                     using Microsoft.Extensions.Logging;
+
+                     public class TestClass
+                     {
+                         public void Test({{parameters}})
+                         {
+                         }
+                     }
+                     """;
+
+        return CreateTester(code).RunAsync();
+    }
+
+    /*
     [Fact]
     public Task WhenMethod_WithNoConfig_WhenNoParameters_ThenOk()
     {
@@ -103,14 +125,7 @@ public sealed class LoggerParameterShouldBeAtSpecificPositionAnalyzerTests(ITest
         return CreateTester(code).RunAsync();
     }
 
-    private CSharpAnalyzerTest<LoggerParameterShouldBeAtSpecificPositionAnalyzer, DefaultVerifier> CreateTester(string code, string? configValueForLoggerParameterPlacement = null)
-    {
-        return CreateTesterBuilder()
-            .WithTestCode(code)
-            .WithNugetPackage("Microsoft.Extensions.Logging.Abstractions", "8.0.2")
-            .WithGlobalOptions($"{Aj0007Configuration.KeyNames.LoggerParameterPlacement} = {configValueForLoggerParameterPlacement ?? string.Empty}")
-            .Build();
-    }
+
 
     /*
 
@@ -203,11 +218,20 @@ public sealed class LoggerParameterShouldBeAtSpecificPositionAnalyzerTests(ITest
 
         return CreateTester(code).RunAsync();
     }
-*/
+    */
 
     /*
     ParameterList
         when immediate parent is ConstructorDeclarationSyntax or MethodDeclarationSyntax or ClassDeclarationSyntax
 
 */
+
+    private CSharpAnalyzerTest<ParameterOrderingAnalyzer, DefaultVerifier> CreateTester(string code, string? configValueForLoggerParameterPlacement = null)
+    {
+        return CreateTesterBuilder()
+            .WithTestCode(code)
+            .WithNugetPackage("Microsoft.Extensions.Logging.Abstractions", "8.0.2")
+            .WithGlobalOptions($"{Aj0007Configuration.KeyNames.ParameterOrderingFlat} = {configValueForLoggerParameterPlacement ?? string.Empty}")
+            .Build();
+    }
 }

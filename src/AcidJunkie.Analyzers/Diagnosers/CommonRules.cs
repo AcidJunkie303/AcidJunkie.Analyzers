@@ -24,9 +24,9 @@ public static class CommonRules
         public const string DiagnosticId = "AJ9998";
         public const string HelpLinkUri = "https://github.com/AcidJunkie303/AcidJunkie.Analyzers/blob/main/docs/Rules/AJ9998.md";
 
-        public static readonly LocalizableString Title = "Invalid analyzer AJ configuration value";
+        public static readonly LocalizableString Title = "Invalid AJ analyzer configuration value";
         public static readonly LocalizableString MessageFormat = "The configuration entry '{0}' in file '{1}' is invalid because: {2}";
         public static readonly LocalizableString Description = Title;
-        public static readonly DiagnosticDescriptor Rule = new(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, true, Description, HelpLinkUri);
+        public static readonly DiagnosticDescriptor Rule = new(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, true, Description, HelpLinkUri, "CompilationEnd");
     }
 }

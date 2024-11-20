@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 using AcidJunkie.Analyzers.Extensions;
 using Microsoft.CodeAnalysis.Diagnostics;
 
@@ -13,50 +12,34 @@ internal sealed class Aj0007ConfigurationProvider : IConfigurationProvider<Aj000
             return (Aj0007Configuration.Disabled, false);
         }
 
-        var parameterOrdering = GetParameterOrdering(options);
-        if (parameterOrdering.Length == 0)
+        var (parameterOrder, parameterOrderFlat) = GetParameterOrdering(options);
+        if (parameterOrder.Count == 0)
         {
             return (Aj0007Configuration.Default, true);
         }
 
-        var firstDuplicate = parameterOrdering
+        var firstDuplicate = parameterOrder
             .GroupBy(a => a, StringComparer.OrdinalIgnoreCase)
             .Where(a => a.Count() > 1)
             .Select(a => a.Key)
             .FirstOrDefault();
 
-
         if (firstDuplicate is not null)
         {
-            throw new IOException($"Duplicate parameter names found: {firstDuplicate}");
+            var error = new ConfigurationError(Aj0007Configuration.KeyNames.ParameterOrderingFlat, ".globalconfig", $"Duplicate value: {firstDuplicate}");
+            return (new Aj0007Configuration(error), false);
         }
 
-        new Aj0007Configuration()
+        return (new Aj0007Configuration(true, parameterOrderFlat, ParameterOrderParser.Parse(parameterOrder)), true);
     }
 
-    private static ImmutableArray<string> GetParameterOrdering(AnalyzerOptions options)
+    private static (IReadOnlyList<string> ParameterOrder, string ParameterOrderFlat) GetParameterOrdering(AnalyzerOptions options)
     {
         var value = options.GetGlobalOptionsValueOrDefault(Aj0007Configuration.KeyNames.ParameterOrderingFlat);
         return value.IsNullOrWhiteSpace()
-            ? []
-            : ParseParameterOrdering(value);
-
-        static ImmutableArray<string> ParseParameterOrdering(string value)
-        {
-            return value.Split(['|'], StringSplitOptions.RemoveEmptyEntries)
-                .Select(a => a.Trim())
-                .Where(a => a.Length > 0)
-                .ToImmutableArray();
-        }
+            ? ([], string.Empty)
+            : (ParameterOrderParser.SplitConfigurationParameterOrder(value), value);
     }
-
 
     private static bool IsEnabled(AnalyzerOptions options) => options.GetGlobalOptionsBooleanValue(Aj0007Configuration.KeyNames.IsEnabled);
-
-    private static class Defaults
-    {
-        public static Aj0007Configuration First { get; } = new(true, ParameterPlacement.First);
-        public static Aj0007Configuration Last { get; } = new(true, ParameterPlacement.Last);
-        public static Aj0007Configuration Disabled { get; } = new(false, ParameterPlacement.First);
-    }
 }
