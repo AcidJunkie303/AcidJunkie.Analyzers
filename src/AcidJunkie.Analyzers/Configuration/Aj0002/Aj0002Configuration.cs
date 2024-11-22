@@ -1,16 +1,15 @@
 using System.Collections.Frozen;
-using System.Collections.Immutable;
 
-namespace AcidJunkie.Analyzers.Configuration;
+namespace AcidJunkie.Analyzers.Configuration.Aj0002;
 
-public sealed class Aj0002Configuration
+internal sealed class Aj0002Configuration : IAnalyzerConfiguration
 {
     public static Aj0002Configuration Default { get; } = new(true, Defaults.IgnoredObjects);
     public static Aj0002Configuration Disabled { get; } = new(false, FrozenSet<string>.Empty);
 
     public bool IsEnabled { get; }
-
     public FrozenSet<string> IgnoredObjects { get; }
+    public ConfigurationError? ConfigurationError => null;
 
     public Aj0002Configuration(bool isEnabled, FrozenSet<string> ignoredObjects)
     {

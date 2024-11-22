@@ -25,14 +25,14 @@ public sealed class MissingUsingStatementAnalyzer : DiagnosticAnalyzer
 
     private static void AnalyzeInvocation(SyntaxNodeAnalysisContext context, ILogger<MissingUsingStatementAnalyzer> logger)
     {
-        var invocationExpression = (InvocationExpressionSyntax)context.Node;
-
         var config = ConfigurationManager.GetAj0002Configuration(context.Options);
         if (!config.IsEnabled)
         {
-            logger.LogAnalyzerIsDisabled();
+            logger.AnalyzerIsDisabled();
             return;
         }
+
+        var invocationExpression = (InvocationExpressionSyntax)context.Node;
 
         if (context.SemanticModel.GetSymbolInfo(invocationExpression, context.CancellationToken).Symbol is not IMethodSymbol methodSymbol)
         {
@@ -86,7 +86,7 @@ public sealed class MissingUsingStatementAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        logger.LogReportDiagnostic(DiagnosticRules.Default.Rule, invocationExpression.GetLocation());
+        logger.ReportDiagnostic(DiagnosticRules.Default.Rule, invocationExpression.GetLocation());
         context.ReportDiagnostic(Diagnostic.Create(DiagnosticRules.Default.Rule, invocationExpression.GetLocation()));
     }
 

@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using AcidJunkie.Analyzers.Configuration;
+using AcidJunkie.Analyzers.Configuration.Aj0002;
 using AcidJunkie.Analyzers.Diagnosers.MissingUsingStatement;
 using Xunit.Abstractions;
 
@@ -128,16 +129,16 @@ public sealed class MissingUsingStatementAnalyzerTests(ITestOutputHelper testOut
           {
               private IDisposable? _disposable;
               private IDisposable? Disposable {get; set;}
-
+          
               public object? ComplexTestMethod()
               {
                   {{simpleInsertionCode}}
-
+          
                   return null; // fallback. Some testing methods might return something
               }
-
+          
               {{complexInsertionCode}}
-
+          
               private static DisposableRefType GetDisposableRefType() => null!;
               private static IDisposable GetDisposable() => null!;
               private static RefStructWithDisposeMethod GetRefStructWithDisposeMethod() => new();

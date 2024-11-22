@@ -9,21 +9,21 @@ internal static class CachedConfigurationProvider
 }
 
 internal sealed class CachedConfigurationProvider<T> : IConfigurationProvider<T>
-    where T : class
+    where T : class, IAnalyzerConfiguration
 {
-    private readonly object _lock = new();
     private readonly IConfigurationProvider<T> _innerConfigurationProvider;
-    private DateTime _lastPublished = DateTime.MinValue;
+    private readonly object _lock = new();
     private T? _config;
+    private DateTime _lastPublished = DateTime.MinValue;
 
     public CachedConfigurationProvider(IConfigurationProvider<T> innerConfigurationProvider)
     {
         _innerConfigurationProvider = innerConfigurationProvider;
     }
 
-    public (T Configuration, bool IsDefault) GetConfiguration(AnalyzerOptions options) => GetAndReloadIfRequired(options);
+    public (T Configuration, bool CanBeCached) GetConfiguration(AnalyzerOptions options) => GetAndReloadIfRequired(options);
 
-    private (T Configuration, bool IsDefault) GetAndReloadIfRequired(AnalyzerOptions options)
+    private (T Configuration, bool CanBeCached) GetAndReloadIfRequired(AnalyzerOptions options)
     {
         if (!CachedConfigurationProvider.IsCachingEnabled)
         {
@@ -36,16 +36,18 @@ internal sealed class CachedConfigurationProvider<T> : IConfigurationProvider<T>
             {
                 if (IsReloadRequired())
                 {
-                    var (configuration, isDefault) = _innerConfigurationProvider.GetConfiguration(options);
+                    var (configuration, canBeCached) = _innerConfigurationProvider.GetConfiguration(options);
                     // if it is the default settings, do not cache it.
                     // this is because some weird behavior that at the first time the analyzer loads, there's no configuration. Therefore, we don't cache this false data
-                    if (isDefault)
+                    if (!canBeCached)
                     {
-                        return (configuration, isDefault);
+                        return (configuration, canBeCached);
                     }
 
                     _lastPublished = DateTime.UtcNow;
                     _config = configuration;
+
+                    return (_config!, false);
                 }
             }
         }

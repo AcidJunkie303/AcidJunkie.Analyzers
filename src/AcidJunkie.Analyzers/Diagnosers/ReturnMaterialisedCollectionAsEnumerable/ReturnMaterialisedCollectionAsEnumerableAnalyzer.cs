@@ -52,7 +52,7 @@ public sealed class ReturnMaterialisedCollectionAsEnumerableAnalyzer : Diagnosti
             return;
         }
 
-        logger.LogReportDiagnostic(DiagnosticRules.Default.Rule, returnStatement.ReturnKeyword.GetLocation());
+        logger.ReportDiagnostic(DiagnosticRules.Default.Rule, returnStatement.ReturnKeyword.GetLocation());
         context.ReportDiagnostic(Diagnostic.Create(DiagnosticRules.Default.Rule, returnStatement.ReturnKeyword.GetLocation()));
     }
 
@@ -122,7 +122,7 @@ public sealed class ReturnMaterialisedCollectionAsEnumerableAnalyzer : Diagnosti
             public static readonly LocalizableString Title = "Do not return materialised collection as enumerable";
             public static readonly LocalizableString MessageFormat = "Do not return materialised collection as enumerable";
             public static readonly LocalizableString Description = MessageFormat;
-            public static readonly DiagnosticDescriptor Rule = new(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description, helpLinkUri: HelpLinkUri);
+            public static readonly DiagnosticDescriptor Rule = new(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, true, Description, HelpLinkUri);
         }
     }
 }

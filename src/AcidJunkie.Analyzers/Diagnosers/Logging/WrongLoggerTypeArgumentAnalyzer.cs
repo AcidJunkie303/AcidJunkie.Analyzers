@@ -1,13 +1,10 @@
 using System.Collections.Immutable;
-using AcidJunkie.Analyzers.Diagnosers.MissingEqualityComparer;
 using AcidJunkie.Analyzers.Extensions;
 using AcidJunkie.Analyzers.Logging;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
-using DiagnosticDescriptor = Microsoft.CodeAnalysis.DiagnosticDescriptor;
-using LanguageNames = Microsoft.CodeAnalysis.LanguageNames;
-using SyntaxKind = Microsoft.CodeAnalysis.CSharp.SyntaxKind;
 
 namespace AcidJunkie.Analyzers.Diagnosers.Logging;
 
@@ -22,16 +19,16 @@ public sealed class WrongLoggerTypeArgumentAnalyzer : DiagnosticAnalyzer
     {
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze);
         context.EnableConcurrentExecutionInReleaseMode();
-        context.RegisterSyntaxNodeActionAndCheck<MissingEqualityComparerAnalyzer>(AnalyzeProperty, SyntaxKind.PropertyDeclaration);
-        context.RegisterSyntaxNodeActionAndCheck<MissingEqualityComparerAnalyzer>(AnalyzeField, SyntaxKind.FieldDeclaration);
-        context.RegisterSyntaxNodeActionAndCheck<MissingEqualityComparerAnalyzer>(AnalyzeParameterList, SyntaxKind.ParameterList);
+        context.RegisterSyntaxNodeActionAndCheck<WrongLoggerTypeArgumentAnalyzer>(AnalyzeProperty, SyntaxKind.PropertyDeclaration);
+        context.RegisterSyntaxNodeActionAndCheck<WrongLoggerTypeArgumentAnalyzer>(AnalyzeField, SyntaxKind.FieldDeclaration);
+        context.RegisterSyntaxNodeActionAndCheck<WrongLoggerTypeArgumentAnalyzer>(AnalyzeParameterList, SyntaxKind.ParameterList);
     }
 
-    private static void AnalyzeProperty(SyntaxNodeAnalysisContext context, ILogger<MissingEqualityComparerAnalyzer> logger)
+    private static void AnalyzeProperty(SyntaxNodeAnalysisContext context, ILogger<WrongLoggerTypeArgumentAnalyzer> logger)
     {
         var property = (PropertyDeclarationSyntax)context.Node;
 
-        if (context.SemanticModel.GetDeclaredSymbol(property) is not IPropertySymbol propertySymbol)
+        if (ModelExtensions.GetDeclaredSymbol(context.SemanticModel, property) is not IPropertySymbol propertySymbol)
         {
             return;
         }
@@ -50,11 +47,11 @@ public sealed class WrongLoggerTypeArgumentAnalyzer : DiagnosticAnalyzer
         Analyze(context, propertyType, containingType, property.Type.GetLocation(), logger);
     }
 
-    private static void AnalyzeField(SyntaxNodeAnalysisContext context, ILogger<MissingEqualityComparerAnalyzer> logger)
+    private static void AnalyzeField(SyntaxNodeAnalysisContext context, ILogger<WrongLoggerTypeArgumentAnalyzer> logger)
     {
         var field = (FieldDeclarationSyntax)context.Node;
 
-        if (context.SemanticModel.GetTypeInfo(field.Declaration.Type).Type is not INamedTypeSymbol fieldType)
+        if (ModelExtensions.GetTypeInfo(context.SemanticModel, field.Declaration.Type).Type is not INamedTypeSymbol fieldType)
         {
             return;
         }
@@ -68,7 +65,7 @@ public sealed class WrongLoggerTypeArgumentAnalyzer : DiagnosticAnalyzer
         Analyze(context, fieldType, containingType, field.Declaration.Type.GetLocation(), logger);
     }
 
-    private static void AnalyzeParameterList(SyntaxNodeAnalysisContext context, ILogger<MissingEqualityComparerAnalyzer> logger)
+    private static void AnalyzeParameterList(SyntaxNodeAnalysisContext context, ILogger<WrongLoggerTypeArgumentAnalyzer> logger)
     {
         var parameterList = (ParameterListSyntax)context.Node;
 
@@ -83,7 +80,7 @@ public sealed class WrongLoggerTypeArgumentAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        if (context.SemanticModel.GetDeclaredSymbol(typeDeclaration) is not INamedTypeSymbol containerType)
+        if (ModelExtensions.GetDeclaredSymbol(context.SemanticModel, typeDeclaration) is not INamedTypeSymbol containerType)
         {
             return;
         }
@@ -95,7 +92,7 @@ public sealed class WrongLoggerTypeArgumentAnalyzer : DiagnosticAnalyzer
         }
     }
 
-    private static void Analyze(SyntaxNodeAnalysisContext context, INamedTypeSymbol nodeType, INamedTypeSymbol containerType, Location location, ILogger<MissingEqualityComparerAnalyzer> logger)
+    private static void Analyze(SyntaxNodeAnalysisContext context, INamedTypeSymbol nodeType, INamedTypeSymbol containerType, Location location, ILogger<WrongLoggerTypeArgumentAnalyzer> logger)
     {
         if (nodeType.Arity != 1)
         {
@@ -116,18 +113,18 @@ public sealed class WrongLoggerTypeArgumentAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        logger.LogReportDiagnostic(DiagnosticRules.Default.Rule, location);
+        logger.ReportDiagnostic(DiagnosticRules.Default.Rule, location);
         context.ReportDiagnostic(Diagnostic.Create(DiagnosticRules.Default.Rule, location));
     }
 
-    private static void HandleParameter(SyntaxNodeAnalysisContext context, INamedTypeSymbol containerType, ParameterSyntax loggerParameter, ILogger<MissingEqualityComparerAnalyzer> logger)
+    private static void HandleParameter(SyntaxNodeAnalysisContext context, INamedTypeSymbol containerType, ParameterSyntax loggerParameter, ILogger<WrongLoggerTypeArgumentAnalyzer> logger)
     {
         if (loggerParameter.Type is null)
         {
             return;
         }
 
-        if (context.SemanticModel.GetTypeInfo(loggerParameter.Type).Type is not INamedTypeSymbol argumentType)
+        if (ModelExtensions.GetTypeInfo(context.SemanticModel, loggerParameter.Type).Type is not INamedTypeSymbol argumentType)
         {
             return;
         }
@@ -146,7 +143,7 @@ public sealed class WrongLoggerTypeArgumentAnalyzer : DiagnosticAnalyzer
             .Where(a => a.Type is not null)
             .Where(a =>
             {
-                if (context.SemanticModel.GetTypeInfo(a.Type!, context.CancellationToken).Type is not INamedTypeSymbol typeSymbol)
+                if (ModelExtensions.GetTypeInfo(context.SemanticModel, a.Type!, context.CancellationToken).Type is not INamedTypeSymbol typeSymbol)
                 {
                     return false;
                 }

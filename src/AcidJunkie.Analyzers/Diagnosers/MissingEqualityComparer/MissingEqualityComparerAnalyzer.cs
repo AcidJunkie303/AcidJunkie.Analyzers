@@ -96,7 +96,7 @@ public sealed class MissingEqualityComparerAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        logger.LogReportDiagnostic(DiagnosticRules.Default.Rule, locationToReport);
+        logger.ReportDiagnostic(DiagnosticRules.Default.Rule, locationToReport);
         context.ReportDiagnostic(Diagnostic.Create(DiagnosticRules.Default.Rule, locationToReport));
 
         string? GetKeyTypeParameterName()
@@ -156,7 +156,7 @@ public sealed class MissingEqualityComparerAnalyzer : DiagnosticAnalyzer
                 : null;
         }
 
-        logger.LogReportDiagnostic(DiagnosticRules.Default.Rule, memberAccess.Name.GetLocation());
+        logger.ReportDiagnostic(DiagnosticRules.Default.Rule, memberAccess.Name.GetLocation());
         context.ReportDiagnostic(Diagnostic.Create(DiagnosticRules.Default.Rule, memberAccess.Name.GetLocation()));
     }
 

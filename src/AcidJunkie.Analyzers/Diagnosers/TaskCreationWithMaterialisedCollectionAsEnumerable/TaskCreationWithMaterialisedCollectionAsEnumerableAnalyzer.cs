@@ -78,7 +78,7 @@ public sealed class TaskCreationWithMaterialisedCollectionAsEnumerableAnalyzer :
             return;
         }
 
-        logger.LogReportDiagnostic(DiagnosticRules.Default.Rule, invocation.Expression.GetLocation());
+        logger.ReportDiagnostic(DiagnosticRules.Default.Rule, invocation.Expression.GetLocation());
         context.ReportDiagnostic(Diagnostic.Create(DiagnosticRules.Default.Rule, invocation.Expression.GetLocation()));
     }
 
