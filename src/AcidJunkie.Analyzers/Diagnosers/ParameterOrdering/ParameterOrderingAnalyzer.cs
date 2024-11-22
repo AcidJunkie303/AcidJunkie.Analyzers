@@ -70,7 +70,7 @@ public sealed class ParameterOrderingAnalyzer : DiagnosticAnalyzer
             var index = GetOrderIndex(parameter, config, fallbackIndex);
             if (index < previousIndex)
             {
-                context.ReportDiagnostic(Diagnostic.Create(DiagnosticRules.Default.Rule, parameter.Node.GetLocation(), config.ParameterOrderFlat));
+                context.ReportDiagnostic(Diagnostic.Create(DiagnosticRules.Default.Rule, parameterList.GetLocation(), config.ParameterOrderFlat));
                 return;
             }
 
