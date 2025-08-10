@@ -90,6 +90,23 @@ internal sealed class ReturnMaterialisedCollectionAsEnumerableAnalyzerImplementa
         return false;
     }
 
+    private static MethodDeclarationSyntaxOrLocalFunctionDeclaration? GetContainingMethodOrLocalFunction(ReturnStatementSyntax node)
+    {
+        foreach (var parent in node.Ancestors())
+        {
+            switch (parent)
+            {
+                case ReturnStatementSyntax:                      return null;
+                case LambdaExpressionSyntax:                     return null;
+                case ArrowExpressionClauseSyntax:                return null;
+                case MethodDeclarationSyntax methodDeclaration:  return new MethodDeclarationSyntaxOrLocalFunctionDeclaration(methodDeclaration);
+                case LocalFunctionStatementSyntax localFunction: return new MethodDeclarationSyntaxOrLocalFunctionDeclaration(localFunction);
+            }
+        }
+
+        return null;
+    }
+
     private void AnalyzeCore(MethodDeclarationSyntaxOrLocalFunctionDeclaration methodOrFunction, ITypeSymbol actualReturnedType, Location location)
     {
         var declaredReturnType = Context.SemanticModel.GetTypeInfo(methodOrFunction.ReturnType, Context.CancellationToken).Type;
@@ -135,23 +152,6 @@ internal sealed class ReturnMaterialisedCollectionAsEnumerableAnalyzerImplementa
         }
 
         return false;
-    }
-
-    private MethodDeclarationSyntaxOrLocalFunctionDeclaration? GetContainingMethodOrLocalFunction(ReturnStatementSyntax node)
-    {
-        foreach (var parent in node.Ancestors())
-        {
-            switch (parent)
-            {
-                case ReturnStatementSyntax:                      return null;
-                case LambdaExpressionSyntax:                     return null;
-                case ArrowExpressionClauseSyntax:                return null;
-                case MethodDeclarationSyntax methodDeclaration:  return new MethodDeclarationSyntaxOrLocalFunctionDeclaration(methodDeclaration);
-                case LocalFunctionStatementSyntax localFunction: return new MethodDeclarationSyntaxOrLocalFunctionDeclaration(localFunction);
-            }
-        }
-
-        return null;
     }
 
     private bool IsInterfaceImplementation(MethodDeclarationSyntax methodDeclaration)

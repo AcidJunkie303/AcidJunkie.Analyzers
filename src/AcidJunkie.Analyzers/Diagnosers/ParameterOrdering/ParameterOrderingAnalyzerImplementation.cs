@@ -46,7 +46,7 @@ internal sealed class ParameterOrderingAnalyzerImplementation : SyntaxNodeAnalyz
         var fallbackIndex = _configuration.ParameterDescriptions.IndexOf(a => a.IsOther);
         if (fallbackIndex < 0)
         {
-            // TODO: Should not happen when we enforce the configuration to contain '{other}'
+            // Should not happen when we enforce the configuration to contain '{other}'
             return;
         }
 
