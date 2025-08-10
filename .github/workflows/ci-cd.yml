@@ -26,11 +26,11 @@ jobs:
         working-directory: ./src
 
       - name: Build Analyzers
-        run: dotnet build --no-restore --configuration Release /p:Version=0.0.0.$GITHUB_RUN_NUMBER
+        run: dotnet build --no-restore --configuration Release /p:Version=1.0.0.$GITHUB_RUN_NUMBER
         working-directory: ./src/AcidJunkie.Analyzers
 
       - name: Build Tests
-        run: dotnet build --no-restore --configuration Release /p:Version=0.0.0.$GITHUB_RUN_NUMBER
+        run: dotnet build --no-restore --configuration Release /p:Version=1.0.0.$GITHUB_RUN_NUMBER
         working-directory: ./src/AcidJunkie.Analyzers.Tests
 
       - name: Test
