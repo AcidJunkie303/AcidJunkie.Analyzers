@@ -156,4 +156,4 @@ ma0051.skip_local_functions = true
 
 
 # AJ specific settings
-AcidJunkie_Analyzers.is_logging_enabled = true
+AcidJunkie_Analyzers.is_logging_enabled = false

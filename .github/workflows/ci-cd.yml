@@ -25,15 +25,17 @@ jobs:
         run: dotnet restore
         working-directory: ./src
 
-      - name: Build
+      - name: Build Analyzers
         run: dotnet build --no-restore --configuration Release /p:Version=0.0.0.$GITHUB_RUN_NUMBER
-        working-directory: ./src
-      
-      # Integration tests should not run in parallel as it would cause issues with the shared MS SQL docker container.
-      # Therefore, we run them sequentially.
+        working-directory: ./src/AcidJunkie.Analyzers
+
+      - name: Build Tests
+        run: dotnet build --no-restore --configuration Release /p:Version=0.0.0.$GITHUB_RUN_NUMBER
+        working-directory: ./src/AcidJunkie.Analyzers.Tests
+
       - name: Test
         run: dotnet test --no-build --configuration Release --verbosity normal
-        working-directory: ./src
+        working-directory: ./src/AcidJunkie.Analyzers
 
       - name: Pack NuGet package
         run: dotnet pack --no-build --configuration Release -p:PackageVersion=1.0.0-prerelease.$GITHUB_RUN_NUMBER
