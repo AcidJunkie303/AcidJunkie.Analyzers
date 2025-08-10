@@ -21,6 +21,7 @@
         <OutputItemType>Analyzer</OutputItemType>
         <PackageProjectUrl>https://github.com/AcidJunkie303/AcidJunkie.Analyzers</PackageProjectUrl>
         <RepositoryUrl>https://github.com/AcidJunkie303/AcidJunkie.Analyzers</RepositoryUrl>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>
 
     <ItemGroup>
@@ -36,9 +37,13 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
     </ItemGroup>
-
+    
     <ItemGroup>
-        <None Include="$(SolutionDir)LICENSE.txt">
+        <None Include="$(SolutionDir)docs\README.md" Pack="true">
+            <Pack>True</Pack>
+            <PackagePath/>
+        </None>
+        <None Include="$(SolutionDir)LICENSE.txt" Pack="true">
             <Pack>True</Pack>
             <PackagePath/>
         </None>
