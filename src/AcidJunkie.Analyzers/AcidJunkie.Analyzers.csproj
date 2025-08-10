@@ -19,6 +19,8 @@
         <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_AddAnalyzersToOutput</TargetsForTfmSpecificContentInPackage>
         <PackageIcon>icon.png</PackageIcon>
         <OutputItemType>Analyzer</OutputItemType>
+        <PackageProjectUrl>https://github.com/AcidJunkie303/AcidJunkie.Analyzers</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/AcidJunkie303/AcidJunkie.Analyzers</RepositoryUrl>
     </PropertyGroup>
 
     <ItemGroup>
