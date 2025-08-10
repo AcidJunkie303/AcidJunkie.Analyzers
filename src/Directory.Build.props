@@ -32,6 +32,8 @@
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
         <SignAssembly>false</SignAssembly>
         <TargetFramework>net9.0</TargetFramework>
+        <PackageProjectUrl>https://github.com/AcidJunkie303/Microsoft.EntityFrameworkCore.ConcurrentChunking</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/AcidJunkie303/Microsoft.EntityFrameworkCore.ConcurrentChunking</RepositoryUrl>
     </PropertyGroup>
 
     <ItemGroup>

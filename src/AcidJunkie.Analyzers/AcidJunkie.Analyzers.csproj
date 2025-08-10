@@ -20,12 +20,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Remove="Old_Stuff\**"/>
-        <EmbeddedResource Remove="Old_Stuff\**"/>
-        <None Remove="Old_Stuff\**"/>
-    </ItemGroup>
-
-    <ItemGroup>
         <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -35,6 +29,14 @@
         <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.Common" Version="4.14.0"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <Content Include="..\icon.png">
+            <Link>icon.png</Link>
+        </Content>
+        <Content Include="..\LICENSE.txt">
+            <Link>LICENSE.txt</Link>
+        </Content>
+    </ItemGroup>
 
     <Target Name="_AddAnalyzersToOutput">
         <ItemGroup>
