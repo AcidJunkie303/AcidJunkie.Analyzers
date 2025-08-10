@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <Copyright>Copyright TODO</Copyright>
+        <Copyright>2025 AcidJunkie</Copyright>
         <Description>AcidJunkie Analyzers</Description>
         <DevelopmentDependency>true</DevelopmentDependency>
         <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
@@ -37,7 +37,7 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
     </ItemGroup>
-    
+
     <ItemGroup>
         <None Include="$(SolutionDir)..\docs\README.md" Pack="true">
             <Pack>True</Pack>
