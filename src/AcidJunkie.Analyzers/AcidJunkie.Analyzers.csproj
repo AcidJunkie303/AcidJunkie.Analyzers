@@ -17,6 +17,7 @@
         <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
         <TargetFramework>netstandard2.0</TargetFramework>
         <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_AddAnalyzersToOutput</TargetsForTfmSpecificContentInPackage>
+        <PackageIcon>icon.png</PackageIcon>
     </PropertyGroup>
 
     <ItemGroup>
@@ -30,12 +31,14 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Content Include="..\icon.png">
-            <Link>icon.png</Link>
-        </Content>
-        <Content Include="..\LICENSE.txt">
-            <Link>LICENSE.txt</Link>
-        </Content>
+        <None Include="$(SolutionDir)LICENSE.txt">
+            <Pack>True</Pack>
+            <PackagePath/>
+        </None>
+        <None Include="$(SolutionDir)icon.png">
+            <Pack>True</Pack>
+            <PackagePath/>
+        </None>
     </ItemGroup>
 
     <Target Name="_AddAnalyzersToOutput">
