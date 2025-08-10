@@ -109,7 +109,7 @@ internal sealed class WrongLoggerTypeArgumentAnalyzerImplementation : SyntaxNode
             return;
         }
 
-        Logger.ReportDiagnostic2(DiagnosticRules.Default.Rule, location);
+        Logger.ReportDiagnostic(DiagnosticRules.Default.Rule, location);
         Context.ReportDiagnostic(Diagnostic.Create(DiagnosticRules.Default.Rule, location));
     }
 

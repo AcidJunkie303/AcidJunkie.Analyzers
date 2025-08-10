@@ -1,9 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using AcidJunkie.Analyzers.Tests.Helpers;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
-using Microsoft.CodeAnalysis.Testing;
 using Xunit.Abstractions;
 
 namespace AcidJunkie.Analyzers.Tests;

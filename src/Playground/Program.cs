@@ -26,6 +26,8 @@ internal static class Program
         System.Collections.Generic.OrderedDictionary<int, int> aa = [];
         System.Collections.Concurrent.ConcurrentDictionary<int, int> bb = [];
         */
+
+        var items = "".Select(a => { return a; });
     }
 }
 #pragma warning restore S125

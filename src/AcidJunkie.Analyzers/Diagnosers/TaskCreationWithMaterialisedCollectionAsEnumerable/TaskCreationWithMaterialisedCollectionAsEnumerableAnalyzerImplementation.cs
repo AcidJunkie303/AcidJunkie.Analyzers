@@ -71,7 +71,7 @@ internal sealed class TaskCreationWithMaterialisedCollectionAsEnumerableAnalyzer
             return;
         }
 
-        Logger.ReportDiagnostic2(DiagnosticRules.Default.Rule, invocation.Expression.GetLocation());
+        Logger.ReportDiagnostic(DiagnosticRules.Default.Rule, invocation.Expression.GetLocation());
         Context.ReportDiagnostic(Diagnostic.Create(DiagnosticRules.Default.Rule, invocation.Expression.GetLocation()));
     }
 

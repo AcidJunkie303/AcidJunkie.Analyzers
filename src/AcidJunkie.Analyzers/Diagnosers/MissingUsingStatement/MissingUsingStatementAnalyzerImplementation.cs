@@ -1,5 +1,5 @@
 using System.Collections.Immutable;
-using AcidJunkie.Analyzers.Configuration;
+using AcidJunkie.Analyzers.Configuration.Aj0002;
 using AcidJunkie.Analyzers.Extensions;
 using AcidJunkie.Analyzers.Logging;
 using Microsoft.CodeAnalysis;
@@ -11,14 +11,16 @@ namespace AcidJunkie.Analyzers.Diagnosers.MissingUsingStatement;
 
 internal sealed class MissingUsingStatementAnalyzerImplementation : SyntaxNodeAnalyzerImplementationBase<MissingUsingStatementAnalyzer>
 {
+    private readonly Aj0002Configuration _configuration;
+
     public MissingUsingStatementAnalyzerImplementation(SyntaxNodeAnalysisContext context) : base(context)
     {
+        _configuration = Aj0002ConfigurationProvider.Instance.GetConfiguration(Context);
     }
 
     public void AnalyzeInvocation()
     {
-        var config = ConfigurationManager.GetAj0002Configuration(Context.Options);
-        if (!config.IsEnabled)
+        if (!_configuration.IsEnabled)
         {
             Logger.AnalyzerIsDisabled();
             return;
@@ -126,25 +128,10 @@ internal sealed class MissingUsingStatementAnalyzerImplementation : SyntaxNodeAn
     }
 
     private bool IsTypeIgnored(ITypeSymbol typeSymbol)
-    {
-        if (typeSymbol is not INamedTypeSymbol namedTypeSymbol)
-        {
-            return false;
-        }
-
-        var simplifiedName = namedTypeSymbol.GetSimplifiedName();
-        var ignoredObjects = ConfigurationManager.GetAj0002Configuration(Context.Options).IgnoredObjects;
-
-        return ignoredObjects.Contains(simplifiedName);
-    }
+        => typeSymbol is INamedTypeSymbol namedTypeSymbol && _configuration.IgnoredObjects.Contains(namedTypeSymbol.GetSimplifiedName());
 
     private bool IsMethodIgnored(IMethodSymbol methodSymbol)
-    {
-        var simplifiedName = methodSymbol.GetSimplifiedName();
-        var ignoredObjects = ConfigurationManager.GetAj0002Configuration(Context.Options).IgnoredObjects;
-
-        return ignoredObjects.Contains(simplifiedName);
-    }
+        => _configuration.IgnoredObjects.Contains(methodSymbol.GetSimplifiedName());
 
     private bool IsResultStoredInFieldOrProperty(InvocationExpressionSyntax invocationExpression)
     {
@@ -174,7 +161,7 @@ internal sealed class MissingUsingStatementAnalyzerImplementation : SyntaxNodeAn
 #pragma warning restore S1075
 
             public static readonly LocalizableString Title = "Missing using statement";
-            public static readonly LocalizableString MessageFormat = "The disposable object is disposed via the using statement";
+            public static readonly LocalizableString MessageFormat = "The disposable object is not disposed via the using statement";
             public static readonly LocalizableString Description = MessageFormat + ".";
             public static readonly DiagnosticDescriptor Rule = new(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, true, Description, HelpLinkUri);
         }

@@ -153,3 +153,7 @@ dotnet_diagnostic.s1135.severity = warning
 ma0051.maximum_lines_per_method = 80
 ma0051.maximum_statements_per_method = 60
 ma0051.skip_local_functions = true
+
+
+# AJ specific settings
+AcidJunkie_Analyzers.is_logging_enabled = true

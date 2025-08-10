@@ -17,7 +17,7 @@ internal sealed class GeneralWarningSuppressionAnalyzerImplementation : SyntaxNo
         var directive = (PragmaWarningDirectiveTriviaSyntax)Context.Node;
         if (directive.ErrorCodes.Count == 0)
         {
-            Logger.ReportDiagnostic2(DiagnosticRules.Default.Rule, directive.GetLocation());
+            Logger.ReportDiagnostic(DiagnosticRules.Default.Rule, directive.GetLocation());
             Context.ReportDiagnostic(Diagnostic.Create(DiagnosticRules.Default.Rule, directive.GetLocation()));
         }
     }

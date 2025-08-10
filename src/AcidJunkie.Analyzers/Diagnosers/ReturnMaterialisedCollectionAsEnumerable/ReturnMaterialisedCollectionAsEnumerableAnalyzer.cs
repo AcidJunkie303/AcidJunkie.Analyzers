@@ -18,5 +18,6 @@ public sealed class ReturnMaterialisedCollectionAsEnumerableAnalyzer : Diagnosti
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze);
         context.EnableConcurrentExecutionInReleaseMode();
         context.RegisterSyntaxNodeActionAndAnalyze<ReturnMaterialisedCollectionAsEnumerableAnalyzerImplementation>(a => a.AnalyzeReturn, SyntaxKind.ReturnStatement);
+        context.RegisterSyntaxNodeActionAndAnalyze<ReturnMaterialisedCollectionAsEnumerableAnalyzerImplementation>(a => a.AnalyzeArrowExpression, SyntaxKind.ArrowExpressionClause);
     }
 }

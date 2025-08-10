@@ -117,7 +117,7 @@ internal sealed class MissingEqualityComparerAnalyzerImplementation : SyntaxNode
                 ? GenericKeyParameterNameProvider.GetKeyParameterNameForInvocation(owningTypeNameSpace, owningTypeName, methodName)
                 : null;
 
-        Logger.ReportDiagnostic2(DiagnosticRules.Default.Rule, memberAccess.Name.GetLocation());
+        Logger.ReportDiagnostic(DiagnosticRules.Default.Rule, memberAccess.Name.GetLocation());
         Context.ReportDiagnostic(Diagnostic.Create(DiagnosticRules.Default.Rule, memberAccess.Name.GetLocation()));
     }
 
@@ -242,7 +242,7 @@ internal sealed class MissingEqualityComparerAnalyzerImplementation : SyntaxNode
             return;
         }
 
-        Logger.ReportDiagnostic2(DiagnosticRules.Default.Rule, locationToReport);
+        Logger.ReportDiagnostic(DiagnosticRules.Default.Rule, locationToReport);
         Context.ReportDiagnostic(Diagnostic.Create(DiagnosticRules.Default.Rule, locationToReport));
 
         string? GetKeyTypeParameterName()

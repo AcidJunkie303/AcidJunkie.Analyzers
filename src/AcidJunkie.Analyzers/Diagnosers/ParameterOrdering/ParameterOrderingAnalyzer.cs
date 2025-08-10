@@ -1,5 +1,4 @@
 using System.Collections.Immutable;
-using AcidJunkie.Analyzers.Configuration;
 using AcidJunkie.Analyzers.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -16,18 +15,8 @@ public sealed class ParameterOrderingAnalyzer : DiagnosticAnalyzer
 
     public override void Initialize(AnalysisContext context)
     {
-        context.RegisterCompilationAction(CompilationAction);
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze);
         context.EnableConcurrentExecutionInReleaseMode();
         context.RegisterSyntaxNodeActionAndAnalyze<ParameterOrderingAnalyzerImplementation>(a => a.AnalyzeParameterList, SyntaxKind.ParameterList);
-    }
-
-    private static void CompilationAction(CompilationAnalysisContext context)
-    {
-        var config = ConfigurationManager.GetAj0007Configuration(context.Options);
-        if (config.ConfigurationError is not null)
-        {
-            context.ReportValidationError(config.ConfigurationError);
-        }
     }
 }

@@ -14,6 +14,32 @@ internal sealed class ReturnMaterialisedCollectionAsEnumerableAnalyzerImplementa
     {
     }
 
+    public void AnalyzeArrowExpression()
+    {
+        var arrowExpression = (ArrowExpressionClauseSyntax)Context.Node;
+
+        var methodOrLocalFunction = arrowExpression.Parent switch
+        {
+            MethodDeclarationSyntax methodDeclaration  => new MethodDeclarationSyntaxOrLocalFunctionDeclaration(methodDeclaration),
+            LocalFunctionStatementSyntax localFunction => new MethodDeclarationSyntaxOrLocalFunctionDeclaration(localFunction),
+            _                                          => null
+        };
+        if (methodOrLocalFunction is null)
+        {
+            return;
+        }
+
+        var firstNonCastExpression = arrowExpression.Expression.GetFirstNonCastExpression();
+        var actualReturnedType = Context.SemanticModel.GetTypeInfo(firstNonCastExpression).Type;
+        if (actualReturnedType is null)
+        {
+            Logger.WriteLine(() => "Unable to determine the actual return type of the expression");
+            return;
+        }
+
+        AnalyzeCore(methodOrLocalFunction, actualReturnedType, arrowExpression.ArrowToken.GetLocation());
+    }
+
     public void AnalyzeReturn()
     {
         var returnStatement = (ReturnStatementSyntax)Context.Node;
@@ -24,29 +50,26 @@ internal sealed class ReturnMaterialisedCollectionAsEnumerableAnalyzerImplementa
             return;
         }
 
-        if (!DoesMethodReturnEnumerable(returnStatement))
+        var firstNonCastExpression = returnStatement.Expression.GetFirstNonCastExpression();
+        var actualReturnedType = Context.SemanticModel.GetTypeInfo(firstNonCastExpression).Type;
+        if (actualReturnedType is null)
         {
-            Logger.WriteLine(() => "Method return type is not IEnumerable or IEnumerable<T>");
+            Logger.WriteLine(() => "Unable to determine the actual return type of the expression");
             return;
         }
 
-        var realReturnExpression = returnStatement.Expression.GetFirstNonCastExpression();
-        var returnType = Context.SemanticModel.GetTypeInfo(realReturnExpression, Context.CancellationToken).Type;
-        if (returnType is null)
+        var containingMethodOrLocalFunction = GetContainingMethodOrLocalFunction(returnStatement);
+        if (containingMethodOrLocalFunction is null)
         {
-            Logger.WriteLine(() => $"Unable to determine the method return type from expression {realReturnExpression}");
+            Logger.WriteLine(() => "Unable to determine method the return statement belongs to");
             return;
         }
 
-        if (!returnType.DoesImplementWellKnownCollectionInterface())
-        {
-            Logger.WriteLine(() => $"Return type {returnType.GetFullName()} does is or does not implement any well known collection interfaces");
-            return;
-        }
-
-        Logger.ReportDiagnostic2(DiagnosticRules.Default.Rule, returnStatement.ReturnKeyword.GetLocation());
-        Context.ReportDiagnostic(Diagnostic.Create(DiagnosticRules.Default.Rule, returnStatement.ReturnKeyword.GetLocation()));
+        AnalyzeCore(containingMethodOrLocalFunction, actualReturnedType, returnStatement.ReturnKeyword.GetLocation());
     }
+
+    private static bool IsOverrideOrNewModifier(MethodDeclarationSyntax methodDeclaration)
+        => methodDeclaration.Modifiers.Any(static a => a.IsKind(SyntaxKind.OverrideKeyword) || a.IsKind(SyntaxKind.NewKeyword));
 
     private static bool IsEnumerable(ITypeSymbol typeSymbol)
     {
@@ -67,38 +90,116 @@ internal sealed class ReturnMaterialisedCollectionAsEnumerableAnalyzerImplementa
         return false;
     }
 
-    private bool DoesMethodReturnEnumerable(ReturnStatementSyntax returnStatement)
+    private void AnalyzeCore(MethodDeclarationSyntaxOrLocalFunctionDeclaration methodOrFunction, ITypeSymbol actualReturnedType, Location location)
     {
-        var firstMatchingParent = returnStatement.GetParents().FirstOrDefault(static a => a is MethodDeclarationSyntax or LocalFunctionStatementSyntax or LambdaExpressionSyntax or SimpleLambdaExpressionSyntax or ParenthesizedLambdaExpressionSyntax);
-        if (firstMatchingParent is null)
+        var declaredReturnType = Context.SemanticModel.GetTypeInfo(methodOrFunction.ReturnType, Context.CancellationToken).Type;
+        if (declaredReturnType is null)
+        {
+            Logger.WriteLine(() => "Unable to determine the return type syntax of the method");
+            return;
+        }
+
+        if (!IsEnumerable(declaredReturnType))
+        {
+            Logger.WriteLine(() => "Method return type is not IEnumerable or IEnumerable<T>");
+            return;
+        }
+
+        if (methodOrFunction.MethodDeclaration is not null && IsOverrideOrInterfaceImplementation(methodOrFunction.MethodDeclaration))
+        {
+            return;
+        }
+
+        if (!actualReturnedType.DoesImplementWellKnownCollectionInterface())
+        {
+            Logger.WriteLine(() => $"Return type {actualReturnedType.GetFullName()} does is or does not implement any well known collection interfaces");
+            return;
+        }
+
+        Logger.ReportDiagnostic(DiagnosticRules.Default.Rule, location);
+        Context.ReportDiagnostic(Diagnostic.Create(DiagnosticRules.Default.Rule, location));
+    }
+
+    private bool IsOverrideOrInterfaceImplementation(MethodDeclarationSyntax containingMethod)
+    {
+        if (IsOverrideOrNewModifier(containingMethod))
+        {
+            Logger.WriteLine(() => "Method has an override or new modifier");
+            return true;
+        }
+
+        if (IsInterfaceImplementation(containingMethod))
+        {
+            Logger.WriteLine(() => "Method is an interface implementation");
+            return true;
+        }
+
+        return false;
+    }
+
+    private MethodDeclarationSyntaxOrLocalFunctionDeclaration? GetContainingMethodOrLocalFunction(ReturnStatementSyntax node)
+    {
+        foreach (var parent in node.Ancestors())
+        {
+            switch (parent)
+            {
+                case ReturnStatementSyntax:                      return null;
+                case LambdaExpressionSyntax:                     return null;
+                case ArrowExpressionClauseSyntax:                return null;
+                case MethodDeclarationSyntax methodDeclaration:  return new MethodDeclarationSyntaxOrLocalFunctionDeclaration(methodDeclaration);
+                case LocalFunctionStatementSyntax localFunction: return new MethodDeclarationSyntaxOrLocalFunctionDeclaration(localFunction);
+            }
+        }
+
+        return null;
+    }
+
+    private bool IsInterfaceImplementation(MethodDeclarationSyntax methodDeclaration)
+    {
+        if (methodDeclaration.Modifiers.Any(SyntaxKind.StaticKeyword))
         {
             return false;
         }
 
-        if (firstMatchingParent is LambdaExpressionSyntax or SimpleLambdaExpressionSyntax or ParenthesizedLambdaExpressionSyntax)
+        var methodSymbol = Context.SemanticModel.GetDeclaredSymbol(methodDeclaration, Context.CancellationToken);
+        if (methodSymbol is null)
         {
             return false;
         }
 
-        var returnTypeSyntax = firstMatchingParent switch
-        {
-            MethodDeclarationSyntax methodDeclaration           => methodDeclaration.ReturnType,
-            LocalFunctionStatementSyntax localFunctionStatement => localFunctionStatement.ReturnType,
-            _                                                   => null
-        };
+        var containingType = methodSymbol.ContainingType;
+        return containingType.AllInterfaces.Any(IsMethodDefinedInInterface);
 
-        if (returnTypeSyntax is null)
+        bool IsMethodDefinedInInterface(INamedTypeSymbol interfaceSymbol) =>
+            interfaceSymbol
+               .GetMembers(methodSymbol.Name)
+               .Any(member => member is IMethodSymbol method && IsInterfaceImplementationCore(method, methodSymbol));
+
+        static bool IsInterfaceImplementationCore(IMethodSymbol methodSymbolOfInterface, IMethodSymbol methodSymbolOfImplementation) =>
+            methodSymbolOfInterface.Parameters.Length == methodSymbolOfImplementation.Parameters.Length
+            && methodSymbolOfInterface.Name.EqualsOrdinal(methodSymbolOfImplementation.Name)
+            && SymbolEqualityComparer.Default.Equals(methodSymbolOfInterface.ReturnType, methodSymbolOfImplementation.ReturnType)
+            && methodSymbolOfInterface.TypeParameters.Length == methodSymbolOfImplementation.TypeParameters.Length
+            && methodSymbolOfInterface.TypeParameters
+                                      .Zip(methodSymbolOfImplementation.TypeParameters, (a, b) => SymbolEqualityComparer.Default.Equals(a, b))
+                                      .All(a => a);
+    }
+
+    private sealed class MethodDeclarationSyntaxOrLocalFunctionDeclaration
+    {
+        private LocalFunctionStatementSyntax? LocalFunctionStatement { get; }
+        public MethodDeclarationSyntax? MethodDeclaration { get; }
+        public TypeSyntax ReturnType => MethodDeclaration?.ReturnType ?? LocalFunctionStatement!.ReturnType;
+
+        public MethodDeclarationSyntaxOrLocalFunctionDeclaration(MethodDeclarationSyntax methodDeclaration)
         {
-            return false;
+            MethodDeclaration = methodDeclaration;
         }
 
-        var returnType = Context.SemanticModel.GetTypeInfo(returnTypeSyntax, Context.CancellationToken).Type;
-        if (returnType is null)
+        public MethodDeclarationSyntaxOrLocalFunctionDeclaration(LocalFunctionStatementSyntax localFunctionStatement)
         {
-            return false;
+            LocalFunctionStatement = localFunctionStatement;
         }
-
-        return IsEnumerable(returnType);
     }
 
     internal static class DiagnosticRules

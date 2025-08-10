@@ -1,5 +1,4 @@
 using System.Collections.Immutable;
-using AcidJunkie.Analyzers.Configuration;
 using AcidJunkie.Analyzers.Configuration.Aj0007;
 using AcidJunkie.Analyzers.Extensions;
 using AcidJunkie.Analyzers.Logging;
@@ -12,16 +11,23 @@ namespace AcidJunkie.Analyzers.Diagnosers.ParameterOrdering;
 
 internal sealed class ParameterOrderingAnalyzerImplementation : SyntaxNodeAnalyzerImplementationBase<ParameterOrderingAnalyzerImplementation>
 {
+    private readonly Aj0007Configuration _configuration;
+
     public ParameterOrderingAnalyzerImplementation(SyntaxNodeAnalysisContext context) : base(context)
     {
+        _configuration = Aj0007ConfigurationProvider.Instance.GetConfiguration(context);
+        if (_configuration.ConfigurationError is not null)
+        {
+            context.ReportValidationError(_configuration.ConfigurationError);
+        }
     }
 
     public void AnalyzeParameterList()
     {
-        var config = ConfigurationManager.GetAj0007Configuration(Context.Options);
-        if (!config.IsEnabled)
+        if (!_configuration.IsEnabled)
         {
             Logger.AnalyzerIsDisabled();
+            return;
         }
 
         var parameterList = (ParameterListSyntax)Context.Node;
@@ -37,7 +43,7 @@ internal sealed class ParameterOrderingAnalyzerImplementation : SyntaxNodeAnalyz
             return;
         }
 
-        var fallbackIndex = config.ParameterDescriptions.IndexOf(a => a.IsOther);
+        var fallbackIndex = _configuration.ParameterDescriptions.IndexOf(a => a.IsOther);
         if (fallbackIndex < 0)
         {
             // TODO: Should not happen when we enforce the configuration to contain '{other}'
@@ -49,10 +55,10 @@ internal sealed class ParameterOrderingAnalyzerImplementation : SyntaxNodeAnalyz
 
         foreach (var parameter in parameters)
         {
-            var index = GetOrderIndex(parameter, config, fallbackIndex);
+            var index = GetOrderIndex(parameter, _configuration, fallbackIndex);
             if (index < previousIndex)
             {
-                Context.ReportDiagnostic(Diagnostic.Create(DiagnosticRules.Default.Rule, parameterList.GetLocation(), config.ParameterOrderFlat));
+                Context.ReportDiagnostic(Diagnostic.Create(DiagnosticRules.Default.Rule, parameterList.GetLocation(), _configuration.ParameterOrderFlat));
                 return;
             }
 

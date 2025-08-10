@@ -5,9 +5,9 @@ namespace AcidJunkie.Analyzers.Logging;
 
 internal static class LoggerFactory
 {
-    public static ILogger<TContext> CreateLogger<TContext>(SyntaxNodeAnalysisContext analysisContext)
+    public static ILogger<TContext> CreateLogger<TContext>(SyntaxNodeAnalysisContext context)
         where TContext : class
-        => GeneralConfigurationManager.IsLoggingEnabled(analysisContext.Options)
+        => GeneralConfigurationManager.IsLoggingEnabled(context)
             ? new DefaultLogger<TContext>()
             : NullLogger<TContext>.Default;
 }
