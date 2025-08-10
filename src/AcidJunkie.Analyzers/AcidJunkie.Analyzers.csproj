@@ -10,10 +10,10 @@
         <NoPackageAnalysis>true</NoPackageAnalysis>
         <!-- RS1038:     Compiler extensions should be implemented in assemblies with compiler-provided references -> needs to be tacklet separately by moving the code fixers to a separate assembly -->
         <NoWarn>$(NoWarn);RS2007;RS1026;RS1038</NoWarn>
-        <PackageId>Aj.Analyzers</PackageId>
+        <PackageId>AcidJunkie.Analyzers</PackageId>
         <PackageReleaseNotes>Summary of changes made in this release of the package.</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-        <PackageTags>AJ.Analyzers, analyzers</PackageTags>
+        <PackageTags>AcidJunkie.Analyzers, analyzers</PackageTags>
         <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
         <TargetFramework>netstandard2.0</TargetFramework>
         <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_AddAnalyzersToOutput</TargetsForTfmSpecificContentInPackage>

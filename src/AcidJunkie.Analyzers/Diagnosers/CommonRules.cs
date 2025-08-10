@@ -16,7 +16,7 @@ public static class CommonRules
         public const string HelpLinkUri = "https://github.com/AcidJunkie303/AcidJunkie.Analyzers/blob/main/docs/Rules/AJ9999.md";
 
         public static readonly LocalizableString Title = "The AcidJunkie analyzer package encountered an error";
-        public static readonly LocalizableString MessageFormat = "An error occurred in the AcidJunkie.Analyzers package. Check the log file 'AJ.Analyzers.log' in the temp folder.";
+        public static readonly LocalizableString MessageFormat = "An error occurred in the AcidJunkie.Analyzers package. Check the log files in the 'AcidJunkie.Analyzers' subfolder of the temp folder.";
         public static readonly LocalizableString Description = Title;
         public static readonly DiagnosticDescriptor Rule = new(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, true, Description, HelpLinkUri);
     }
