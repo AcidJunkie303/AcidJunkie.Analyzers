@@ -144,40 +144,56 @@ public sealed class MissingEqualityComparerAnalyzerTests(ITestOutputHelper testO
         var code = CreateTestCode(insertionCode);
 
         await CreateTesterBuilder()
-            .WithTestCode(code)
-            .Build()
-            .RunAsync();
+             .WithTestCode(code)
+             .Build()
+             .RunAsync();
     }
 
     [Theory]
     [InlineData("/* 1000 */  new Dictionary<RefType,int>( refTypeEqualityComparer );")]
     [InlineData("/* 1001 */  {|AJ0001:new Dictionary<RefType,int>|}();")]
-    [InlineData("/* 1002 */  Dictionary<RefType,int> dict = new ( refTypeEqualityComparer );")] // implicit creation
-    [InlineData("/* 1003 */  Dictionary<RefType,int> dict = {|AJ0001:new|} ( );")] // implicit creation
+    [InlineData("/* 1002 */  Dictionary<RefType,int> dict = {|AJ0001:new|} ( );")] // implicit creation
+    [InlineData("/* 1003 */  Dictionary<RefType,int> dict; dict = {|AJ0001:new|} ( );")] // implicit creation
+    [InlineData("/* 1004 */  Dictionary<RefType,int> dict = new ( refTypeEqualityComparer );")] // implicit creation
+    [InlineData("/* 1005 */  Dictionary<RefType,int> dict; dict = new ( refTypeEqualityComparer );")] // implicit creation
+    [InlineData("/* 1006 */  Dictionary<RefType,int> dict = {|AJ0001:[]|};")] // object initializer
+    [InlineData("/* 1007 */  Dictionary<RefType,int> dict; dict = {|AJ0001:[]|};")] // object initializer
+    [InlineData("/* 1010 */  new OrderedDictionary<RefType,int>( refTypeEqualityComparer );")]
+    [InlineData("/* 1011 */  {|AJ0001:new OrderedDictionary<RefType,int>|}();")]
+    [InlineData("/* 1012 */  OrderedDictionary<RefType,int> dict = {|AJ0001:new|} ( );")] // implicit creation
+    [InlineData("/* 1013 */  OrderedDictionary<RefType,int> dict; dict = {|AJ0001:new|} ( );")] // implicit creation
+    [InlineData("/* 1014 */  OrderedDictionary<RefType,int> dict = new ( refTypeEqualityComparer );")] // implicit creation
+    [InlineData("/* 1015 */  OrderedDictionary<RefType,int> dict; dict = new ( refTypeEqualityComparer );")] // implicit creation
+    [InlineData("/* 1016 */  OrderedDictionary<RefType,int> dict = {|AJ0001:[]|};")] // object initializer
+    [InlineData("/* 1017 */  OrderedDictionary<RefType,int> dict; dict = {|AJ0001:[]|};")] // object initializer
     public async Task Theory_DictionaryCreation(string insertionCode)
     {
         var code = CreateTestCode(insertionCode);
 
         await CreateTesterBuilder()
-            .WithTestCode(code)
-            .Build()
-            .RunAsync();
+             .WithTestCode(code)
+             .Build()
+             .RunAsync();
     }
 
     [Theory]
     [InlineData("/* 9001 */  refTypeCollection.ToHashSet( refTypeEqualityComparer );")] // variable
     [InlineData("/* 9002 */  refTypeCollection.ToHashSet( (IEqualityComparer<RefType>) refTypeEqualityComparer );")] // variable with cast
     [InlineData("/* 9003 */  refTypeCollection.ToHashSet( RefType.EqualityComparers.Default );")] // property
-    [InlineData("/* 9004 */  refTypeCollection.ToHashSet( GetRefTypeEqualityComparer() );")] // method
+    [InlineData("""
+                /* 9004 */
+                static IEqualityComparer<RefType> GetRefTypeEqualityComparer() => null!;
+                refTypeCollection.ToHashSet( GetRefTypeEqualityComparer() );
+                """)] // method
     [InlineData("/* 9005 */  refTypeCollection.{|AJ0001:ToHashSet|}( null );")] // null reference
     public async Task Theory_CheckVariousWaysOfPassingEqualityComparer(string insertionCode)
     {
         var code = CreateTestCode(insertionCode);
 
         await CreateTesterBuilder()
-            .WithTestCode(code)
-            .Build()
-            .RunAsync();
+             .WithTestCode(code)
+             .Build()
+             .RunAsync();
     }
 
     [Fact]
@@ -187,9 +203,9 @@ public sealed class MissingEqualityComparerAnalyzerTests(ITestOutputHelper testO
         var code = CreateTestCode("valueTypeCollection.ToHashSet();");
 
         await CreateTesterBuilder()
-            .WithTestCode(code)
-            .Build()
-            .RunAsync();
+             .WithTestCode(code)
+             .Build()
+             .RunAsync();
     }
 
     [Fact]
@@ -200,9 +216,9 @@ public sealed class MissingEqualityComparerAnalyzerTests(ITestOutputHelper testO
         var code = CreateTestCode("refTypeCollection.{|AJ0001:ToHashSet|}( );");
 
         await CreateTesterBuilder()
-            .WithTestCode(code)
-            .Build()
-            .RunAsync();
+             .WithTestCode(code)
+             .Build()
+             .RunAsync();
     }
 
     [Fact]
@@ -210,12 +226,12 @@ public sealed class MissingEqualityComparerAnalyzerTests(ITestOutputHelper testO
     {
         // FullEquatableRefType implements IEquatable<T> and overrides GetHashCode() => no equality comparer required
 
-        var code = CreateTestCode("fullEquatableRefTypeCollection.Distinct();");
+        var code = CreateTestCode("new FullEquatableRefType[0].Distinct();");
 
         await CreateTesterBuilder()
-            .WithTestCode(code)
-            .Build()
-            .RunAsync();
+             .WithTestCode(code)
+             .Build()
+             .RunAsync();
     }
 
     [Fact]
@@ -226,9 +242,9 @@ public sealed class MissingEqualityComparerAnalyzerTests(ITestOutputHelper testO
         var code = CreateTestCode("partialEquatableRefTypeCollection.{|AJ0001:Distinct|}();");
 
         await CreateTesterBuilder()
-            .WithTestCode(code)
-            .Build()
-            .RunAsync();
+             .WithTestCode(code)
+             .Build()
+             .RunAsync();
     }
 
     [Fact]
@@ -239,9 +255,9 @@ public sealed class MissingEqualityComparerAnalyzerTests(ITestOutputHelper testO
         var code = CreateTestCode("partialEquatableRefTypeCollection.{|AJ0001:Distinct|}();");
 
         await CreateTesterBuilder()
-            .WithTestCode(code)
-            .Build()
-            .RunAsync();
+             .WithTestCode(code)
+             .Build()
+             .RunAsync();
     }
 
     private static string CreateTestCode(string insertionCode) =>
@@ -265,18 +281,10 @@ public sealed class MissingEqualityComparerAnalyzerTests(ITestOutputHelper testO
                   var partialEquatableRefTypeCollection = new PartialEquatableRefType[0];
                   var partialEquatableRefTypeEqualityComparer = new PartialEquatableRefTypeEqualityComparer();
 
-                  var fullEquatableRefTypeCollection = new FullEquatableRefType[0];
-                  var fullEquatableRefTypeEqualityComparer = new FullEquatableRefTypeEqualityComparer();
-
                   var valueTypeCollection = new ValueType[0];
 
                   {{insertionCode}}
               }
-
-              private static IEqualityComparer<RefType> GetRefTypeEqualityComparer() => new RefTypeEqualityComparer();
-              private static IEqualityComparer<PartialEquatableRefType> GePartialEquatableRefTypeEqualityComparer() => new PartialEquatableRefTypeEqualityComparer();
-              private static IEqualityComparer<FullEquatableRefType> GetFullEquatableRefTypeEqualityComparer() => new FullEquatableRefTypeEqualityComparer();
-
           }
 
           ////////////////////////////////////////////////////////////////

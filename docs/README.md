@@ -9,3 +9,4 @@
 | [AJ0005](https://github.com/AcidJunkie303/AcidJunkie.Analyzers/blob/main/docs/Rules/AJ0005.md) | Predictability | ⚠️       |    ❌     | Do not use general warning suppression                                      | 
 | [AJ0006](https://github.com/AcidJunkie303/AcidJunkie.Analyzers/blob/main/docs/Rules/AJ0005.md) | Predictability | ⚠️       |    ✔️    | Type argument for ILogger<TContext> should be the enclosing type            | 
 | [AJ9999](https://github.com/AcidJunkie303/AcidJunkie.Analyzers/blob/main/docs/Rules/AJ9999.md) | Predictability | ⚠️       |    ❌     | Unexpected error in AcidJunkie.Analyzers                                    | 
+
