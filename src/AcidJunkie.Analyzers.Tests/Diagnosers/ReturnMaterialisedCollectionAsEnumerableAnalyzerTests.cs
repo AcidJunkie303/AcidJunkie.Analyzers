@@ -6,7 +6,8 @@ namespace AcidJunkie.Analyzers.Tests.Diagnosers;
 
 [SuppressMessage("Code Smell", "S4144:Methods should not have identical implementations", Justification = "Splitted up the test into different methods for different categories")]
 [SuppressMessage("Code Smell", "S2699:Tests should include assertions", Justification = "This is done internally by AnalyzerTest.RunAsync()")]
-public sealed class ReturnMaterialisedCollectionAsEnumerableAnalyzerTests(ITestOutputHelper testOutputHelper) : TestBase<ReturnMaterialisedCollectionAsEnumerableAnalyzer>(testOutputHelper)
+public sealed class ReturnMaterialisedCollectionAsEnumerableAnalyzerTests(ITestOutputHelper testOutputHelper)
+    : TestBase<ReturnMaterialisedCollectionAsEnumerableAnalyzer>(testOutputHelper)
 {
     [Fact]
     public async Task WhenReturningPureEnumerable_ThenOk()
@@ -29,9 +30,9 @@ public sealed class ReturnMaterialisedCollectionAsEnumerableAnalyzerTests(ITestO
                             """;
 
         await CreateTesterBuilder()
-            .WithTestCode(code)
-            .Build()
-            .RunAsync();
+             .WithTestCode(code)
+             .Build()
+             .RunAsync();
     }
 
     [Fact]
@@ -55,9 +56,9 @@ public sealed class ReturnMaterialisedCollectionAsEnumerableAnalyzerTests(ITestO
                             """;
 
         await CreateTesterBuilder()
-            .WithTestCode(code)
-            .Build()
-            .RunAsync();
+             .WithTestCode(code)
+             .Build()
+             .RunAsync();
     }
 
     [Fact]
@@ -82,9 +83,9 @@ public sealed class ReturnMaterialisedCollectionAsEnumerableAnalyzerTests(ITestO
                             """;
 
         await CreateTesterBuilder()
-            .WithTestCode(code)
-            .Build()
-            .RunAsync();
+             .WithTestCode(code)
+             .Build()
+             .RunAsync();
     }
 
     [Fact]
@@ -108,8 +109,99 @@ public sealed class ReturnMaterialisedCollectionAsEnumerableAnalyzerTests(ITestO
                             """;
 
         await CreateTesterBuilder()
-            .WithTestCode(code)
-            .Build()
-            .RunAsync();
+             .WithTestCode(code)
+             .Build()
+             .RunAsync();
+    }
+
+    [Fact]
+    public async Task WhenReturningMaterialisedCollectionThroughLambda_ThenDiagnose()
+    {
+        const string code = """
+                            using System;
+                            using System.Collections.Generic;
+                            using System.Linq;
+                            using System.Threading.Tasks;
+
+                            namespace Tests;
+
+                            public class Test
+                            {
+                                public IEnumerable<int> TestMethod()
+                                    {|AJ0003:=>|} Enumerable.Range(0, 10).ToList();
+                            }
+                            """;
+
+        await CreateTesterBuilder()
+             .WithTestCode(code)
+             .Build()
+             .RunAsync();
+    }
+
+    [Fact]
+    public async Task WhenInterfaceImplementation_WhenReturningMaterialisedCollection_ThenOk()
+    {
+        const string code = """
+                            using System;
+                            using System.Collections.Generic;
+                            using System.Linq;
+                            using System.Threading.Tasks;
+
+                            namespace Tests;
+
+                            public interface ITest
+                            {
+                                IEnumerable<int> TestMethod();
+                            }
+
+                            public class Test : ITest
+                            {
+                                public IEnumerable<int> TestMethod()
+                                {
+                                    var list = Enumerable.Range(0, 10).ToList();
+                                    return list; ;
+                                }
+                            }
+                            """;
+
+        await CreateTesterBuilder()
+             .WithTestCode(code)
+             .Build()
+             .RunAsync();
+    }
+
+    [Fact]
+    public async Task WhenMethodIsOverridden_WhenReturningMaterialisedCollection_ThenOk()
+    {
+        const string code = """
+                            using System;
+                            using System.Collections.Generic;
+                            using System.Linq;
+                            using System.Threading.Tasks;
+
+                            namespace Tests;
+
+                            public class TestBase
+                            {
+                                public virtual IEnumerable<int> TestMethod()
+                                {{
+                                    return [];
+                                }}
+                            }
+
+                            public class Test : TestBase
+                            {
+                                public override IEnumerable<int> TestMethod()
+                                {
+                                    var list = Enumerable.Range(0, 10).ToList();
+                                    return list; ;
+                                }
+                            }
+                            """;
+
+        await CreateTesterBuilder()
+             .WithTestCode(code)
+             .Build()
+             .RunAsync();
     }
 }

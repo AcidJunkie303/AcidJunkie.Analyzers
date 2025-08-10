@@ -5,11 +5,8 @@ namespace AcidJunkie.Analyzers.Configuration;
 
 internal static class GeneralConfigurationManager
 {
-    public static bool IsLoggingEnabled(AnalyzerOptions options)
-        => options.GetGlobalOptionsBooleanValue(KeyNames.LoggingEnabled, defaultValue: false);
+    private const string LoggingEnabledKeyName = "AcidJunkie_Analyzers.is_logging_enabled";
 
-    public static class KeyNames
-    {
-        public const string LoggingEnabled = "AJ.is_logging_enabled";
-    }
+    public static bool IsLoggingEnabled(SyntaxNodeAnalysisContext context)
+        => context.GetOptionsBooleanValue(LoggingEnabledKeyName, defaultValue: false);
 }

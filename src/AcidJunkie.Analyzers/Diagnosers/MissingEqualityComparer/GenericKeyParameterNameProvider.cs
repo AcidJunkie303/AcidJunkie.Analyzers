@@ -15,7 +15,9 @@ internal static class GenericKeyParameterNameProvider
                         "Enumerable",
                         new[]
                         {
+                            ("AggregateBy", "TKey"),
                             ("Contains", "TSource"),
+                            ("CountBy", "TSource"),
                             ("Distinct", "TSource"),
                             ("DistinctBy", "TKey"),
                             ("Except", "TSource"),
@@ -108,13 +110,31 @@ internal static class GenericKeyParameterNameProvider
                                     1, "T"
                                 )
                             }.ToFrozenDictionary(a => a.Item1, a => a.Item2)
+                        ),
+                        (
+                            "OrderedDictionary",
+                            new[]
+                            {
+                                (
+                                    2, "TKey"
+                                )
+                            }.ToFrozenDictionary(a => a.Item1, a => a.Item2)
+                        ),
+                        (
+                            "SortedDictionary",
+                            new[]
+                            {
+                                (
+                                    2, "TKey"
+                                )
+                            }.ToFrozenDictionary(a => a.Item1, a => a.Item2)
                         )
                     }.ToFrozenDictionary(a => a.Item1, a => a.Item2, StringComparer.Ordinal)
                 )
             }.ToFrozenDictionary(a => a.Item1, a => a.Item2, StringComparer.Ordinal);
 
     public static string? GetKeyParameterNameForInvocation(string containingTypeNamespaceName,
-        string containingTypeName, string methodName)
+                                                           string containingTypeName, string methodName)
     {
         if (!GenericKeyByMethodNameByContainingTypeByContainingTypeNameSpace.TryGetValue(containingTypeNamespaceName, out var genericKeyByMethodNameByContainingType))
         {
@@ -130,7 +150,7 @@ internal static class GenericKeyParameterNameProvider
     }
 
     public static string? GetKeyParameterNameForCreation(string containingTypeNamespaceName, string containingTypeName,
-        int genericParameterCount)
+                                                         int genericParameterCount)
     {
         if (!GenericKeyByGenericTypeCountByTypeNameByNameSpace.TryGetValue(containingTypeNamespaceName, out var genericKeyByMethodNameByContainingType))
         {

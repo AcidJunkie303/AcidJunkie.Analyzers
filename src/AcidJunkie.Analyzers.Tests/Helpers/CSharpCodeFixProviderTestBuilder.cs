@@ -24,7 +24,14 @@ internal sealed class CSharpCodeFixProviderTestBuilder<TAnalyzer, TCodeFixProvid
     where TAnalyzer : DiagnosticAnalyzer, new()
     where TCodeFixProvider : CodeFixProvider, new()
 {
-    private readonly List<string> _additionalGlobalOptionsLines = [];
+    private const string EditorConfigHeader = """
+                                              root = true
+
+                                              [*.cs]
+
+                                              """;
+
+    private readonly List<string> _additionalEditorConfigLines = [];
     private readonly List<PackageIdentity> _additionalPackages = [];
     private readonly List<Type> _additionalTypes = [];
     private readonly ITestOutputHelper _testOutputHelper;
@@ -61,9 +68,9 @@ internal sealed class CSharpCodeFixProviderTestBuilder<TAnalyzer, TCodeFixProvid
         return this;
     }
 
-    public CSharpCodeFixProviderTestBuilder<TAnalyzer, TCodeFixProvider> WithGlobalOptions(string optionsLine)
+    public CSharpCodeFixProviderTestBuilder<TAnalyzer, TCodeFixProvider> WithEditorConfigLine(string optionsLine)
     {
-        _additionalGlobalOptionsLines.Add(optionsLine);
+        _additionalEditorConfigLines.Add(optionsLine);
         return this;
     }
 
@@ -103,10 +110,10 @@ internal sealed class CSharpCodeFixProviderTestBuilder<TAnalyzer, TCodeFixProvid
             codeFixTest.TestState.AdditionalReferences.Add(reference);
         }
 
-        if (_additionalGlobalOptionsLines.Count > 0)
+        if (_additionalEditorConfigLines.Count > 0)
         {
-            var content = string.Join(Environment.NewLine, _additionalGlobalOptionsLines);
-            codeFixTest.TestState.AnalyzerConfigFiles.Add(("/.globalconfig", content));
+            var content = EditorConfigHeader + string.Join(Environment.NewLine, _additionalEditorConfigLines);
+            codeFixTest.TestState.AnalyzerConfigFiles.Add(("/.editorconfig", content));
         }
 
         return codeFixTest;

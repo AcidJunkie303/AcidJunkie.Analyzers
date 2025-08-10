@@ -12,7 +12,7 @@ namespace AcidJunkie.Analyzers.Diagnosers.Logging;
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(WrongLoggerTypeArgumentFixProvider))]
 public sealed class WrongLoggerTypeArgumentFixProvider : CodeFixProvider
 {
-    public override ImmutableArray<string> FixableDiagnosticIds { get; } = [WrongLoggerTypeArgumentAnalyzer.DiagnosticRules.Default.DiagnosticId];
+    public override ImmutableArray<string> FixableDiagnosticIds { get; } = [WrongLoggerTypeArgumentAnalyzerImplementation.DiagnosticRules.Default.DiagnosticId];
 
     public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 
@@ -64,8 +64,8 @@ public sealed class WrongLoggerTypeArgumentFixProvider : CodeFixProvider
     private static async Task<Document> ChangeLoggerParameterTypeArgument(Document document, ParameterSyntax parameter, CancellationToken cancellationToken)
     {
         var parentTypeDeclaration = parameter
-            .GetParents()
-            .FirstOrDefault(static a => a is ClassDeclarationSyntax or RecordDeclarationSyntax or StructDeclarationSyntax);
+                                   .GetParents()
+                                   .FirstOrDefault(static a => a is ClassDeclarationSyntax or RecordDeclarationSyntax or StructDeclarationSyntax);
 
         if (parentTypeDeclaration is null)
         {
@@ -105,8 +105,8 @@ public sealed class WrongLoggerTypeArgumentFixProvider : CodeFixProvider
     private static async Task<Document> ChangeLoggerFieldTypeArgument(Document document, FieldDeclarationSyntax fieldDeclaration, CancellationToken cancellationToken)
     {
         var parentTypeDeclaration = fieldDeclaration
-            .GetParents()
-            .FirstOrDefault(static a => a is ClassDeclarationSyntax or RecordDeclarationSyntax or StructDeclarationSyntax);
+                                   .GetParents()
+                                   .FirstOrDefault(static a => a is ClassDeclarationSyntax or RecordDeclarationSyntax or StructDeclarationSyntax);
 
         if (parentTypeDeclaration is null)
         {
@@ -148,8 +148,8 @@ public sealed class WrongLoggerTypeArgumentFixProvider : CodeFixProvider
     private static async Task<Document> ChangeLoggerPropertyTypeArgument(Document document, PropertyDeclarationSyntax propertyDeclaration, CancellationToken cancellationToken)
     {
         var parentTypeDeclaration = propertyDeclaration
-            .GetParents()
-            .FirstOrDefault(static a => a is ClassDeclarationSyntax or RecordDeclarationSyntax or StructDeclarationSyntax);
+                                   .GetParents()
+                                   .FirstOrDefault(static a => a is ClassDeclarationSyntax or RecordDeclarationSyntax or StructDeclarationSyntax);
 
         if (parentTypeDeclaration is null)
         {

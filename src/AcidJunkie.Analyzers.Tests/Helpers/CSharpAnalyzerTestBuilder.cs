@@ -21,7 +21,14 @@ internal static class CSharpAnalyzerTestBuilder
 internal sealed class CSharpAnalyzerTestBuilder<TAnalyzer>
     where TAnalyzer : DiagnosticAnalyzer, new()
 {
-    private readonly List<string> _additionalGlobalOptionsLines = [];
+    private const string EditorConfigHeader = """
+                                              root = true
+
+                                              [*.cs]
+
+                                              """;
+
+    private readonly List<string> _additionalEditorConfigLines = [];
     private readonly List<PackageIdentity> _additionalPackages = [];
     private readonly List<Type> _additionalTypes = [];
     private readonly ITestOutputHelper _testOutputHelper;
@@ -51,9 +58,9 @@ internal sealed class CSharpAnalyzerTestBuilder<TAnalyzer>
         return this;
     }
 
-    public CSharpAnalyzerTestBuilder<TAnalyzer> WithGlobalOptions(string optionsLine)
+    public CSharpAnalyzerTestBuilder<TAnalyzer> WithEditorConfigLine(string optionsLine)
     {
-        _additionalGlobalOptionsLines.Add(optionsLine);
+        _additionalEditorConfigLines.Add(optionsLine);
         return this;
     }
 
@@ -90,10 +97,10 @@ internal sealed class CSharpAnalyzerTestBuilder<TAnalyzer>
             analyzerTest.TestState.AdditionalReferences.Add(reference);
         }
 
-        if (_additionalGlobalOptionsLines.Count > 0)
+        if (_additionalEditorConfigLines.Count > 0)
         {
-            var content = string.Join(Environment.NewLine, _additionalGlobalOptionsLines);
-            analyzerTest.TestState.AnalyzerConfigFiles.Add(("/.globalconfig", content));
+            var content = EditorConfigHeader + string.Join(Environment.NewLine, _additionalEditorConfigLines);
+            analyzerTest.TestState.AnalyzerConfigFiles.Add(("/.editorconfig", content));
         }
 
         return analyzerTest;

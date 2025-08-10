@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 
@@ -6,6 +7,8 @@ namespace AcidJunkie.Analyzers.Diagnosers;
 [SuppressMessage("Security", "S1075:Refactor your code not to use hardcoded absolution paths or URIs", Justification = "Path to the documentation")]
 public static class CommonRules
 {
+    public static ImmutableArray<DiagnosticDescriptor> AllCommonRules { get; } = [UnhandledError.Rule, InvalidConfigurationValue.Rule];
+
     public static class UnhandledError
     {
         private const string Category = "Warning";

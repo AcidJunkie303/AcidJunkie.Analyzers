@@ -1,5 +1,4 @@
 using System.Diagnostics.CodeAnalysis;
-using AcidJunkie.Analyzers.Configuration;
 using AcidJunkie.Analyzers.Configuration.Aj0002;
 using AcidJunkie.Analyzers.Diagnosers.MissingUsingStatement;
 using Xunit.Abstractions;
@@ -10,11 +9,6 @@ namespace AcidJunkie.Analyzers.Tests.Diagnosers;
 [SuppressMessage("Code Smell", "S2699:Tests should include assertions", Justification = "This is done internally by AnalyzerTest.RunAsync()")]
 public sealed class MissingUsingStatementAnalyzerTests(ITestOutputHelper testOutputHelper) : TestBase<MissingUsingStatementAnalyzer>(testOutputHelper)
 {
-    static MissingUsingStatementAnalyzerTests()
-    {
-        CachedConfigurationProvider.IsCachingEnabled = false;
-    }
-
     [Theory]
     [InlineData("/* 0000 */  using var a = new Factory().GetDisposable();")] // instance method
     [InlineData("/* 0001 */  using var a = new Factory().GetDisposableRefType();")] // instance method
@@ -61,9 +55,9 @@ public sealed class MissingUsingStatementAnalyzerTests(ITestOutputHelper testOut
         var code = CreateTestCode(insertionCode, string.Empty);
 
         await CreateTesterBuilder()
-            .WithTestCode(code)
-            .Build()
-            .RunAsync();
+             .WithTestCode(code)
+             .Build()
+             .RunAsync();
     }
 
     [Fact]
@@ -73,9 +67,9 @@ public sealed class MissingUsingStatementAnalyzerTests(ITestOutputHelper testOut
         var code = CreateTestCode(insertionCode, string.Empty);
 
         await CreateTesterBuilder()
-            .WithTestCode(code)
-            .Build()
-            .RunAsync();
+             .WithTestCode(code)
+             .Build()
+             .RunAsync();
     }
 
     [Fact]
@@ -85,9 +79,9 @@ public sealed class MissingUsingStatementAnalyzerTests(ITestOutputHelper testOut
         var code = CreateTestCode(insertionCode, string.Empty);
 
         await CreateTesterBuilder()
-            .WithTestCode(code)
-            .Build()
-            .RunAsync();
+             .WithTestCode(code)
+             .Build()
+             .RunAsync();
     }
 
     [Fact]
@@ -97,10 +91,10 @@ public sealed class MissingUsingStatementAnalyzerTests(ITestOutputHelper testOut
         var code = CreateTestCode(insertionCode, string.Empty);
 
         await CreateTesterBuilder()
-            .WithTestCode(code)
-            .WithGlobalOptions($"{Aj0002Configuration.KeyNames.IgnoredObjectNames} = Tests.Factory`1.GetDisposable")
-            .Build()
-            .RunAsync();
+             .WithTestCode(code)
+             .WithEditorConfigLine($"{Aj0002Configuration.KeyNames.IgnoredObjectNames} = Tests.Factory`1.GetDisposable")
+             .Build()
+             .RunAsync();
     }
 
     [Fact]
@@ -110,10 +104,10 @@ public sealed class MissingUsingStatementAnalyzerTests(ITestOutputHelper testOut
         var code = CreateTestCode(insertionCode, string.Empty);
 
         await CreateTesterBuilder()
-            .WithTestCode(code)
-            .WithGlobalOptions($"{Aj0002Configuration.KeyNames.IgnoredObjectNames} = Tests.DisposableRefType")
-            .Build()
-            .RunAsync();
+             .WithTestCode(code)
+             .WithEditorConfigLine($"{Aj0002Configuration.KeyNames.IgnoredObjectNames} = Tests.DisposableRefType")
+             .Build()
+             .RunAsync();
     }
 
     private static string CreateTestCode(string simpleInsertionCode, string complexInsertionCode) =>
@@ -129,16 +123,16 @@ public sealed class MissingUsingStatementAnalyzerTests(ITestOutputHelper testOut
           {
               private IDisposable? _disposable;
               private IDisposable? Disposable {get; set;}
-          
+
               public object? ComplexTestMethod()
               {
                   {{simpleInsertionCode}}
-          
+
                   return null; // fallback. Some testing methods might return something
               }
-          
+
               {{complexInsertionCode}}
-          
+
               private static DisposableRefType GetDisposableRefType() => null!;
               private static IDisposable GetDisposable() => null!;
               private static RefStructWithDisposeMethod GetRefStructWithDisposeMethod() => new();

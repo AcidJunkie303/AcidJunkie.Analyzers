@@ -2,8 +2,8 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace AcidJunkie.Analyzers.Configuration;
 
-internal interface IConfigurationProvider<T>
+internal interface IConfigurationProvider<out T>
     where T : IAnalyzerConfiguration
 {
-    (T Configuration, bool CanBeCached) GetConfiguration(AnalyzerOptions options);
+    T GetConfiguration(SyntaxNodeAnalysisContext context);
 }
