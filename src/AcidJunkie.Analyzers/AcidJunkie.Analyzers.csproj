@@ -5,7 +5,7 @@
         <Description>AcidJunkie Analyzers</Description>
         <DevelopmentDependency>true</DevelopmentDependency>
         <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
         <IsPackable>true</IsPackable>
         <NoPackageAnalysis>true</NoPackageAnalysis>
         <!-- RS1038:     Compiler extensions should be implemented in assemblies with compiler-provided references -> needs to be tacklet separately by moving the code fixers to a separate assembly -->
