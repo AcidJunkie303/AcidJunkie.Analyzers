@@ -75,7 +75,10 @@ internal sealed class ReturnMaterialisedCollectionAsEnumerableAnalyzerImplementa
     {
         var ns = typeSymbol.ContainingNamespace.ToString() ?? string.Empty;
 
-        var namedTypeSymbol = typeSymbol as INamedTypeSymbol;
+        if (!(typeSymbol is INamedTypeSymbol namedTypeSymbol))
+        {
+            return false;
+        }
 
         if (typeSymbol.Name.EqualsOrdinal("IEnumerable"))
         {
@@ -84,7 +87,7 @@ internal sealed class ReturnMaterialisedCollectionAsEnumerableAnalyzerImplementa
                 return true;
             }
 
-            return namedTypeSymbol is not null && namedTypeSymbol.Arity == 1 && ns.EqualsOrdinal("System.Collections.Generic");
+            return namedTypeSymbol.Arity == 1 && ns.EqualsOrdinal("System.Collections.Generic");
         }
 
         return false;
