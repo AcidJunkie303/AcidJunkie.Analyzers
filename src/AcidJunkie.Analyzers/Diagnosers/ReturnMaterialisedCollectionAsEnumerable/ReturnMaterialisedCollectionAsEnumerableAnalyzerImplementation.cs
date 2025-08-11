@@ -79,17 +79,13 @@ internal sealed class ReturnMaterialisedCollectionAsEnumerableAnalyzerImplementa
         }
 
         var ns = typeSymbol.ContainingNamespace?.ToString() ?? string.Empty;
-        if (typeSymbol.Name.EqualsOrdinal("IEnumerable"))
+        if (!typeSymbol.Name.EqualsOrdinal("IEnumerable"))
         {
-            if (ns.EqualsOrdinal("System.Collections"))
-            {
-                return true;
-            }
-
-            return namedTypeSymbol.Arity == 1 && ns.EqualsOrdinal("System.Collections.Generic");
+            return false;
         }
 
-        return false;
+        return ns.EqualsOrdinal("System.Collections")
+               ||( namedTypeSymbol.Arity == 1 && ns.EqualsOrdinal("System.Collections.Generic"));
     }
 
     private static MethodDeclarationSyntaxOrLocalFunctionDeclaration? GetContainingMethodOrLocalFunction(ReturnStatementSyntax node)
