@@ -100,25 +100,24 @@ internal sealed class MissingEqualityComparerAnalyzerImplementation : SyntaxNode
             return; // Value types use structural comparison
         }
 
-        if (keyType.ImplementsGenericEquatable() && keyType.IsGetHashCodeOverridden())
+        if (IsCompliantReferenceType(keyType))
         {
-            Logger.WriteLine(() => $"Key type {keyType.GetFullName()} not not implement IEquatable<{keyType.GetFullName()}> or does not override {nameof(GetHashCode)}()");
             return;
         }
 
         if (IsAnyParameterEqualityComparer(keyType, invocationExpression.ArgumentList))
         {
-            Logger.WriteLine(() => "No parameter is a equality comparer");
+            Logger.WriteLine(() => "Found equality comparer argument");
             return;
         }
+
+        Logger.ReportDiagnostic(DiagnosticRules.Default.Rule, memberAccess.Name.GetLocation());
+        Context.ReportDiagnostic(Diagnostic.Create(DiagnosticRules.Default.Rule, memberAccess.Name.GetLocation()));
 
         string? GetKeyTypeParameterName() =>
             owningTypeNameSpace is not null && owningTypeName is not null && methodName is not null
                 ? GenericKeyParameterNameProvider.GetKeyParameterNameForInvocation(owningTypeNameSpace, owningTypeName, methodName)
                 : null;
-
-        Logger.ReportDiagnostic(DiagnosticRules.Default.Rule, memberAccess.Name.GetLocation());
-        Context.ReportDiagnostic(Diagnostic.Create(DiagnosticRules.Default.Rule, memberAccess.Name.GetLocation()));
     }
 
     private static T? GetTypeSymbol<T>(ISymbol? symbol)
@@ -133,6 +132,23 @@ internal sealed class MissingEqualityComparerAnalyzerImplementation : SyntaxNode
             ILocalSymbol localSymbol       => localSymbol.Type as T,
             _                              => null
         };
+
+    private bool IsCompliantReferenceType(ITypeSymbol keyType)
+    {
+        if (!keyType.IsGetHashCodeOverridden())
+        {
+            Logger.WriteLine(() => $"Key type {keyType.GetFullName()} does not override {nameof(GetHashCode)}()");
+            return false;
+        }
+
+        if (!keyType.IsEqualsOverridden() && !keyType.IsSpecificEqualsOverridden())
+        {
+            Logger.WriteLine(() => $"Key type {keyType.GetFullName()} does not override {nameof(Equals)}()");
+            return false;
+        }
+
+        return true;
+    }
 
     private bool IsAnyParameterEqualityComparer(ITypeSymbol keyType, ArgumentListSyntax? argumentList)
     {

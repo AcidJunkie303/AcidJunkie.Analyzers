@@ -44,15 +44,29 @@ internal static class TypeSymbolExtensions
 
     public static bool ImplementsGenericEquatable(this ITypeSymbol symbol)
         => symbol.AllInterfaces
-            .Where(static a => a.TypeParameters.Length == 1)
-            .Where(static a => a.ContainingNamespace.Name.EqualsOrdinal("System"))
-            .Any(static a => a.Name.EqualsOrdinal("IEquatable"));
+                 .Where(static a => a.TypeParameters.Length == 1)
+                 .Where(static a => a.ContainingNamespace.Name.EqualsOrdinal("System"))
+                 .Any(static a => a.Name.EqualsOrdinal("IEquatable"));
+
+    public static bool IsEqualsOverridden(this ITypeSymbol symbol)
+        => symbol
+          .GetMembers(nameof(Equals))
+          .OfType<IMethodSymbol>()
+          .Any(static a => a.Parameters.Length == 1 && a is { Arity: 0, ReturnType.SpecialType: SpecialType.System_Boolean } && a.Parameters[0].Type.SpecialType == SpecialType.System_Object);
+
+    public static bool IsSpecificEqualsOverridden(this ITypeSymbol symbol)
+        => symbol
+          .GetMembers(nameof(Equals))
+          .OfType<IMethodSymbol>()
+          .Any(a => a.Parameters.Length == 1
+                    && a is { Arity: 0, ReturnType.SpecialType: SpecialType.System_Boolean }
+                    && SymbolEqualityComparer.Default.Equals(a.Parameters[0].Type, symbol));
 
     public static bool IsGetHashCodeOverridden(this ITypeSymbol symbol)
         => symbol
-            .GetMembers(nameof(GetHashCode))
-            .OfType<IMethodSymbol>()
-            .Any(static a => a.Parameters.Length == 0);
+          .GetMembers(nameof(GetHashCode))
+          .OfType<IMethodSymbol>()
+          .Any(static a => a.Parameters.Length == 0 && a is { Arity: 0, ReturnType.SpecialType: SpecialType.System_Int32 });
 
     public static string GetFullNamespace(this ITypeSymbol symbol)
         => symbol.ContainingNamespace?.ToString() ?? string.Empty;
@@ -97,29 +111,29 @@ internal static class TypeSymbolExtensions
         }
 
         return symbol.AllInterfaces
-                .Where(a => a.TypeParameters.Length == typeArguments.Length)
-                .Where(a => a.ContainingNamespace.ToString().EqualsOrdinal(interfaceNamespace))
-                .Where(a => a.Name.EqualsOrdinal(interfaceName))
-                .Any(a =>
-                {
-                    if (a.TypeArguments.Length != typeArguments.Length)
-                    {
-                        return false;
-                    }
+                     .Where(a => a.TypeParameters.Length == typeArguments.Length)
+                     .Where(a => a.ContainingNamespace.ToString().EqualsOrdinal(interfaceNamespace))
+                     .Where(a => a.Name.EqualsOrdinal(interfaceName))
+                     .Any(a =>
+                      {
+                          if (a.TypeArguments.Length != typeArguments.Length)
+                          {
+                              return false;
+                          }
 
-                    for (var i = 0; i < typeArguments.Length; i++)
-                    {
-                        var typeArgument = typeArguments[i];
-                        var typeArgument2 = a.TypeArguments[i];
+                          for (var i = 0; i < typeArguments.Length; i++)
+                          {
+                              var typeArgument = typeArguments[i];
+                              var typeArgument2 = a.TypeArguments[i];
 
-                        if (!typeArgument.Equals(typeArgument2, SymbolEqualityComparer.Default))
-                        {
-                            return false;
-                        }
-                    }
+                              if (!typeArgument.Equals(typeArgument2, SymbolEqualityComparer.Default))
+                              {
+                                  return false;
+                              }
+                          }
 
-                    return true;
-                })
+                          return true;
+                      })
             ;
     }
 
@@ -196,8 +210,8 @@ internal static class TypeSymbolExtensions
         return namedTypeSymbol.Arity switch
         {
             1 when !typeSymbol.IsContainedInNamespace("System.Collections.Generic") => false,
-            0 when !typeSymbol.IsContainedInNamespace("System.Collections") => false,
-            _ => typeSymbol.Name.EqualsOrdinal("IEnumerable")
+            0 when !typeSymbol.IsContainedInNamespace("System.Collections")         => false,
+            _                                                                       => typeSymbol.Name.EqualsOrdinal("IEnumerable")
         };
     }
 }
