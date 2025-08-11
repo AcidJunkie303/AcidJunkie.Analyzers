@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <Copyright>Copyright TODO</Copyright>
+        <Copyright>2025 AcidJunkie</Copyright>
         <Description>AcidJunkie Analyzers</Description>
         <DevelopmentDependency>true</DevelopmentDependency>
         <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
@@ -21,6 +21,7 @@
         <OutputItemType>Analyzer</OutputItemType>
         <PackageProjectUrl>https://github.com/AcidJunkie303/AcidJunkie.Analyzers</PackageProjectUrl>
         <RepositoryUrl>https://github.com/AcidJunkie303/AcidJunkie.Analyzers</RepositoryUrl>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>
 
     <ItemGroup>
@@ -38,7 +39,11 @@
     </ItemGroup>
 
     <ItemGroup>
-        <None Include="$(SolutionDir)LICENSE.txt">
+        <None Include="$(SolutionDir)..\docs\README.md" Pack="true">
+            <Pack>True</Pack>
+            <PackagePath/>
+        </None>
+        <None Include="$(SolutionDir)LICENSE.txt" Pack="true">
             <Pack>True</Pack>
             <PackagePath/>
         </None>
