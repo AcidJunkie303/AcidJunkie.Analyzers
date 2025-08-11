@@ -71,15 +71,14 @@ internal sealed class ReturnMaterialisedCollectionAsEnumerableAnalyzerImplementa
     private static bool IsOverrideOrNewModifier(MethodDeclarationSyntax methodDeclaration)
         => methodDeclaration.Modifiers.Any(static a => a.IsKind(SyntaxKind.OverrideKeyword) || a.IsKind(SyntaxKind.NewKeyword));
 
-    private static bool IsEnumerable(ITypeSymbol typeSymbol)
+    private static bool IsEnumerable(ITypeSymbol? typeSymbol)
     {
-        var ns = typeSymbol.ContainingNamespace.ToString() ?? string.Empty;
-
-        if (!(typeSymbol is INamedTypeSymbol namedTypeSymbol))
+        if (typeSymbol is not INamedTypeSymbol namedTypeSymbol)
         {
             return false;
         }
 
+        var ns = typeSymbol.ContainingNamespace?.ToString() ?? string.Empty;
         if (typeSymbol.Name.EqualsOrdinal("IEnumerable"))
         {
             if (ns.EqualsOrdinal("System.Collections"))
