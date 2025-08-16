@@ -1,15 +1,45 @@
 using System.Diagnostics.CodeAnalysis;
-using AcidJunkie.Analyzers.Diagnosers.WarningSuppression;
+using AcidJunkie.Analyzers.Diagnosers.EnforceEntityFrameworkTrackingType;
 using Xunit.Abstractions;
 
 namespace AcidJunkie.Analyzers.Tests.Diagnosers;
 
 [SuppressMessage("Code Smell", "S2699:Tests should include assertions", Justification = "This is done internally by AnalyzerTest.RunAsync()")]
 public sealed class EnforceEntityFrameworkTrackingTypeAnalyzerTests(ITestOutputHelper testOutputHelper)
-    : TestBase<GeneralWarningSuppressionAnalyzer>(testOutputHelper)
+    : TestBase<EnforceEntityFrameworkTrackingTypeAnalyzer>(testOutputHelper)
 {
     [Fact]
-    public async Task First() => await RunTestAsync("");
+    public async Task WithoutAnyTracking_ThenDiagnose()
+    {
+        const string code = """
+                            using var dbContext = new TestContext();
+                            {|AJ0002:dbContext.Entities.Where(a => a.Id > 303).ToList()|};
+                            """;
+        await RunTestAsync(code);
+    }
+
+    [Fact]
+    public async Task WithAsTracking_ThenOk()
+    {
+        const string code = """
+                            using var dbContext = new TestContext();
+                            var entities = dbContext.Entities;
+                            var query = dbContext.Entities;
+                            var queryable = dbContext.Entities.AsQueryable();
+                            dbContext.Entities.Where(a => a.Id > 303).AsTracking().ToList();
+                            """;
+        await RunTestAsync(code);
+    }
+
+    [Fact]
+    public async Task WithAsNoTracking_ThenOk()
+    {
+        const string code = """
+                            using var dbContext = new TestContext();
+                            dbContext.Entities.Where(a => a.Id > 303).AsNoTracking().ToList();
+                            """;
+        await RunTestAsync(code);
+    }
 
     private static string CreateTestCode(string insertionCode)
     {

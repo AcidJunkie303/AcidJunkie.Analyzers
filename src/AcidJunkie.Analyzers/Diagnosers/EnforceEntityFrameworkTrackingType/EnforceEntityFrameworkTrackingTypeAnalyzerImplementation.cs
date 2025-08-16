@@ -1,5 +1,8 @@
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
+using AcidJunkie.Analyzers.Extensions;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
 // TODO: remove
@@ -13,8 +16,33 @@ internal sealed class EnforceEntityFrameworkTrackingTypeAnalyzerImplementation :
     {
     }
 
-    public void AnalyzeInvocation()
+    public void AnalyzeMemberAccessExpression()
     {
+        var memberAccessExpression = (MemberAccessExpressionSyntax)Context.Node;
+        if (!IsDbSetType(memberAccessExpression, out var entityType))
+        {
+            return;
+        }
+
+        return;
+    }
+
+    private bool IsDbSetType(MemberAccessExpressionSyntax memberAccessExpression, [NotNullWhen(true)] out INamedTypeSymbol? entityType)
+    {
+        entityType = null;
+
+        if (Context.SemanticModel.GetTypeInfo(memberAccessExpression).Type is not INamedTypeSymbol memberType)
+        {
+            return false;
+        }
+
+        if (!memberType.IsTypeOrIsInheritedFrom(Context.Compilation, "Microsoft.EntityFrameworkCore.DbSet`1"))
+        {
+            return false;
+        }
+
+        entityType = memberType.TypeArguments[0] as INamedTypeSymbol;
+        return entityType is not null;
     }
 
     internal static class DiagnosticRules

@@ -2,5 +2,9 @@
 
 internal static class Program
 {
-    private static void Main() => Console.WriteLine("Hello, World!");
+    private static void Main()
+    {
+        Console.WriteLine("Hello, World!");
+        Console.WriteLine("Hello, World!");
+    }
 }
