@@ -1,13 +1,13 @@
 using System.Diagnostics.CodeAnalysis;
-using AcidJunkie.Analyzers.Diagnosers.ReturnMaterialisedCollectionAsEnumerable;
+using AcidJunkie.Analyzers.Diagnosers.ReturnMaterializedCollectionAsEnumerable;
 using Xunit.Abstractions;
 
 namespace AcidJunkie.Analyzers.Tests.Diagnosers;
 
 [SuppressMessage("Code Smell", "S4144:Methods should not have identical implementations", Justification = "Splitted up the test into different methods for different categories")]
 [SuppressMessage("Code Smell", "S2699:Tests should include assertions", Justification = "This is done internally by AnalyzerTest.RunAsync()")]
-public sealed class ReturnMaterialisedCollectionAsEnumerableAnalyzerTests(ITestOutputHelper testOutputHelper)
-    : TestBase<ReturnMaterialisedCollectionAsEnumerableAnalyzer>(testOutputHelper)
+public sealed class ReturnMaterializedCollectionAsEnumerableAnalyzerTests(ITestOutputHelper testOutputHelper)
+    : TestBase<ReturnMaterializedCollectionAsEnumerableAnalyzer>(testOutputHelper)
 {
     [Fact]
     public async Task WhenReturningPureEnumerable_ThenOk()
@@ -89,7 +89,7 @@ public sealed class ReturnMaterialisedCollectionAsEnumerableAnalyzerTests(ITestO
     }
 
     [Fact]
-    public async Task WhenReturningMaterialisedCollection_ThenDiagnose()
+    public async Task WhenReturningMaterializedCollection_ThenDiagnose()
     {
         const string code = """
                             using System;
@@ -115,7 +115,7 @@ public sealed class ReturnMaterialisedCollectionAsEnumerableAnalyzerTests(ITestO
     }
 
     [Fact]
-    public async Task WhenReturningMaterialisedCollectionThroughLambda_ThenDiagnose()
+    public async Task WhenReturningMaterializedCollectionThroughLambda_ThenDiagnose()
     {
         const string code = """
                             using System;
@@ -139,7 +139,7 @@ public sealed class ReturnMaterialisedCollectionAsEnumerableAnalyzerTests(ITestO
     }
 
     [Fact]
-    public async Task WhenInterfaceImplementation_WhenReturningMaterialisedCollection_ThenOk()
+    public async Task WhenInterfaceImplementation_WhenReturningMaterializedCollection_ThenOk()
     {
         const string code = """
                             using System;
@@ -171,7 +171,7 @@ public sealed class ReturnMaterialisedCollectionAsEnumerableAnalyzerTests(ITestO
     }
 
     [Fact]
-    public async Task WhenMethodIsOverridden_WhenReturningMaterialisedCollection_ThenOk()
+    public async Task WhenMethodIsOverridden_WhenReturningMaterializedCollection_ThenOk()
     {
         const string code = """
                             using System;

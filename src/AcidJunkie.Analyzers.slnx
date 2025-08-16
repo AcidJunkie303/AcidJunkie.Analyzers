@@ -12,12 +12,10 @@
   </Folder>
   <Folder Name="/Solution Items/docs/Rules/">
     <File Path="..\docs\Rules\AJ0001.md" />
-    <File Path="..\docs\Rules\AJ0002.md" />
     <File Path="..\docs\Rules\AJ0003.md" />
     <File Path="..\docs\Rules\AJ0004.md" />
     <File Path="..\docs\Rules\AJ0005.md" />
     <File Path="..\docs\Rules\AJ9999.md" />
-    <File Path="..\docs\Rules\AJ0006.md" />
   </Folder>
   <Project Path="AcidJunkie.Analyzers.Tests\AcidJunkie.Analyzers.Tests.csproj" />
   <Project Path="AcidJunkie.Analyzers\AcidJunkie.Analyzers.csproj" />

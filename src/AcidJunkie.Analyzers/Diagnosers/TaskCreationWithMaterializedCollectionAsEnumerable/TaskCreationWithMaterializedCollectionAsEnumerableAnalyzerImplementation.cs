@@ -7,11 +7,11 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
-namespace AcidJunkie.Analyzers.Diagnosers.TaskCreationWithMaterialisedCollectionAsEnumerable;
+namespace AcidJunkie.Analyzers.Diagnosers.TaskCreationWithMaterializedCollectionAsEnumerable;
 
-internal sealed class TaskCreationWithMaterialisedCollectionAsEnumerableAnalyzerImplementation : SyntaxNodeAnalyzerImplementationBase<TaskCreationWithMaterialisedCollectionAsEnumerableAnalyzerImplementation>
+internal sealed class TaskCreationWithMaterializedCollectionAsEnumerableAnalyzerImplementation : SyntaxNodeAnalyzerImplementationBase<TaskCreationWithMaterializedCollectionAsEnumerableAnalyzerImplementation>
 {
-    public TaskCreationWithMaterialisedCollectionAsEnumerableAnalyzerImplementation(SyntaxNodeAnalysisContext context) : base(context)
+    public TaskCreationWithMaterializedCollectionAsEnumerableAnalyzerImplementation(SyntaxNodeAnalysisContext context) : base(context)
     {
     }
 
@@ -119,8 +119,8 @@ internal sealed class TaskCreationWithMaterialisedCollectionAsEnumerableAnalyzer
             public const string HelpLinkUri = "https://github.com/AcidJunkie303/AcidJunkie.Analyzers/blob/main/docs/Rules/AJ0004.md";
 #pragma warning restore S1075
 
-            public static readonly LocalizableString Title = "Do not create tasks of enumerable type containing a materialised collection";
-            public static readonly LocalizableString MessageFormat = "Do not create tasks of type IEnumerable or IEnumerable<T> containing a materialised collection";
+            public static readonly LocalizableString Title = "Do not create tasks of enumerable type containing a materialized collection";
+            public static readonly LocalizableString MessageFormat = "Do not create tasks of type IEnumerable or IEnumerable<T> containing a materialized collection";
             public static readonly LocalizableString Description = MessageFormat;
             public static readonly DiagnosticDescriptor Rule = new(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, true, Description, HelpLinkUri);
         }

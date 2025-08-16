@@ -6,11 +6,11 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
-namespace AcidJunkie.Analyzers.Diagnosers.ReturnMaterialisedCollectionAsEnumerable;
+namespace AcidJunkie.Analyzers.Diagnosers.ReturnMaterializedCollectionAsEnumerable;
 
-internal sealed class ReturnMaterialisedCollectionAsEnumerableAnalyzerImplementation : SyntaxNodeAnalyzerImplementationBase<ReturnMaterialisedCollectionAsEnumerableAnalyzerImplementation>
+internal sealed class ReturnMaterializedCollectionAsEnumerableAnalyzerImplementation : SyntaxNodeAnalyzerImplementationBase<ReturnMaterializedCollectionAsEnumerableAnalyzerImplementation>
 {
-    public ReturnMaterialisedCollectionAsEnumerableAnalyzerImplementation(SyntaxNodeAnalysisContext context) : base(context)
+    public ReturnMaterializedCollectionAsEnumerableAnalyzerImplementation(SyntaxNodeAnalysisContext context) : base(context)
     {
     }
 
@@ -212,8 +212,8 @@ internal sealed class ReturnMaterialisedCollectionAsEnumerableAnalyzerImplementa
             public const string HelpLinkUri = "https://github.com/AcidJunkie303/AcidJunkie.Analyzers/blob/main/docs/Rules/AJ0003.md";
 #pragma warning restore S1075
 
-            public static readonly LocalizableString Title = "Do not return materialised collection as enumerable";
-            public static readonly LocalizableString MessageFormat = "Do not return materialised collection as enumerable";
+            public static readonly LocalizableString Title = "Do not return materialized collection as enumerable";
+            public static readonly LocalizableString MessageFormat = "Do not return materialized collection as enumerable";
             public static readonly LocalizableString Description = MessageFormat;
             public static readonly DiagnosticDescriptor Rule = new(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, true, Description, HelpLinkUri);
         }

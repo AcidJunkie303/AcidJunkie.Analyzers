@@ -1,14 +1,14 @@
 using System.Diagnostics.CodeAnalysis;
-using AcidJunkie.Analyzers.Diagnosers.TaskCreationWithMaterialisedCollectionAsEnumerable;
+using AcidJunkie.Analyzers.Diagnosers.TaskCreationWithMaterializedCollectionAsEnumerable;
 using Xunit.Abstractions;
 
 namespace AcidJunkie.Analyzers.Tests.Diagnosers;
 
 [SuppressMessage("Code Smell", "S2699:Tests should include assertions", Justification = "This is done internally by AnalyzerTest.RunAsync()")]
-public sealed class TaskCreationWithMaterialisedCollectionAsEnumerableAnalyzerTests(ITestOutputHelper testOutputHelper) : TestBase<TaskCreationWithMaterialisedCollectionAsEnumerableAnalyzer>(testOutputHelper)
+public sealed class TaskCreationWithMaterializedCollectionAsEnumerableAnalyzerTests(ITestOutputHelper testOutputHelper) : TestBase<TaskCreationWithMaterializedCollectionAsEnumerableAnalyzer>(testOutputHelper)
 {
     [Fact]
-    public async Task WhenCreatingEnumerableTaskWithMaterialisedCollection_ThenDiagnose()
+    public async Task WhenCreatingEnumerableTaskWithMaterializedCollection_ThenDiagnose()
     {
         const string code = """
                             using System;
@@ -34,7 +34,7 @@ public sealed class TaskCreationWithMaterialisedCollectionAsEnumerableAnalyzerTe
     }
 
     [Fact]
-    public async Task WhenCreatingEnumerableValueTaskWithMaterialisedCollection_ThenDiagnose()
+    public async Task WhenCreatingEnumerableValueTaskWithMaterializedCollection_ThenDiagnose()
     {
         const string code = """
                             using System;
@@ -59,7 +59,7 @@ public sealed class TaskCreationWithMaterialisedCollectionAsEnumerableAnalyzerTe
     }
 
     [Fact]
-    public async Task WhenCreatingTaskOfTypeCollectionWithMaterialisedCollection_ThenOk()
+    public async Task WhenCreatingTaskOfTypeCollectionWithMaterializedCollection_ThenOk()
     {
         const string code = """
                             using System;

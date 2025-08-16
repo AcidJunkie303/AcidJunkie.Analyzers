@@ -41,7 +41,7 @@ public sealed class ParameterOrderingAnalyzerTests(ITestOutputHelper testOutputH
     private CSharpAnalyzerTest<ParameterOrderingAnalyzer, DefaultVerifier> CreateTester(string code, string? configValueForLoggerParameterPlacement = null)
         => CreateTesterBuilder()
           .WithTestCode(code)
-          .WithNugetPackage("Microsoft.Extensions.Logging.Abstractions", "8.0.2")
+          .WithNugetPackage("Microsoft.Extensions.Logging.Abstractions", "9.0.8")
           .WithEditorConfigLine($"{Aj0007Configuration.KeyNames.ParameterOrderingFlat} = {configValueForLoggerParameterPlacement ?? string.Empty}")
           .Build();
 }

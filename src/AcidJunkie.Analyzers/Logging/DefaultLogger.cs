@@ -2,7 +2,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Runtime.CompilerServices;
-using AcidJunkie.Analyzers.Diagnosers.TaskCreationWithMaterialisedCollectionAsEnumerable;
+using AcidJunkie.Analyzers.Diagnosers.TaskCreationWithMaterializedCollectionAsEnumerable;
 
 namespace AcidJunkie.Analyzers.Logging;
 
@@ -40,7 +40,7 @@ internal static class DefaultLogger
         // That's the longest class name we have in the analyzers right now
         // doing the very same using reflection fails because some DLLs cannot be loaded in the analyzer context.
         // No idea why... Therefore, we go with this simple approach.
-        => nameof(TaskCreationWithMaterialisedCollectionAsEnumerableAnalyzerImplementation).Length;
+        => nameof(TaskCreationWithMaterializedCollectionAsEnumerableAnalyzerImplementation).Length;
 }
 
 internal sealed class DefaultLogger<TContext> : ILogger<TContext>

@@ -82,9 +82,9 @@ internal sealed class CSharpAnalyzerTestBuilder<TAnalyzer>
                     _code
                 },
 #if NET9_0
-                ReferenceAssemblies = Net.Assemblies.Net90.AddPackages([.._additionalPackages]),
+                ReferenceAssemblies = ReferenceAssemblies.Net.Net90.AddPackages([.._additionalPackages]),
 #elif NET8_0
-                ReferenceAssemblies = Net.Assemblies.Net80.AddPackages([.._additionalPackages]),
+                ReferenceAssemblies = ReferenceAssemblies.Net.Net80.AddPackages([.._additionalPackages]),
 #else
                 .NET framework not handled!
 #endif
