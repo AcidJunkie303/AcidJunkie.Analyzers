@@ -1,0 +1,23 @@
+﻿<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="..\README.md" />
+    <File Path="..\STATUS.md" />
+    <File Path=".editorconfig" />
+    <File Path="Directory.Build.props" />
+    <File Path="BannedSymbols.txt" />
+    <File Path="..\.github\workflows\ci-cd.yml" />
+  </Folder>
+  <Folder Name="/Solution Items/docs/">
+    <File Path="..\docs\README.md" />
+  </Folder>
+  <Folder Name="/Solution Items/docs/Rules/">
+    <File Path="..\docs\Rules\AJ0001.md" />
+    <File Path="..\docs\Rules\AJ0003.md" />
+    <File Path="..\docs\Rules\AJ0004.md" />
+    <File Path="..\docs\Rules\AJ0005.md" />
+    <File Path="..\docs\Rules\AJ9999.md" />
+  </Folder>
+  <Project Path="AcidJunkie.Analyzers.Tests\AcidJunkie.Analyzers.Tests.csproj" />
+  <Project Path="AcidJunkie.Analyzers\AcidJunkie.Analyzers.csproj" />
+  <Project Path="Playground\Playground.csproj" Type="Classic C#" />
+</Solution>
