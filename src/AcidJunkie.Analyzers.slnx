@@ -16,6 +16,7 @@
     <File Path="..\docs\Rules\AJ0004.md" />
     <File Path="..\docs\Rules\AJ0005.md" />
     <File Path="..\docs\Rules\AJ9999.md" />
+    <File Path="..\docs\Rules\AJ0002.md" />
   </Folder>
   <Project Path="AcidJunkie.Analyzers.Tests\AcidJunkie.Analyzers.Tests.csproj" />
   <Project Path="AcidJunkie.Analyzers\AcidJunkie.Analyzers.csproj" />
