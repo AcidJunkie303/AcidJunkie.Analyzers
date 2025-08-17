@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 
 namespace AcidJunkie.Analyzers.Extensions;
@@ -213,5 +214,28 @@ internal static class TypeSymbolExtensions
             0 when !typeSymbol.IsContainedInNamespace("System.Collections")         => false,
             _                                                                       => typeSymbol.Name.EqualsOrdinal("IEnumerable")
         };
+    }
+
+    public static bool IsEnumerable(this ITypeSymbol typeSymbol, [NotNullWhen(true)] out ITypeSymbol? ofType)
+    {
+        ofType = null;
+
+        if (typeSymbol is not INamedTypeSymbol namedTypeSymbol)
+        {
+            return false;
+        }
+
+        if (namedTypeSymbol.Arity != 1)
+        {
+            return false;
+        }
+
+        if (!typeSymbol.IsContainedInNamespace("System.Collections.Generic") || !typeSymbol.Name.EqualsOrdinal("IEnumerable"))
+        {
+            return false;
+        }
+
+        ofType = namedTypeSymbol.TypeArguments[0];
+        return true;
     }
 }
