@@ -7,8 +7,6 @@ using Xunit.Abstractions;
 
 namespace AcidJunkie.Analyzers.Tests.Diagnosers;
 
-#pragma warning disable S125 // TODO: remove
-
 [SuppressMessage("Code Smell", "S2699:Tests should include assertions", Justification = "This is done internally by AnalyzerTest.RunAsync()")]
 public sealed class ParameterOrderingAnalyzerTests(ITestOutputHelper testOutputHelper) : TestBase<ParameterOrderingAnalyzer>(testOutputHelper)
 {

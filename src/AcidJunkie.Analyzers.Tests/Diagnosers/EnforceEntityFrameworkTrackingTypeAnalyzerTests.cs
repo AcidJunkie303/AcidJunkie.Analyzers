@@ -13,7 +13,7 @@ public sealed class EnforceEntityFrameworkTrackingTypeAnalyzerTests(ITestOutputH
     {
         const string code = """
                             using var dbContext = new TestContext();
-                            {|AJ0002:dbContext.Entities.Where(a => a.Id > 303).ToList()|};
+                            {|AJ0002:dbContext.Entities|}.Where(a => a.Id > 303).ToList();
                             """;
         await RunTestAsync(code);
     }
@@ -23,9 +23,6 @@ public sealed class EnforceEntityFrameworkTrackingTypeAnalyzerTests(ITestOutputH
     {
         const string code = """
                             using var dbContext = new TestContext();
-                            var entities = dbContext.Entities;
-                            var query = dbContext.Entities;
-                            var queryable = dbContext.Entities.AsQueryable();
                             dbContext.Entities.Where(a => a.Id > 303).AsTracking().ToList();
                             """;
         await RunTestAsync(code);
@@ -37,6 +34,66 @@ public sealed class EnforceEntityFrameworkTrackingTypeAnalyzerTests(ITestOutputH
         const string code = """
                             using var dbContext = new TestContext();
                             dbContext.Entities.Where(a => a.Id > 303).AsNoTracking().ToList();
+                            """;
+        await RunTestAsync(code);
+    }
+
+    [Fact]
+    public async Task WithNoTracking_WhenSelectingNonEntity_ThenOk()
+    {
+        const string code = """
+                            using var dbContext = new TestContext();
+                            dbContext.Entities.Where(a => a.Id > 303).Select(a => a.Name).ToList();
+                            """;
+        await RunTestAsync(code);
+    }
+
+    [Fact]
+    public async Task WithNoTracking_WhenSelectingAnonymousTypeWithoutEntity_ThenOk()
+    {
+        const string code = """
+                            using var dbContext = new TestContext();
+                            dbContext.Entities.Where(a => a.Id > 303).Select(a => new {a.Name}).ToList();
+                            """;
+        await RunTestAsync(code);
+    }
+
+    [Fact]
+    public async Task WithNoTracking_WhenSelectingAnonymousTypeWithEntity_ThenDiagnose()
+    {
+        const string code = """
+                            using var dbContext = new TestContext();
+                            {|AJ0002:dbContext.Entities|}.Where(a => a.Id > 303).Select(a => new { Related = a.ProjectionEntity} ).ToList();
+                            """;
+        await RunTestAsync(code);
+    }
+
+    [Fact]
+    public async Task WithNoTracking_WhenSelectingAnonymousTypeWithSubTypeAndEntity_ThenDiagnose()
+    {
+        const string code = """
+                            using var dbContext = new TestContext();
+                            {|AJ0002:dbContext.Entities|}.Where(a => a.Id > 303).Select(a => new { Sub = new { Related = a.ProjectionEntity} } ).ToList();
+                            """;
+        await RunTestAsync(code);
+    }
+
+    [Fact]
+    public async Task WithNoTracking_WhenSelectingAnonymousTypeWithEntityEnumerable_ThenDiagnose()
+    {
+        const string code = """
+                            using var dbContext = new TestContext();
+                            {|AJ0002:dbContext.Entities|}.Where(a => a.Id > 303).Select(a => new { Prop1 = (IEnumerable<ProjectionEntity>) a.ProjectionEntities } ).ToList();
+                            """;
+        await RunTestAsync(code);
+    }
+
+    [Fact]
+    public async Task WithNoTracking_WhenSelectingAnonymousTypeWithEntityCollection_ThenDiagnose()
+    {
+        const string code = """
+                            using var dbContext = new TestContext();
+                            {|AJ0002:dbContext.Entities|}.Where(a => a.Id > 303).Select(a => new { Prop1 = a.ProjectionEntities } ).ToList();
                             """;
         await RunTestAsync(code);
     }
