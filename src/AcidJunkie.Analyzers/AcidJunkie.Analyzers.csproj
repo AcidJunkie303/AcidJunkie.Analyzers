@@ -1,32 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-    <!--
-    <PropertyGroup>
-        <Copyright>2025 AcidJunkie</Copyright>
-        <Description>AcidJunkie Analyzers</Description>
-        <DevelopmentDependency>true</DevelopmentDependency>
-        <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
-        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-        <IsPackable>true</IsPackable>
-        <IncludeBuildOutput>false</IncludeBuildOutput>
-        <NoPackageAnalysis>true</NoPackageAnalysis>
-        <NoWarn>$(NoWarn);RS2007;RS1026;RS1038</NoWarn>
-        <PackageId>AcidJunkie.Analyzers</PackageId>
-        <PackageReleaseNotes>Summary of changes made in this release of the package.</PackageReleaseNotes>
-        <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-        <PackageTags>AcidJunkie.Analyzers, analyzers</PackageTags>
-        <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
-        <TargetFramework>netstandard2.0</TargetFramework>
-        <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_AddAnalyzersToOutput</TargetsForTfmSpecificContentInPackage>
-        <PackageIcon>icon.png</PackageIcon>
-        <OutputItemType>Analyzer</OutputItemType>
-        <PackageProjectUrl>https://github.com/AcidJunkie303/AcidJunkie.Analyzers</PackageProjectUrl>
-        <RepositoryUrl>https://github.com/AcidJunkie303/AcidJunkie.Analyzers</RepositoryUrl>
-        <PackageReadmeFile>README.md</PackageReadmeFile>
-        <BaseOutputPath>bin\$(RoslynVersion)\</BaseOutputPath>
-    </PropertyGroup>
-    -->
-
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
         <IncludeBuildOutput>false</IncludeBuildOutput>
@@ -46,33 +19,6 @@
         <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.Common" PrivateAssets="all"/>
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp" PrivateAssets="all"/>
         <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers; buildtransitive"/>
-
-        <!--
-        <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" PrivateAssets="all" />
-        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" PrivateAssets="all" />
-        -->
     </ItemGroup>
-
-    <!--
-    <ItemGroup>
-        <None Include="$(SolutionDir)..\docs\README.md" Pack="true">
-            <Pack>True</Pack>
-            <PackagePath/>
-        </None>
-        <None Include="$(SolutionDir)LICENSE.txt" Pack="true">
-            <Pack>True</Pack>
-            <PackagePath/>
-        </None>
-        <None Include="$(SolutionDir)icon.png">
-            <Pack>True</Pack>
-            <PackagePath/>
-        </None>
-    </ItemGroup>
-
-    <Target Name="_AddAnalyzersToOutput">
-        <ItemGroup>
-            <TfmSpecificPackageFile Include="$(OutputPath)\$(ProjectName).dll" PackagePath="analyzers/dotnet/cs"/>
-        </ItemGroup>
-    </Target>
-    -->
+    
 </Project>

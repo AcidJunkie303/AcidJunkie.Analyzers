@@ -23,12 +23,13 @@ internal sealed class EnforceEntityFrameworkTrackingTypeAnalyzerImplementation :
     public void AnalyzeMemberAccessExpression()
     {
         var memberAccessExpression = (MemberAccessExpressionSyntax)Context.Node;
-        if (!IsDbSetType(memberAccessExpression, out var dbContextType, out var entityType))
+        if (!IsDbSetType(memberAccessExpression, out var dbContextType, out _))
         {
             return;
         }
 
-        Lazy<IReadOnlyDictionary<string, IReadOnlyList<INamedTypeSymbol>>> entitiesOfDbContextByNamespaceNameLazy = new(() => GetEntitiesOfDbContextByNamespaceName(dbContextType));
+        Lazy<IReadOnlyDictionary<string, IReadOnlyList<INamedTypeSymbol>>> entitiesOfDbContextByNamespaceNameLazy =
+            new(() => GetEntitiesOfDbContextByNamespaceName(dbContextType));
 
         var currentExpression = memberAccessExpression.Parent;
         while (currentExpression is not null)
