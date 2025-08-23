@@ -131,7 +131,8 @@ jobs:
       - name: Pack NuGet package
         working-directory: src/AcidJunkie.Analyzers.Pack
         run: |
-          dotnet pack AcidJunkie.Analyzers.Pack.csproj --configuration Release /p:Version=$NUGET_VERSION
+          dotnet restore AcidJunkie.Analyzers.Pack.csproj
+          dotnet pack AcidJunkie.Analyzers.Pack.csproj --configuration Release --no-build /p:Version=$NUGET_VERSION
           ls -lR
 
       - name: Publish to NuGet
