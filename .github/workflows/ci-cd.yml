@@ -128,12 +128,8 @@ jobs:
           dotnet build src/AcidJunkie.Analyzers/AcidJunkie.Analyzers.csproj --configuration Release /p:RoslynVersion=roslyn4.14 /p:Version=$ASSEMBLY_VERSION
           dotnet build src/AcidJunkie.Analyzers.CodeFixers/AcidJunkie.Analyzers.CodeFixers.csproj --configuration Release /p:RoslynVersion=roslyn4.14 /p:Version=$ASSEMBLY_VERSION
 
-      - name: Compile Analyzers.Pack
-        run: |
-          dotnet pack src/AcidJunkie.Analyzers.Pack/AcidJunkie.Analyzers.Pack.csproj --configuration Release /p:Version=$ASSEMBLY_VERSION
-
       - name: Pack NuGet package
-        run: dotnet pack src/AcidJunkie.Analyzers.Pack/AcidJunkie.Analyzers.Pack.csproj --configuration Release /p:Version=$ASSEMBLY_VERSION
+        run: dotnet pack src/AcidJunkie.Analyzers.Pack/AcidJunkie.Analyzers.Pack.csproj --configuration Release /p:Version=$NUGET_VERSION
 
       - name: Publish to NuGet
         if: ${{ startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/heads/release-') }}

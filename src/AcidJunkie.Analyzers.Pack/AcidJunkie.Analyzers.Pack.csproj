@@ -8,7 +8,7 @@
         <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
         <GenerateDependencyFile>false</GenerateDependencyFile>
         <IncludeBuildOutput>false</IncludeBuildOutput>
-        <IsPackable>true</IsPackable>
+        <IsPackable>false</IsPackable>
         <NoPackageAnalysis>true</NoPackageAnalysis>
         <PackageIcon>icon.png</PackageIcon>
         <PackageId>AcidJunkie.Analyzers</PackageId>
@@ -17,10 +17,11 @@
         <PackageReleaseNotes>Initial version.</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
         <PackageTags>AcidJunkie.Analyzers, analyzers</PackageTags>
+        <PackageVersion>0.0.1</PackageVersion>
         <RepositoryUrl>https://github.com/AcidJunkie303/AcidJunkie.Analyzerss</RepositoryUrl>
         <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
         <TargetFramework>netstandard2.0</TargetFramework>
-        <Version>2.0.1</Version>
+        <Version>0.0.1</Version>
         <developmentDependency>true</developmentDependency>
     </PropertyGroup>
 

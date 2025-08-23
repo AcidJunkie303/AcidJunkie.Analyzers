@@ -1,18 +1,19 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netstandard2.0</TargetFramework>
-        <IncludeBuildOutput>false</IncludeBuildOutput>
-        <Version>1.0.1</Version>
-        <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
-        <PackageId>Dummy</PackageId>
-        <GenerateDependencyFile>false</GenerateDependencyFile>
-        <developmentDependency>true</developmentDependency>
-        <Description>AcidJunkie Analyzers</Description>
-        <PackageTags>AcidJunkie.Analyzers, analyzers</PackageTags>
-        <NoPackageAnalysis>true</NoPackageAnalysis>
         <BaseOutputPath>bin\$(RoslynVersion)\</BaseOutputPath>
-        <NoWarn>$(NoWarn);RS1026;RS2007;UseCollectionExpression;ReSharper;ReSharper:UseCollectionExpression</NoWarn>
+        <Description>AcidJunkie Analyzers</Description>
+        <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+        <GenerateDependencyFile>false</GenerateDependencyFile>
+        <IncludeBuildOutput>false</IncludeBuildOutput>
+        <IsPackable>false</IsPackable>
+        <NoPackageAnalysis>true</NoPackageAnalysis>
+        <NoWarn>$(NoWarn);RS1026;RS2007</NoWarn>
+        <PackageId>Dummy</PackageId>
+        <PackageTags>AcidJunkie.Analyzers, analyzers</PackageTags>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <Version>1.0.1</Version>
+        <developmentDependency>true</developmentDependency>
     </PropertyGroup>
 
     <ItemGroup>
@@ -20,5 +21,5 @@
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp" PrivateAssets="all"/>
         <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers; buildtransitive"/>
     </ItemGroup>
-    
+
 </Project>
