@@ -9,9 +9,8 @@ namespace AcidJunkie.Analyzers.Diagnosers.ParameterOrdering;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class ParameterOrderingAnalyzer : DiagnosticAnalyzer
 {
-    private static readonly ImmutableArray<DiagnosticDescriptor> Rules = [..CommonRules.AllCommonRules, ..ParameterOrderingAnalyzerImplementation.DiagnosticRules.AllRules];
-
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => Rules;
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics
+        => ParameterOrderingAnalyzerImplementation.DiagnosticRules.Rules;
 
     public override void Initialize(AnalysisContext context)
     {

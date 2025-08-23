@@ -10,13 +10,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\AcidJunkie.Analyzers\AcidJunkie.Analyzers.csproj"
-                          ReferenceOutputAssembly="false"
-                          OutputItemType="Analyzer"
-                          SetTargetFramework="TargetFramework=netstandard2.0"/>
-    </ItemGroup>
 
-    <ItemGroup>
+        <PackageReference Include="AcidJunkie.Analyzers" Version="2.0.1">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.8"/>
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.8"/>
     </ItemGroup>

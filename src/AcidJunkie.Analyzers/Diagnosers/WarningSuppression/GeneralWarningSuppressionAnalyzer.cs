@@ -9,9 +9,8 @@ namespace AcidJunkie.Analyzers.Diagnosers.WarningSuppression;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class GeneralWarningSuppressionAnalyzer : DiagnosticAnalyzer
 {
-    private static readonly ImmutableArray<DiagnosticDescriptor> Rules = [CommonRules.UnhandledError.Rule, ..GeneralWarningSuppressionAnalyzerImplementation.DiagnosticRules.AllRules];
-
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => Rules;
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics
+        => GeneralWarningSuppressionAnalyzerImplementation.DiagnosticRules.Rules;
 
     public override void Initialize(AnalysisContext context)
     {

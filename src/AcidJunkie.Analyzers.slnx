@@ -6,6 +6,7 @@
     <File Path="Directory.Build.props" />
     <File Path="BannedSymbols.txt" />
     <File Path="..\.github\workflows\ci-cd.yml" />
+    <File Path="Directory.Build.targets" />
   </Folder>
   <Folder Name="/Solution Items/docs/">
     <File Path="..\docs\README.md" />
@@ -18,7 +19,10 @@
     <File Path="..\docs\Rules\AJ9999.md" />
     <File Path="..\docs\Rules\AJ0002.md" />
   </Folder>
+  <Project Path="AcidJunkie.Analyzers.CodeFixers\AcidJunkie.Analyzers.CodeFixers.csproj" Type="Classic C#" />
+  <Project Path="AcidJunkie.Analyzers.Pack\AcidJunkie.Analyzers.Pack.csproj" Type="Classic C#" />
   <Project Path="AcidJunkie.Analyzers.Tests\AcidJunkie.Analyzers.Tests.csproj" />
   <Project Path="AcidJunkie.Analyzers\AcidJunkie.Analyzers.csproj" />
+  <Project Path="Playground2\Playground2.csproj" Type="Classic C#" />
   <Project Path="Playground\Playground.csproj" Type="Classic C#" />
 </Solution>

@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using AcidJunkie.Analyzers.Configuration.Aj0007;
 using AcidJunkie.Analyzers.Extensions;
 using AcidJunkie.Analyzers.Logging;
@@ -9,6 +10,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace AcidJunkie.Analyzers.Diagnosers.ParameterOrdering;
 
+[SuppressMessage("ReSharper", "UseCollectionExpression", Justification = "Not supported in lower versions of Roslyn")]
 internal sealed class ParameterOrderingAnalyzerImplementation : SyntaxNodeAnalyzerImplementationBase<ParameterOrderingAnalyzerImplementation>
 {
     private readonly Aj0007Configuration _configuration;
@@ -115,7 +117,10 @@ internal sealed class ParameterOrderingAnalyzerImplementation : SyntaxNodeAnalyz
 
     internal static class DiagnosticRules
     {
-        internal static ImmutableArray<DiagnosticDescriptor> AllRules { get; } = [Default.Rule];
+        internal static ImmutableArray<DiagnosticDescriptor> Rules { get; }
+            = CommonRules.AllCommonRules
+                         .Append(Default.Rule)
+                         .ToImmutableArray();
 
         internal static class Default
         {

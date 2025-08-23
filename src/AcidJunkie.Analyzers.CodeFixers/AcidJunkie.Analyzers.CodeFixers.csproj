@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
@@ -12,13 +12,7 @@
         <PackageTags>AcidJunkie.Analyzers, analyzers</PackageTags>
         <NoPackageAnalysis>true</NoPackageAnalysis>
         <BaseOutputPath>bin\$(RoslynVersion)\</BaseOutputPath>
-        <NoWarn>$(NoWarn);RS1026;RS2007;UseCollectionExpression;ReSharper;ReSharper:UseCollectionExpression</NoWarn>
+        <NoWarn>$(NoWarn);RS1026;RS2007</NoWarn>
     </PropertyGroup>
-
-    <ItemGroup>
-        <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.Common" PrivateAssets="all"/>
-        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" PrivateAssets="all"/>
-        <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers; buildtransitive"/>
-    </ItemGroup>
     
 </Project>

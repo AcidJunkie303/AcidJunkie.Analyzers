@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using AcidJunkie.Analyzers.Extensions;
 using AcidJunkie.Analyzers.Logging;
 using Microsoft.CodeAnalysis;
@@ -8,6 +9,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace AcidJunkie.Analyzers.Diagnosers.ReturnMaterializedCollectionAsEnumerable;
 
+[SuppressMessage("ReSharper", "UseCollectionExpression", Justification = "Not supported in lower versions of Roslyn")]
 internal sealed class ReturnMaterializedCollectionAsEnumerableAnalyzerImplementation : SyntaxNodeAnalyzerImplementationBase<ReturnMaterializedCollectionAsEnumerableAnalyzerImplementation>
 {
     public ReturnMaterializedCollectionAsEnumerableAnalyzerImplementation(SyntaxNodeAnalysisContext context) : base(context)
@@ -85,7 +87,7 @@ internal sealed class ReturnMaterializedCollectionAsEnumerableAnalyzerImplementa
         }
 
         return ns.EqualsOrdinal("System.Collections")
-               ||( namedTypeSymbol.Arity == 1 && ns.EqualsOrdinal("System.Collections.Generic"));
+               || (namedTypeSymbol.Arity == 1 && ns.EqualsOrdinal("System.Collections.Generic"));
     }
 
     private static MethodDeclarationSyntaxOrLocalFunctionDeclaration? GetContainingMethodOrLocalFunction(ReturnStatementSyntax node)
@@ -202,7 +204,10 @@ internal sealed class ReturnMaterializedCollectionAsEnumerableAnalyzerImplementa
 
     internal static class DiagnosticRules
     {
-        internal static ImmutableArray<DiagnosticDescriptor> AllRules { get; } = [Default.Rule];
+        internal static ImmutableArray<DiagnosticDescriptor> Rules { get; }
+            = CommonRules.AllCommonRules
+                         .Append(Default.Rule)
+                         .ToImmutableArray();
 
         internal static class Default
         {

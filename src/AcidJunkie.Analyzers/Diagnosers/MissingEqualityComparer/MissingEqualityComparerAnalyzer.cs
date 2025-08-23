@@ -9,9 +9,8 @@ namespace AcidJunkie.Analyzers.Diagnosers.MissingEqualityComparer;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class MissingEqualityComparerAnalyzer : DiagnosticAnalyzer
 {
-    private static readonly ImmutableArray<DiagnosticDescriptor> Rules = [..CommonRules.AllCommonRules, ..MissingEqualityComparerAnalyzerImplementation.DiagnosticRules.AllRules];
-
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => Rules;
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics
+        => MissingEqualityComparerAnalyzerImplementation.DiagnosticRules.Rules;
 
     public override void Initialize(AnalysisContext context)
     {
@@ -21,6 +20,9 @@ public sealed class MissingEqualityComparerAnalyzer : DiagnosticAnalyzer
         context.RegisterSyntaxNodeActionAndAnalyze<MissingEqualityComparerAnalyzerImplementation>(a => a.AnalyzeInvocation, SyntaxKind.InvocationExpression);
         context.RegisterSyntaxNodeActionAndAnalyze<MissingEqualityComparerAnalyzerImplementation>(a => a.AnalyzeObjectCreation, SyntaxKind.ObjectCreationExpression);
         context.RegisterSyntaxNodeActionAndAnalyze<MissingEqualityComparerAnalyzerImplementation>(a => a.AnalyzeImplicitObjectCreation, SyntaxKind.ImplicitObjectCreationExpression);
+
+#if CSHARP12_OR_GREATER
         context.RegisterSyntaxNodeActionAndAnalyze<MissingEqualityComparerAnalyzerImplementation>(a => a.AnalyzeCollectionExpression, SyntaxKind.CollectionExpression);
+#endif
     }
 }

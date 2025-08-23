@@ -9,9 +9,8 @@ namespace AcidJunkie.Analyzers.Diagnosers.ReturnMaterializedCollectionAsEnumerab
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class ReturnMaterializedCollectionAsEnumerableAnalyzer : DiagnosticAnalyzer
 {
-    private static readonly ImmutableArray<DiagnosticDescriptor> Rules = [..CommonRules.AllCommonRules, ..ReturnMaterializedCollectionAsEnumerableAnalyzerImplementation.DiagnosticRules.AllRules];
-
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => Rules;
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics
+        => ReturnMaterializedCollectionAsEnumerableAnalyzerImplementation.DiagnosticRules.Rules;
 
     public override void Initialize(AnalysisContext context)
     {

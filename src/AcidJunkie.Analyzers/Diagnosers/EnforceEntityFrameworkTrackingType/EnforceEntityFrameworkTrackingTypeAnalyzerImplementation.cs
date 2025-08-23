@@ -1,4 +1,3 @@
-using System.Collections.Frozen;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using AcidJunkie.Analyzers.Extensions;
@@ -8,13 +7,14 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace AcidJunkie.Analyzers.Diagnosers.EnforceEntityFrameworkTrackingType;
 
+[SuppressMessage("ReSharper", "UseCollectionExpression", Justification = "Not supported in lower versions of Roslyn")]
 internal sealed class EnforceEntityFrameworkTrackingTypeAnalyzerImplementation : SyntaxNodeAnalyzerImplementationBase<EnforceEntityFrameworkTrackingTypeAnalyzer>
 {
-    private static readonly FrozenSet<string> TrackingMethodNames = new[]
+    private static readonly ImmutableHashSet<string> TrackingMethodNames = new[]
     {
         "AsTracking",
         "AsNoTracking"
-    }.ToFrozenSet(StringComparer.OrdinalIgnoreCase);
+    }.ToImmutableHashSet(StringComparer.OrdinalIgnoreCase);
 
     public EnforceEntityFrameworkTrackingTypeAnalyzerImplementation(SyntaxNodeAnalysisContext context) : base(context)
     {
@@ -23,12 +23,13 @@ internal sealed class EnforceEntityFrameworkTrackingTypeAnalyzerImplementation :
     public void AnalyzeMemberAccessExpression()
     {
         var memberAccessExpression = (MemberAccessExpressionSyntax)Context.Node;
-        if (!IsDbSetType(memberAccessExpression, out var dbContextType, out var entityType))
+        if (!IsDbSetType(memberAccessExpression, out var dbContextType, out _))
         {
             return;
         }
 
-        Lazy<IReadOnlyDictionary<string, IReadOnlyList<INamedTypeSymbol>>> entitiesOfDbContextByNamespaceNameLazy = new(() => GetEntitiesOfDbContextByNamespaceName(dbContextType));
+        Lazy<IReadOnlyDictionary<string, IReadOnlyList<INamedTypeSymbol>>> entitiesOfDbContextByNamespaceNameLazy =
+            new(() => GetEntitiesOfDbContextByNamespaceName(dbContextType));
 
         var currentExpression = memberAccessExpression.Parent;
         while (currentExpression is not null)
@@ -71,7 +72,10 @@ internal sealed class EnforceEntityFrameworkTrackingTypeAnalyzerImplementation :
 
     private static bool IsEntityTypeOrContainsEntityProperties(ITypeSymbol type, IReadOnlyDictionary<string, IReadOnlyList<INamedTypeSymbol>> entityTypesByNamespaceName)
     {
+#pragma warning disable RS1024 // We want to do it by reference in this case
         var visitedTypes = new HashSet<ITypeSymbol>(EqualityComparer<ITypeSymbol>.Default);
+#pragma warning restore RS1024
+
         return IsEntityTypeOrContainsEntityProperties(type, entityTypesByNamespaceName, visitedTypes);
     }
 
@@ -199,7 +203,10 @@ internal sealed class EnforceEntityFrameworkTrackingTypeAnalyzerImplementation :
 
     internal static class DiagnosticRules
     {
-        internal static ImmutableArray<DiagnosticDescriptor> AllRules { get; } = [Default.Rule];
+        internal static ImmutableArray<DiagnosticDescriptor> Rules { get; }
+            = CommonRules.AllCommonRules
+                         .Append(Default.Rule)
+                         .ToImmutableArray();
 
         internal static class Default
         {

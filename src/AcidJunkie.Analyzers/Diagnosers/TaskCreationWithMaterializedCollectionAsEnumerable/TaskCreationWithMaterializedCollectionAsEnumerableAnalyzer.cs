@@ -9,8 +9,8 @@ namespace AcidJunkie.Analyzers.Diagnosers.TaskCreationWithMaterializedCollection
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class TaskCreationWithMaterializedCollectionAsEnumerableAnalyzer : DiagnosticAnalyzer
 {
-    private static readonly ImmutableArray<DiagnosticDescriptor> Rules = [CommonRules.UnhandledError.Rule, ..TaskCreationWithMaterializedCollectionAsEnumerableAnalyzerImplementation.DiagnosticRules.AllRules];
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => Rules;
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics
+        => TaskCreationWithMaterializedCollectionAsEnumerableAnalyzerImplementation.DiagnosticRules.Rules;
 
     public override void Initialize(AnalysisContext context)
     {

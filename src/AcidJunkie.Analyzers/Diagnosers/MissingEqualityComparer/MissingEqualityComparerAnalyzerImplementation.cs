@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using AcidJunkie.Analyzers.Extensions;
 using AcidJunkie.Analyzers.Logging;
 using Microsoft.CodeAnalysis;
@@ -8,6 +9,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace AcidJunkie.Analyzers.Diagnosers.MissingEqualityComparer;
 
+[SuppressMessage("ReSharper", "UseCollectionExpression", Justification = "Not supported in lower versions of Roslyn")]
 internal sealed class MissingEqualityComparerAnalyzerImplementation : SyntaxNodeAnalyzerImplementationBase<MissingEqualityComparerAnalyzerImplementation>
 {
     public MissingEqualityComparerAnalyzerImplementation(SyntaxNodeAnalysisContext context) : base(context)
@@ -27,6 +29,7 @@ internal sealed class MissingEqualityComparerAnalyzerImplementation : SyntaxNode
         AnalyzeObjectCreationCore(implicitObjectCreation.ArgumentList, implicitObjectCreation.NewKeyword.GetLocation(), namedTypeSymbol);
     }
 
+#if CSHARP12_OR_GREATER
     public void AnalyzeCollectionExpression()
     {
         var collectionExpression = (CollectionExpressionSyntax)Context.Node;
@@ -51,7 +54,7 @@ internal sealed class MissingEqualityComparerAnalyzerImplementation : SyntaxNode
 
         AnalyzeObjectCreationCore(null, collectionExpression.GetLocation(), typeSymbol);
     }
-
+#endif
     public void AnalyzeObjectCreation()
     {
         var objectCreation = (ObjectCreationExpressionSyntax)Context.Node;
@@ -120,19 +123,6 @@ internal sealed class MissingEqualityComparerAnalyzerImplementation : SyntaxNode
                 : null;
     }
 
-    private static T? GetTypeSymbol<T>(ISymbol? symbol)
-        where T : class, ISymbol
-        => symbol switch
-        {
-            ITypeSymbol typeSymbol         => typeSymbol as T,
-            IMethodSymbol methodSymbol     => methodSymbol.ReturnType as T,
-            IPropertySymbol propertySymbol => propertySymbol.Type as T,
-            IFieldSymbol fieldSymbol       => fieldSymbol.Type as T,
-            IEventSymbol eventSymbol       => eventSymbol.Type as T,
-            ILocalSymbol localSymbol       => localSymbol.Type as T,
-            _                              => null
-        };
-
     private bool IsCompliantReferenceType(ITypeSymbol keyType)
     {
         if (!keyType.IsGetHashCodeOverridden())
@@ -172,49 +162,6 @@ internal sealed class MissingEqualityComparerAnalyzerImplementation : SyntaxNode
         }
 
         return false;
-    }
-
-    private INamedTypeSymbol? GetAssignmentTargetType(CollectionExpressionSyntax collectionExpression)
-    {
-        if (collectionExpression.Parent is EqualsValueClauseSyntax equalsValueClause)
-        {
-            return GetAssignmentTargetTypeSymbolForEqualsNode(equalsValueClause);
-        }
-
-        if (collectionExpression.Parent is AssignmentExpressionSyntax assignmentExpression)
-        {
-            return GetAssignmentTargetTypeSymbolForAssignmentNode(assignmentExpression);
-        }
-
-        return null;
-    }
-
-    private INamedTypeSymbol? GetAssignmentTargetTypeSymbolForAssignmentNode(AssignmentExpressionSyntax assignmentExpression)
-    {
-        var symbolInfo = Context.SemanticModel.GetSymbolInfo(assignmentExpression.Left).Symbol;
-        if (symbolInfo is null)
-        {
-            return null;
-        }
-
-        return GetTypeSymbol<INamedTypeSymbol>(symbolInfo);
-    }
-
-    private INamedTypeSymbol? GetAssignmentTargetTypeSymbolForEqualsNode(EqualsValueClauseSyntax equalsValueClause)
-    {
-        var target = equalsValueClause.Parent;
-        if (target is null)
-        {
-            return null;
-        }
-
-        var symbol = Context.SemanticModel.GetDeclaredSymbol(target);
-        if (symbol is null)
-        {
-            return null;
-        }
-
-        return GetTypeSymbol<INamedTypeSymbol>(symbol);
     }
 
     private void AnalyzeObjectCreationCore(ArgumentListSyntax? argumentList, Location locationToReport, INamedTypeSymbol objectTypeBeingCreated)
@@ -271,7 +218,10 @@ internal sealed class MissingEqualityComparerAnalyzerImplementation : SyntaxNode
 
     internal static class DiagnosticRules
     {
-        internal static ImmutableArray<DiagnosticDescriptor> AllRules { get; } = [Default.Rule];
+        internal static ImmutableArray<DiagnosticDescriptor> Rules { get; }
+            = CommonRules.AllCommonRules
+                         .Append(Default.Rule)
+                         .ToImmutableArray();
 
         internal static class Default
         {
@@ -287,4 +237,63 @@ internal sealed class MissingEqualityComparerAnalyzerImplementation : SyntaxNode
             public static readonly DiagnosticDescriptor Rule = new(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, true, Description, HelpLinkUri);
         }
     }
+
+#if CSHARP12_OR_GREATER
+    private INamedTypeSymbol? GetAssignmentTargetType(CollectionExpressionSyntax collectionExpression)
+    {
+        if (collectionExpression.Parent is EqualsValueClauseSyntax equalsValueClause)
+        {
+            return GetAssignmentTargetTypeSymbolForEqualsNode(equalsValueClause);
+        }
+
+        if (collectionExpression.Parent is AssignmentExpressionSyntax assignmentExpression)
+        {
+            return GetAssignmentTargetTypeSymbolForAssignmentNode(assignmentExpression);
+        }
+
+        return null;
+    }
+
+    private INamedTypeSymbol? GetAssignmentTargetTypeSymbolForEqualsNode(EqualsValueClauseSyntax equalsValueClause)
+    {
+        var target = equalsValueClause.Parent;
+        if (target is null)
+        {
+            return null;
+        }
+
+        var symbol = Context.SemanticModel.GetDeclaredSymbol(target);
+        if (symbol is null)
+        {
+            return null;
+        }
+
+        return GetTypeSymbol<INamedTypeSymbol>(symbol);
+    }
+
+    private INamedTypeSymbol? GetAssignmentTargetTypeSymbolForAssignmentNode(AssignmentExpressionSyntax assignmentExpression)
+    {
+        var symbolInfo = Context.SemanticModel.GetSymbolInfo(assignmentExpression.Left).Symbol;
+        if (symbolInfo is null)
+        {
+            return null;
+        }
+
+        return GetTypeSymbol<INamedTypeSymbol>(symbolInfo);
+    }
+
+    private static T? GetTypeSymbol<T>(ISymbol? symbol)
+        where T : class, ISymbol
+        => symbol switch
+        {
+            ITypeSymbol typeSymbol         => typeSymbol as T,
+            IMethodSymbol methodSymbol     => methodSymbol.ReturnType as T,
+            IPropertySymbol propertySymbol => propertySymbol.Type as T,
+            IFieldSymbol fieldSymbol       => fieldSymbol.Type as T,
+            IEventSymbol eventSymbol       => eventSymbol.Type as T,
+            ILocalSymbol localSymbol       => localSymbol.Type as T,
+            _                              => null
+        };
+
+#endif
 }

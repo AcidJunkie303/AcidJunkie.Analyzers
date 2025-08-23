@@ -9,9 +9,8 @@ namespace AcidJunkie.Analyzers.Diagnosers.EnforceEntityFrameworkTrackingType;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class EnforceEntityFrameworkTrackingTypeAnalyzer : DiagnosticAnalyzer
 {
-    private static readonly ImmutableArray<DiagnosticDescriptor> Rules = [..CommonRules.AllCommonRules, ..EnforceEntityFrameworkTrackingTypeAnalyzerImplementation.DiagnosticRules.AllRules];
-
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => Rules;
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics
+        => EnforceEntityFrameworkTrackingTypeAnalyzerImplementation.DiagnosticRules.Rules;
 
     public override void Initialize(AnalysisContext context)
     {
