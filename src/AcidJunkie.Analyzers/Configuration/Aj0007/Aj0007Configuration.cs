@@ -5,7 +5,7 @@ namespace AcidJunkie.Analyzers.Configuration.Aj0007;
 internal sealed class Aj0007Configuration : IAnalyzerConfiguration
 {
     public static Aj0007Configuration Default { get; } = new(true, Defaults.ParameterOrderFlat, Defaults.ParameterDescriptions);
-    public static Aj0007Configuration Disabled { get; } = new(false, Defaults.ParameterOrderFlat, []);
+    public static Aj0007Configuration Disabled { get; } = new(false, Defaults.ParameterOrderFlat, ImmutableArray<ParameterDescription>.Empty);
 
     public bool IsEnabled { get; }
     public ConfigurationError? ConfigurationError { get; }
@@ -24,7 +24,7 @@ internal sealed class Aj0007Configuration : IAnalyzerConfiguration
         ConfigurationError = configurationError;
         ParameterOrderFlat = string.Empty;
         IsEnabled = false;
-        ParameterDescriptions = [];
+        ParameterDescriptions = ImmutableArray<ParameterDescription>.Empty;
     }
 
     public static class KeyNames

@@ -109,7 +109,10 @@ internal sealed class TaskCreationWithMaterializedCollectionAsEnumerableAnalyzer
 
     internal static class DiagnosticRules
     {
-        internal static ImmutableArray<DiagnosticDescriptor> AllRules { get; } = [Default.Rule];
+        internal static ImmutableArray<DiagnosticDescriptor> Rules { get; }
+            = CommonRules.AllCommonRules
+                         .Append(Default.Rule)
+                         .ToImmutableArray();
 
         internal static class Default
         {

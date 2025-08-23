@@ -1,4 +1,3 @@
-using System.Collections.Frozen;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using AcidJunkie.Analyzers.Extensions;
@@ -10,11 +9,11 @@ namespace AcidJunkie.Analyzers.Diagnosers.EnforceEntityFrameworkTrackingType;
 
 internal sealed class EnforceEntityFrameworkTrackingTypeAnalyzerImplementation : SyntaxNodeAnalyzerImplementationBase<EnforceEntityFrameworkTrackingTypeAnalyzer>
 {
-    private static readonly FrozenSet<string> TrackingMethodNames = new[]
+    private static readonly ImmutableHashSet<string> TrackingMethodNames = new[]
     {
         "AsTracking",
         "AsNoTracking"
-    }.ToFrozenSet(StringComparer.OrdinalIgnoreCase);
+    }.ToImmutableHashSet(StringComparer.OrdinalIgnoreCase);
 
     public EnforceEntityFrameworkTrackingTypeAnalyzerImplementation(SyntaxNodeAnalysisContext context) : base(context)
     {
@@ -71,7 +70,10 @@ internal sealed class EnforceEntityFrameworkTrackingTypeAnalyzerImplementation :
 
     private static bool IsEntityTypeOrContainsEntityProperties(ITypeSymbol type, IReadOnlyDictionary<string, IReadOnlyList<INamedTypeSymbol>> entityTypesByNamespaceName)
     {
+#pragma warning disable RS1024 // We want to do it by reference in this case
         var visitedTypes = new HashSet<ITypeSymbol>(EqualityComparer<ITypeSymbol>.Default);
+#pragma warning restore RS1024
+
         return IsEntityTypeOrContainsEntityProperties(type, entityTypesByNamespaceName, visitedTypes);
     }
 
@@ -199,7 +201,10 @@ internal sealed class EnforceEntityFrameworkTrackingTypeAnalyzerImplementation :
 
     internal static class DiagnosticRules
     {
-        internal static ImmutableArray<DiagnosticDescriptor> AllRules { get; } = [Default.Rule];
+        internal static ImmutableArray<DiagnosticDescriptor> Rules { get; }
+            = CommonRules.AllCommonRules
+                         .Append(Default.Rule)
+                         .ToImmutableArray();
 
         internal static class Default
         {

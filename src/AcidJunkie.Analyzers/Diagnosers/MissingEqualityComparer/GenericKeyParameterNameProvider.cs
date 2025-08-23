@@ -1,10 +1,10 @@
-using System.Collections.Frozen;
+using System.Collections.Immutable;
 
 namespace AcidJunkie.Analyzers.Diagnosers.MissingEqualityComparer;
 
 internal static class GenericKeyParameterNameProvider
 {
-    private static readonly FrozenDictionary<string, FrozenDictionary<string, FrozenDictionary<string, string>>> GenericKeyByMethodNameByContainingTypeByContainingTypeNameSpace =
+    private static readonly ImmutableDictionary<string, ImmutableDictionary<string, ImmutableDictionary<string, string>>> GenericKeyByMethodNameByContainingTypeByContainingTypeNameSpace =
         new[]
         {
             (
@@ -33,9 +33,9 @@ internal static class GenericKeyParameterNameProvider
                             ("ToLookup", "TKey"),
                             ("Union", "TSource"),
                             ("UnionBy", "TKey")
-                        }.ToFrozenDictionary(a => a.Item1, a => a.Item2, StringComparer.Ordinal)
+                        }.ToImmutableDictionary(a => a.Item1, a => a.Item2, StringComparer.Ordinal)
                     )
-                }.ToFrozenDictionary(a => a.Item1, a => a.Item2, StringComparer.Ordinal)
+                }.ToImmutableDictionary(a => a.Item1, a => a.Item2, StringComparer.Ordinal)
             ),
             (
                 "System.Collections.Immutable",
@@ -49,7 +49,7 @@ internal static class GenericKeyParameterNameProvider
                             ("CreateRange", "TKey"),
                             ("CreateBuilder", "TKey"),
                             ("ToImmutableDictionary", "TKey")
-                        }.ToFrozenDictionary(a => a.Item1, a => a.Item2, StringComparer.Ordinal)
+                        }.ToImmutableDictionary(a => a.Item1, a => a.Item2, StringComparer.Ordinal)
                     ),
                     (
                         "ImmutableHashSet",
@@ -59,33 +59,33 @@ internal static class GenericKeyParameterNameProvider
                             ("CreateRange", "T"),
                             ("CreateBuilder", "T"),
                             ("ToImmutableHashSet", "TSource")
-                        }.ToFrozenDictionary(a => a.Item1, a => a.Item2, StringComparer.Ordinal)
+                        }.ToImmutableDictionary(a => a.Item1, a => a.Item2, StringComparer.Ordinal)
                     )
-                }.ToFrozenDictionary(a => a.Item1, a => a.Item2, StringComparer.Ordinal)
+                }.ToImmutableDictionary(a => a.Item1, a => a.Item2, StringComparer.Ordinal)
             ),
             (
                 "System.Collections.Frozen",
                 new[]
                 {
                     (
-                        "FrozenDictionary",
+                        "ImmutableDictionary",
                         new[]
                         {
-                            ("ToFrozenDictionary", "TKey")
-                        }.ToFrozenDictionary(a => a.Item1, a => a.Item2, StringComparer.Ordinal)
+                            ("ToImmutableDictionary", "TKey")
+                        }.ToImmutableDictionary(a => a.Item1, a => a.Item2, StringComparer.Ordinal)
                     ),
                     (
                         "FrozenSet",
                         new[]
                         {
                             ("ToFrozenSet", "T")
-                        }.ToFrozenDictionary(a => a.Item1, a => a.Item2, StringComparer.Ordinal)
+                        }.ToImmutableDictionary(a => a.Item1, a => a.Item2, StringComparer.Ordinal)
                     )
-                }.ToFrozenDictionary(a => a.Item1, a => a.Item2, StringComparer.Ordinal)
+                }.ToImmutableDictionary(a => a.Item1, a => a.Item2, StringComparer.Ordinal)
             )
-        }.ToFrozenDictionary(a => a.Item1, a => a.Item2, StringComparer.Ordinal);
+        }.ToImmutableDictionary(a => a.Item1, a => a.Item2, StringComparer.Ordinal);
 
-    private static readonly FrozenDictionary<string, FrozenDictionary<string, FrozenDictionary<int, string>>>
+    private static readonly ImmutableDictionary<string, ImmutableDictionary<string, ImmutableDictionary<int, string>>>
         GenericKeyByGenericTypeCountByTypeNameByNameSpace =
             new[]
             {
@@ -100,7 +100,7 @@ internal static class GenericKeyParameterNameProvider
                                 (
                                     2, "TKey"
                                 )
-                            }.ToFrozenDictionary(a => a.Item1, a => a.Item2)
+                            }.ToImmutableDictionary(a => a.Item1, a => a.Item2)
                         ),
                         (
                             "HashSet",
@@ -109,7 +109,7 @@ internal static class GenericKeyParameterNameProvider
                                 (
                                     1, "T"
                                 )
-                            }.ToFrozenDictionary(a => a.Item1, a => a.Item2)
+                            }.ToImmutableDictionary(a => a.Item1, a => a.Item2)
                         ),
                         (
                             "OrderedDictionary",
@@ -118,7 +118,7 @@ internal static class GenericKeyParameterNameProvider
                                 (
                                     2, "TKey"
                                 )
-                            }.ToFrozenDictionary(a => a.Item1, a => a.Item2)
+                            }.ToImmutableDictionary(a => a.Item1, a => a.Item2)
                         ),
                         (
                             "SortedDictionary",
@@ -127,11 +127,11 @@ internal static class GenericKeyParameterNameProvider
                                 (
                                     2, "TKey"
                                 )
-                            }.ToFrozenDictionary(a => a.Item1, a => a.Item2)
+                            }.ToImmutableDictionary(a => a.Item1, a => a.Item2)
                         )
-                    }.ToFrozenDictionary(a => a.Item1, a => a.Item2, StringComparer.Ordinal)
+                    }.ToImmutableDictionary(a => a.Item1, a => a.Item2, StringComparer.Ordinal)
                 )
-            }.ToFrozenDictionary(a => a.Item1, a => a.Item2, StringComparer.Ordinal);
+            }.ToImmutableDictionary(a => a.Item1, a => a.Item2, StringComparer.Ordinal);
 
     public static string? GetKeyParameterNameForInvocation(string containingTypeNamespaceName,
                                                            string containingTypeName, string methodName)

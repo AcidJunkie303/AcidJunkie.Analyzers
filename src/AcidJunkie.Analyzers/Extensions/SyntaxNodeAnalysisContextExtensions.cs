@@ -1,4 +1,4 @@
-using System.Collections.Frozen;
+using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using AcidJunkie.Analyzers.Logging;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -7,7 +7,7 @@ namespace AcidJunkie.Analyzers.Extensions;
 
 internal static class SyntaxNodeAnalysisContextExtensions
 {
-    private static readonly FrozenDictionary<string, bool> BooleanValuesByValue = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase)
+    private static readonly ImmutableDictionary<string, bool> BooleanValuesByValue = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase)
     {
         {
             "false", false
@@ -39,7 +39,7 @@ internal static class SyntaxNodeAnalysisContextExtensions
         {
             "yes", true
         }
-    }.ToFrozenDictionary(StringComparer.OrdinalIgnoreCase);
+    }.ToImmutableDictionary(StringComparer.OrdinalIgnoreCase);
 
     public static ILogger<TAnalyzer> CreateLogger<TAnalyzer>(this SyntaxNodeAnalysisContext analysisContext)
         where TAnalyzer : class
