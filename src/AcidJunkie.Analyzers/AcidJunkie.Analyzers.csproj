@@ -39,7 +39,7 @@
         <PackageTags>AcidJunkie.Analyzers, analyzers</PackageTags>
         <NoPackageAnalysis>true</NoPackageAnalysis>
         <BaseOutputPath>bin\$(RoslynVersion)\</BaseOutputPath>
-        <NoWarn>$(NoWarn);RS1026;RS2007</NoWarn>
+        <NoWarn>$(NoWarn);RS1026;RS2007;UseCollectionExpression;ReSharper;ReSharper:UseCollectionExpression</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>

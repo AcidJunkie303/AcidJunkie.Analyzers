@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <IncludeBuildOutput>false</IncludeBuildOutput>
+        <Version>1.0.1</Version>
+        <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+        <PackageId>Dummy</PackageId>
+        <GenerateDependencyFile>false</GenerateDependencyFile>
+        <developmentDependency>true</developmentDependency>
+        <Description>AcidJunkie Analyzers</Description>
+        <PackageTags>AcidJunkie.Analyzers, analyzers</PackageTags>
+        <NoPackageAnalysis>true</NoPackageAnalysis>
+        <BaseOutputPath>bin\$(RoslynVersion)\</BaseOutputPath>
+        <NoWarn>$(NoWarn);RS1026;RS2007</NoWarn>
+    </PropertyGroup>
+    
+</Project>

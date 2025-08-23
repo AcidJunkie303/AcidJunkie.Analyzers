@@ -5,6 +5,7 @@ using Microsoft.CodeAnalysis;
 namespace AcidJunkie.Analyzers.Diagnosers;
 
 [SuppressMessage("Security", "S1075:Refactor your code not to use hardcoded absolution paths or URIs", Justification = "Path to the documentation")]
+[SuppressMessage("ReSharper", "UseCollectionExpression", Justification = "Not supported in lower versions of Roslyn")]
 public static class CommonRules
 {
     public static ImmutableArray<DiagnosticDescriptor> AllCommonRules { get; } = new[]
