@@ -1,4 +1,4 @@
-name: CI/CD
+name: CI
 
 on:
   push:
@@ -13,7 +13,7 @@ on:
 
 jobs:
   build-test-pack-publish:
-    runs-on: ubuntu-latest #windows-latest
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
@@ -133,4 +133,5 @@ jobs:
 
       - name: Publish to NuGet
         if: ${{ startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/heads/release-') }}
-        run: dotnet nuget push src/AcidJunkie.Analyzers.Pack/bin/Release/AcidJunkie.Analyzers*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }} --skip-duplicate
+        run: dotnet nuget push AcidJunkie.Analyzers*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }} --skip-duplicate
+        working-directory: ./src/AcidJunkie.Analyzers.Pack/bin/Release/
