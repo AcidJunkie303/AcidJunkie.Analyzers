@@ -25,9 +25,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <None Include="README.md" Pack="true">
+
+        <None Include="..\..\README.md" Pack="true">
+            <Link>README.md</Link>
             <PackagePath/>
         </None>
+
         <None Include="LICENSE.txt" Pack="true">
             <PackagePath/>
         </None>

@@ -2,7 +2,7 @@
 
 internal static class Program
 {
-    private static void Main()
+    private static async Task Main()
     {
         Console.WriteLine("Hello, World!");
         Console.WriteLine("Hello, World!");

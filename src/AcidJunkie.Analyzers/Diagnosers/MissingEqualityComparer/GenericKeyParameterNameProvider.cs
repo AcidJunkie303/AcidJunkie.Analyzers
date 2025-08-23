@@ -82,6 +82,20 @@ internal static class GenericKeyParameterNameProvider
                         }.ToImmutableDictionary(a => a.Item1, a => a.Item2, StringComparer.Ordinal)
                     )
                 }.ToImmutableDictionary(a => a.Item1, a => a.Item2, StringComparer.Ordinal)
+            ),
+            (
+                "Microsoft.EntityFrameworkCore",
+                new[]
+                {
+                    (
+                        "EntityFrameworkQueryableExtensions",
+                        new[]
+                        {
+                            ("ToDictionaryAsync", "TKey"),
+                            ("ToHashSetAsync", "TKey")
+                        }.ToImmutableDictionary(a => a.Item1, a => a.Item2, StringComparer.Ordinal)
+                    )
+                }.ToImmutableDictionary(a => a.Item1, a => a.Item2, StringComparer.Ordinal)
             )
         }.ToImmutableDictionary(a => a.Item1, a => a.Item2, StringComparer.Ordinal);
 
