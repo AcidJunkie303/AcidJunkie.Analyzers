@@ -25,6 +25,12 @@
     </PropertyGroup>
 
     <ItemGroup>
+
+        <None Include="..\..\README.md" Pack="true">
+            <Link>README.md</Link>
+            <PackagePath/>
+        </None>
+
         <None Include="LICENSE.txt" Pack="true">
             <PackagePath/>
         </None>
@@ -92,12 +98,6 @@
         <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers\bin\roslyn4.14\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.14/cs/"/>
         <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers.CodeFixers\bin\roslyn4.14\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.CodeFixers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.14/cs/"/>
 
-    </ItemGroup>
-
-    <ItemGroup>
-        <Content Include="..\..\README.md">
-            <Link>README.md</Link>
-        </Content>
     </ItemGroup>
 
 </Project>
