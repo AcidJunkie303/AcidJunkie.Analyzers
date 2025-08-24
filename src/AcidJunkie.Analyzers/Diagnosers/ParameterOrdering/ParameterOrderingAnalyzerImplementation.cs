@@ -15,13 +15,9 @@ internal sealed class ParameterOrderingAnalyzerImplementation : SyntaxNodeAnalyz
 {
     private readonly Aj0007Configuration _configuration;
 
-    public ParameterOrderingAnalyzerImplementation(SyntaxNodeAnalysisContext context) : base(context)
+    public ParameterOrderingAnalyzerImplementation(in SyntaxNodeAnalysisContext context) : base(context)
     {
         _configuration = Aj0007ConfigurationProvider.Instance.GetConfiguration(context);
-        if (_configuration.ConfigurationError is not null)
-        {
-            context.ReportValidationError(_configuration.ConfigurationError);
-        }
     }
 
     public void AnalyzeParameterList()
@@ -53,9 +49,7 @@ internal sealed class ParameterOrderingAnalyzerImplementation : SyntaxNodeAnalyz
         }
 
         var previousIndex = -1;
-        var parameters = GetParameters(parameterList);
-
-        foreach (var parameter in parameters)
+        foreach (var parameter in GetParameters(parameterList))
         {
             var index = GetOrderIndex(parameter, _configuration, fallbackIndex);
             if (index < previousIndex)

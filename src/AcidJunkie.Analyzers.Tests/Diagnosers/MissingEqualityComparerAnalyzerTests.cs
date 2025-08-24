@@ -140,15 +140,7 @@ public sealed class MissingEqualityComparerAnalyzerTests(ITestOutputHelper testO
     //
     [InlineData("/* 0300 */  refTypeCollection.ToFrozenSet( refTypeEqualityComparer );")]
     [InlineData("/* 0301 */  refTypeCollection.{|AJ0001:ToFrozenSet|}( );")]
-    public async Task Theory_Various_Method_Invocations(string insertionCode)
-    {
-        var code = CreateTestCode(insertionCode);
-
-        await CreateTesterBuilder()
-             .WithTestCode(code)
-             .Build()
-             .RunAsync();
-    }
+    public Task Theory_Various_Method_Invocations(string insertionCode) => RunTestAsync(insertionCode, true);
 
     [Theory]
     [InlineData("/* 1000 */  new Dictionary<RefType,int>( refTypeEqualityComparer );")]
@@ -168,15 +160,7 @@ public sealed class MissingEqualityComparerAnalyzerTests(ITestOutputHelper testO
     //[InlineData("/* 1015 */  OrderedDictionary<RefType,int> dict; dict = new ( refTypeEqualityComparer );")] // implicit creation
     //[InlineData("/* 1016 */  OrderedDictionary<RefType,int> dict = {|AJ0001:[]|};")] // object initializer
     //[InlineData("/* 1017 */  OrderedDictionary<RefType,int> dict; dict = {|AJ0001:[]|};")] // object initializer
-    public async Task Theory_DictionaryCreation(string insertionCode)
-    {
-        var code = CreateTestCode(insertionCode);
-
-        await CreateTesterBuilder()
-             .WithTestCode(code)
-             .Build()
-             .RunAsync();
-    }
+    public Task Theory_DictionaryCreation(string insertionCode) => RunTestAsync(insertionCode, true);
 
     [Theory]
     [InlineData("/* 9001 */  refTypeCollection.ToHashSet( refTypeEqualityComparer );")] // variable
@@ -188,79 +172,67 @@ public sealed class MissingEqualityComparerAnalyzerTests(ITestOutputHelper testO
                 refTypeCollection.ToHashSet( GetRefTypeEqualityComparer() );
                 """)] // method
     [InlineData("/* 9005 */  refTypeCollection.{|AJ0001:ToHashSet|}( null );")] // null reference
-    public async Task Theory_CheckVariousWaysOfPassingEqualityComparer(string insertionCode)
-    {
-        var code = CreateTestCode(insertionCode);
-
-        await CreateTesterBuilder()
-             .WithTestCode(code)
-             .Build()
-             .RunAsync();
-    }
+    public Task Theory_CheckVariousWaysOfPassingEqualityComparer(string insertionCode) => RunTestAsync(insertionCode, true);
 
     [Fact]
-    public async Task WhenInvocationOnValueType_ThenOk()
+    public Task WhenInvocationOnValueType_ThenOk()
     {
         // value types perform structural comparison by default -> no equality comparer required
-        var code = CreateTestCode("valueTypeCollection.ToHashSet();");
+        const string insertionCode = "valueTypeCollection.ToHashSet();";
 
-        await CreateTesterBuilder()
-             .WithTestCode(code)
-             .Build()
-             .RunAsync();
+        return RunTestAsync(insertionCode, true);
     }
 
     [Fact]
-    public async Task WhenPassingNullEqualityComparer_ThenDiagnose()
+    public Task WhenPassingNullEqualityComparer_ThenDiagnose()
     {
         // value types perform structural comparison by default -> no equality comparer required
+        const string insertionCode = "refTypeCollection.{|AJ0001:ToHashSet|}( );";
 
-        var code = CreateTestCode("refTypeCollection.{|AJ0001:ToHashSet|}( );");
-
-        await CreateTesterBuilder()
-             .WithTestCode(code)
-             .Build()
-             .RunAsync();
+        return RunTestAsync(insertionCode, true);
     }
 
     [Fact]
-    public async Task WhenFullyEquatableRefType_ThenOk()
+    public Task WhenFullyEquatableRefType_ThenOk()
     {
         // FullEquatableRefType implements IEquatable<T> and overrides GetHashCode() => no equality comparer required
+        const string insertionCode = "new FullEquatableRefType[0].Distinct();";
 
-        var code = CreateTestCode("new FullEquatableRefType[0].Distinct();");
-
-        await CreateTesterBuilder()
-             .WithTestCode(code)
-             .Build()
-             .RunAsync();
+        return RunTestAsync(insertionCode, true);
     }
 
     [Fact]
-    public async Task WhenPartialEquatableRefType_ThenOk()
+    public Task WhenPartialEquatableRefType_ThenOk()
     {
         // PartialEquatableRefType implements IEquatable<T> but does not override GetHashCode() => equality comparer required
+        const string insertionCode = "partialEquatableRefTypeCollection.{|AJ0001:Distinct|}();";
 
-        var code = CreateTestCode("partialEquatableRefTypeCollection.{|AJ0001:Distinct|}();");
-
-        await CreateTesterBuilder()
-             .WithTestCode(code)
-             .Build()
-             .RunAsync();
+        return RunTestAsync(insertionCode, true);
     }
 
     [Fact]
-    public async Task WhenNonEquatableRefType_ThenOk()
+    public Task WhenNonEquatableRefType_ThenOk()
     {
         // RefType does not implement IEquatable<T> and does not override GetHashCode() => equality comparer required
 
-        var code = CreateTestCode("partialEquatableRefTypeCollection.{|AJ0001:Distinct|}();");
+        const string insertionCode = "partialEquatableRefTypeCollection.{|AJ0001:Distinct|}();";
 
-        await CreateTesterBuilder()
-             .WithTestCode(code)
-             .Build()
-             .RunAsync();
+        return RunTestAsync(insertionCode, true);
     }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task Theory_IsEnabled(bool isEnabled)
+    {
+        var insertionCode = isEnabled
+            ? "refTypeCollection.{|AJ0001:ToDictionary|}( a => a, a => a );"
+            : "refTypeCollection.ToDictionary( a => a, a => a );";
+
+        await RunTestAsync(insertionCode, isEnabled);
+    }
+
+    private static string CreateIsEnabledConfigurationLine(bool isEnabled) => $"AJ0001.is_enabled = {(isEnabled ? "true" : "false")}";
 
     private static string CreateTestCode(string insertionCode) =>
         $$"""
@@ -367,4 +339,15 @@ public sealed class MissingEqualityComparerAnalyzerTests(ITestOutputHelper testO
               public int GetHashCode(FullEquatableRefType item) => 0;
           }
           """;
+
+    private Task RunTestAsync(string insertionCode, bool isEnabled)
+    {
+        var code = CreateTestCode(insertionCode);
+
+        return CreateTesterBuilder()
+              .WithTestCode(code)
+              .WithEditorConfigLine(CreateIsEnabledConfigurationLine(isEnabled))
+              .Build()
+              .RunAsync();
+    }
 }

@@ -1,7 +1,7 @@
 namespace AcidJunkie.Analyzers.Configuration.Aj0007;
 
-public enum ParameterPlacement
+internal enum ParameterPlacement
 {
-    First,
-    Last
+    First = 1,
+    Last = 2
 }

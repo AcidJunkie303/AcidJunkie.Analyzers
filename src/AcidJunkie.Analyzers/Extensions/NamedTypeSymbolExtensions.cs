@@ -7,10 +7,10 @@ public static class NamedTypeSymbolExtensions
     public static bool IsTypeOrIsInheritedFrom(this INamedTypeSymbol namedTypeSymbol, Compilation compilation, string fullTypeName)
     {
         var type = compilation.GetTypeByMetadataName(fullTypeName);
-        return type is not null && namedTypeSymbol.IsTypeOrIsInheritedFrom(compilation, type);
+        return type is not null && namedTypeSymbol.IsTypeOrIsInheritedFrom(type);
     }
 
-    public static bool IsTypeOrIsInheritedFrom(this INamedTypeSymbol namedTypeSymbol, Compilation compilation, INamedTypeSymbol type)
+    public static bool IsTypeOrIsInheritedFrom(this INamedTypeSymbol namedTypeSymbol, INamedTypeSymbol type)
     {
         var current = namedTypeSymbol;
         while (current is not null)

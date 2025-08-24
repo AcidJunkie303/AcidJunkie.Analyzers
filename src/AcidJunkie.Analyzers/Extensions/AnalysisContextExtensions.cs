@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using AcidJunkie.Analyzers.Diagnosers;
 using AcidJunkie.Analyzers.Logging;
 using AcidJunkie.Analyzers.Support;
@@ -10,13 +11,14 @@ namespace AcidJunkie.Analyzers.Extensions;
 
 internal static class AnalysisContextExtensions
 {
+    [SuppressMessage("Roslynator", "RCS1175:Unused \'this\' parameter")]
     public static void EnableConcurrentExecutionInReleaseMode(this AnalysisContext context)
     {
-#if !DEBUG
 #pragma warning disable RS0030 // usage of banned symbol -> This is the only allowed place
+#if !DEBUG
         context.EnableConcurrentExecution();
-#pragma warning restore RS0030
 #endif
+#pragma warning restore RS0030
     }
 
     public static void RegisterSyntaxNodeActionAndCheck<TAnalyzer>(this AnalysisContext context, Action<SyntaxNodeAnalysisContext, ILogger<TAnalyzer>> action, params SyntaxKind[] syntaxKinds)

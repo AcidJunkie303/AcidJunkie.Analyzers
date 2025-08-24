@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
+using AcidJunkie.Analyzers.Configuration;
 using AcidJunkie.Analyzers.Logging;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -10,12 +11,20 @@ namespace AcidJunkie.Analyzers.Diagnosers.WarningSuppression;
 [SuppressMessage("ReSharper", "UseCollectionExpression", Justification = "Not supported in lower versions of Roslyn")]
 internal sealed class GeneralWarningSuppressionAnalyzerImplementation : SyntaxNodeAnalyzerImplementationBase<GeneralWarningSuppressionAnalyzerImplementation>
 {
-    public GeneralWarningSuppressionAnalyzerImplementation(SyntaxNodeAnalysisContext context) : base(context)
+    private readonly IAnalyzerConfiguration _configuration;
+
+    public GeneralWarningSuppressionAnalyzerImplementation(in SyntaxNodeAnalysisContext context) : base(context)
     {
+        _configuration = GenericConfigurationProvider.GetConfiguration(context, DiagnosticRules.Default.DiagnosticId);
     }
 
     public void AnalyzePragma()
     {
+        if (!_configuration.IsEnabled)
+        {
+            return;
+        }
+
         var directive = (PragmaWarningDirectiveTriviaSyntax)Context.Node;
         if (directive.ErrorCodes.Count == 0)
         {

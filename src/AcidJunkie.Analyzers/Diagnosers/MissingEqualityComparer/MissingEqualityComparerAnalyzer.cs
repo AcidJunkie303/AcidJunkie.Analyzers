@@ -21,7 +21,7 @@ public sealed class MissingEqualityComparerAnalyzer : DiagnosticAnalyzer
         context.RegisterSyntaxNodeActionAndAnalyze<MissingEqualityComparerAnalyzerImplementation>(a => a.AnalyzeObjectCreation, SyntaxKind.ObjectCreationExpression);
         context.RegisterSyntaxNodeActionAndAnalyze<MissingEqualityComparerAnalyzerImplementation>(a => a.AnalyzeImplicitObjectCreation, SyntaxKind.ImplicitObjectCreationExpression);
 
-#if CSHARP12_OR_GREATER
+#if CSHARP_12_OR_GREATER
         context.RegisterSyntaxNodeActionAndAnalyze<MissingEqualityComparerAnalyzerImplementation>(a => a.AnalyzeCollectionExpression, SyntaxKind.CollectionExpression);
 #endif
     }

@@ -18,7 +18,7 @@ internal static class MemberDeclarationSyntaxExtensions
         return parent as BaseTypeDeclarationSyntax;
     }
 
-    public static INamedTypeSymbol? GetContainingType(this MemberDeclarationSyntax memberDeclaration, SyntaxNodeAnalysisContext context) => memberDeclaration.GetContainingType(context.SemanticModel);
+    public static INamedTypeSymbol? GetContainingType(this MemberDeclarationSyntax memberDeclaration, in SyntaxNodeAnalysisContext context) => memberDeclaration.GetContainingType(context.SemanticModel);
 
     public static INamedTypeSymbol? GetContainingType(this MemberDeclarationSyntax memberDeclaration, SemanticModel semanticModel)
     {

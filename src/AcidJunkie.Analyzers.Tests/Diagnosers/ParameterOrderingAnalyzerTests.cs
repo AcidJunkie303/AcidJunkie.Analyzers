@@ -33,13 +33,42 @@ public sealed class ParameterOrderingAnalyzerTests(ITestOutputHelper testOutputH
                      }
                      """;
 
-        return CreateTester(code).RunAsync();
+        return CreateTester(code, true).RunAsync();
     }
 
-    private CSharpAnalyzerTest<ParameterOrderingAnalyzer, DefaultVerifier> CreateTester(string code, string? configValueForLoggerParameterPlacement = null)
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public Task Theory_IsEnabled(bool isEnabled)
+    {
+        const string parameters = "(ILogger<TestClass> logger, string value)";
+
+        var p = isEnabled
+            ? "{|AJ0007:" + parameters + "|}"
+            : parameters;
+
+        var code = $$"""
+                     using System.Threading;
+                     using Microsoft.Extensions.Logging;
+
+                     public class TestClass
+                     {
+                         public TestClass{{p}}
+                         {
+                         }
+                     }
+                     """;
+
+        return CreateTester(code, isEnabled).RunAsync();
+    }
+
+    private static string CreateIsEnabledConfigurationLine(bool isEnabled) => $"AJ0007.is_enabled = {(isEnabled ? "true" : "false")}";
+
+    private CSharpAnalyzerTest<ParameterOrderingAnalyzer, DefaultVerifier> CreateTester(string code, bool isEnabled, string? configValueForLoggerParameterPlacement = null)
         => CreateTesterBuilder()
           .WithTestCode(code)
           .WithNugetPackage("Microsoft.Extensions.Logging.Abstractions", "9.0.8")
+          .WithEditorConfigLine(CreateIsEnabledConfigurationLine(isEnabled))
           .WithEditorConfigLine($"{Aj0007Configuration.KeyNames.ParameterOrderingFlat} = {configValueForLoggerParameterPlacement ?? string.Empty}")
           .Build();
 }

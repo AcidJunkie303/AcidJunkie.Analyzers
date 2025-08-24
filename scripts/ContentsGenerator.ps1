@@ -213,7 +213,7 @@ function Create-BuildCommandsForPipeline
 
 }
 
-#Build-TargetFileNodes
+Build-TargetFileNodes
 #Create-BuildCommands
 #Create-PackProjectFileReferences
-Create-BuildCommandsForPipeline
+#Create-BuildCommandsForPipeline

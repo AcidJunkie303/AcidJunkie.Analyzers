@@ -12,8 +12,12 @@ internal static class SyntaxTreeVisualizer
         visitor.Visit(rootNode);
 
         var items = visitor.Nodes
-            .Select(static a => (IndentedTypeName: new string(' ', a.Level * 2) + a.TypeName, Kind: a.Kind.ToString(), a.Node))
-            .ToList();
+                           .ConvertAll(static a =>
+                                (
+                                    IndentedTypeName: new string(' ', a.Level * 2) + a.TypeName,
+                                    a.Kind,
+                                    a.Node)
+                            );
 
         var maxTypeNameLength = items.Max(static a => a.IndentedTypeName.Length);
         var maxKindLength = items.Max(static a => a.Kind.Length);
@@ -23,15 +27,16 @@ internal static class SyntaxTreeVisualizer
         foreach (var (indentedTypeName, kind, node) in items)
         {
             var code = node
-                .ToString()
-                .Replace("\r\n", "\\r\\n", StringComparison.Ordinal)
-                .Replace("\n", "\\n", StringComparison.Ordinal);
+                      .ToString()
+                      .Replace("\r\n", @"\r\n", StringComparison.Ordinal)
+                      .Replace("\n", @"\n", StringComparison.Ordinal);
 
-            buffer.Append(indentedTypeName.PadRight(maxTypeNameLength, ' '));
-            buffer.Append(" | ");
-            buffer.Append(kind.PadRight(maxKindLength));
-            buffer.Append(" | ");
-            buffer.AppendLine(code);
+            buffer
+               .Append(indentedTypeName.PadRight(maxTypeNameLength, ' '))
+               .Append(" | ")
+               .Append(kind.PadRight(maxKindLength))
+               .Append(" | ")
+               .AppendLine(code);
         }
 
         return buffer.ToString();
@@ -39,8 +44,8 @@ internal static class SyntaxTreeVisualizer
 
     private sealed class Walker : CSharpSyntaxWalker
     {
-        public readonly List<(int Level, string Kind, string TypeName, SyntaxNode Node)> Nodes = new(250);
         private int _level;
+        public readonly List<(int Level, string Kind, string TypeName, SyntaxNode Node)> Nodes = new(250);
 
         public override void Visit(SyntaxNode? node)
         {
