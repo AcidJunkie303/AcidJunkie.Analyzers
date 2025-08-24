@@ -8,7 +8,7 @@
         <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
         <GenerateDependencyFile>false</GenerateDependencyFile>
         <IncludeBuildOutput>false</IncludeBuildOutput>
-        <IsPackable>false</IsPackable>
+        <!--<IsPackable>false</IsPackable>-->
         <NoPackageAnalysis>true</NoPackageAnalysis>
         <PackageIcon>icon.png</PackageIcon>
         <PackageId>AcidJunkie.Analyzers</PackageId>
