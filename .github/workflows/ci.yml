@@ -133,8 +133,8 @@ jobs:
       - name: Compile and Pack Analyzers.Pack
         run: |
           dotnet restore src/AcidJunkie.Analyzers.Pack/AcidJunkie.Analyzers.Pack.csproj
-          dotnet build src/AcidJunkie.Analyzers.Pack/AcidJunkie.Analyzers.Pack.csproj --configuration Release /p:Version=$NUGET_VERSION
-          dotnet pack src/AcidJunkie.Analyzers.Pack/AcidJunkie.Analyzers.Pack.csproj --configuration Release /p:Version=$NUGET_VERSION
+          dotnet build src/AcidJunkie.Analyzers.Pack/AcidJunkie.Analyzers.Pack.csproj --configuration Release /p:Version=$ASSEMBLY_VERSION
+          dotnet pack src/AcidJunkie.Analyzers.Pack/AcidJunkie.Analyzers.Pack.csproj --configuration Release  /p:Version=$ASSEMBLY_VERSION /p:PackageVersion=$NUGET_VERSION 
 
       - name: Publish to NuGet
         if: ${{ startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/heads/release-') }}
