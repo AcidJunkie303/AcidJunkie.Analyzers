@@ -1,5 +1,4 @@
 using System.Collections.Immutable;
-using System.Diagnostics.CodeAnalysis;
 using AcidJunkie.Analyzers.Configuration;
 using AcidJunkie.Analyzers.Extensions;
 using AcidJunkie.Analyzers.Logging;
@@ -10,7 +9,6 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace AcidJunkie.Analyzers.Diagnosers.MissingEqualityComparer;
 
-[SuppressMessage("ReSharper", "UseCollectionExpression", Justification = "Not supported in lower versions of Roslyn")]
 internal sealed class MissingEqualityComparerAnalyzerImplementation : SyntaxNodeAnalyzerImplementationBase<MissingEqualityComparerAnalyzerImplementation>
 {
     private readonly IAnalyzerConfiguration _configuration;
@@ -243,10 +241,7 @@ internal sealed class MissingEqualityComparerAnalyzerImplementation : SyntaxNode
 
     internal static class DiagnosticRules
     {
-        internal static ImmutableArray<DiagnosticDescriptor> Rules { get; }
-            = CommonRules.AllCommonRules
-                         .Append(Default.Rule)
-                         .ToImmutableArray();
+        internal static ImmutableArray<DiagnosticDescriptor> Rules { get; } = [..CommonRules.AllCommonRules, Default.Rule];
 
         internal static class Default
         {
