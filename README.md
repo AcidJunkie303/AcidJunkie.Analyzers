@@ -1,5 +1,7 @@
 # AcidJunkie.Analyzers
 
+C# code analyzers for .NET 8.0 and higher. Lower .NET versions are not supported.
+
 Source: https://github.com/AcidJunkie303/AcidJunkie.Analyzers
 
 # Rules
