@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
+using AcidJunkie.Analyzers.Configuration;
 using AcidJunkie.Analyzers.Extensions;
 using AcidJunkie.Analyzers.Logging;
 using Microsoft.CodeAnalysis;
@@ -12,12 +13,20 @@ namespace AcidJunkie.Analyzers.Diagnosers.MissingEqualityComparer;
 [SuppressMessage("ReSharper", "UseCollectionExpression", Justification = "Not supported in lower versions of Roslyn")]
 internal sealed class MissingEqualityComparerAnalyzerImplementation : SyntaxNodeAnalyzerImplementationBase<MissingEqualityComparerAnalyzerImplementation>
 {
-    public MissingEqualityComparerAnalyzerImplementation(SyntaxNodeAnalysisContext context) : base(context)
+    private readonly IAnalyzerConfiguration _configuration;
+
+    public MissingEqualityComparerAnalyzerImplementation(in SyntaxNodeAnalysisContext context) : base(context)
     {
+        _configuration = GenericConfigurationProvider.GetConfiguration(context, DiagnosticRules.Default.DiagnosticId);
     }
 
     public void AnalyzeImplicitObjectCreation()
     {
+        if (!_configuration.IsEnabled)
+        {
+            return;
+        }
+
         var implicitObjectCreation = (ImplicitObjectCreationExpressionSyntax)Context.Node;
 
         var typeSymbol = Context.SemanticModel.GetTypeInfo(implicitObjectCreation, Context.CancellationToken).Type;
@@ -29,9 +38,14 @@ internal sealed class MissingEqualityComparerAnalyzerImplementation : SyntaxNode
         AnalyzeObjectCreationCore(implicitObjectCreation.ArgumentList, implicitObjectCreation.NewKeyword.GetLocation(), namedTypeSymbol);
     }
 
-#if CSHARP12_OR_GREATER
+#if CSHARP_12_OR_GREATER
     public void AnalyzeCollectionExpression()
     {
+        if (!_configuration.IsEnabled)
+        {
+            return;
+        }
+
         var collectionExpression = (CollectionExpressionSyntax)Context.Node;
 
         var typeSymbol = GetAssignmentTargetType(collectionExpression);
@@ -55,8 +69,14 @@ internal sealed class MissingEqualityComparerAnalyzerImplementation : SyntaxNode
         AnalyzeObjectCreationCore(null, collectionExpression.GetLocation(), typeSymbol);
     }
 #endif
+
     public void AnalyzeObjectCreation()
     {
+        if (!_configuration.IsEnabled)
+        {
+            return;
+        }
+
         var objectCreation = (ObjectCreationExpressionSyntax)Context.Node;
 
         var typeSymbol = Context.SemanticModel.GetSymbolInfo(objectCreation.Type, Context.CancellationToken).Symbol;
@@ -75,6 +95,11 @@ internal sealed class MissingEqualityComparerAnalyzerImplementation : SyntaxNode
 
     public void AnalyzeInvocation()
     {
+        if (!_configuration.IsEnabled)
+        {
+            return;
+        }
+
         var invocationExpression = (InvocationExpressionSyntax)Context.Node;
 
         var (owningTypeNameSpace, owningTypeName, methodName, memberAccess) = invocationExpression.GetInvokedMethod(Context.SemanticModel, Context.CancellationToken);
@@ -238,7 +263,7 @@ internal sealed class MissingEqualityComparerAnalyzerImplementation : SyntaxNode
         }
     }
 
-#if CSHARP12_OR_GREATER
+#if CSHARP_12_OR_GREATER
     private INamedTypeSymbol? GetAssignmentTargetType(CollectionExpressionSyntax collectionExpression)
     {
         if (collectionExpression.Parent is EqualsValueClauseSyntax equalsValueClause)

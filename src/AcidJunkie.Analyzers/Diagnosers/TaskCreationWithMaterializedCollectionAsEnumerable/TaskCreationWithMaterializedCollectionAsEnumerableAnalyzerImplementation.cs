@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
+using AcidJunkie.Analyzers.Configuration;
 using AcidJunkie.Analyzers.Extensions;
 using AcidJunkie.Analyzers.Logging;
 using Microsoft.CodeAnalysis;
@@ -12,12 +13,20 @@ namespace AcidJunkie.Analyzers.Diagnosers.TaskCreationWithMaterializedCollection
 [SuppressMessage("ReSharper", "UseCollectionExpression", Justification = "Not supported in lower versions of Roslyn")]
 internal sealed class TaskCreationWithMaterializedCollectionAsEnumerableAnalyzerImplementation : SyntaxNodeAnalyzerImplementationBase<TaskCreationWithMaterializedCollectionAsEnumerableAnalyzerImplementation>
 {
-    public TaskCreationWithMaterializedCollectionAsEnumerableAnalyzerImplementation(SyntaxNodeAnalysisContext context) : base(context)
+    private readonly IAnalyzerConfiguration _configuration;
+
+    public TaskCreationWithMaterializedCollectionAsEnumerableAnalyzerImplementation(in SyntaxNodeAnalysisContext context) : base(context)
     {
+        _configuration = GenericConfigurationProvider.GetConfiguration(context, DiagnosticRules.Default.DiagnosticId);
     }
 
     public void AnalyzeInvocation()
     {
+        if (!_configuration.IsEnabled)
+        {
+            return;
+        }
+
         var invocation = (InvocationExpressionSyntax)Context.Node;
 
         if (Context.SemanticModel.GetSymbolInfo(invocation, Context.CancellationToken).Symbol is not IMethodSymbol methodSymbol)

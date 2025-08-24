@@ -45,9 +45,7 @@ internal static class TypeSymbolExtensions
 
     public static bool ImplementsGenericEquatable(this ITypeSymbol symbol)
         => symbol.AllInterfaces
-                 .Where(static a => a.TypeParameters.Length == 1)
-                 .Where(static a => a.ContainingNamespace.Name.EqualsOrdinal("System"))
-                 .Any(static a => a.Name.EqualsOrdinal("IEquatable"));
+                 .Any(static a => a.TypeParameters.Length == 1 && a.ContainingNamespace.Name.EqualsOrdinal("System") && a.Name.EqualsOrdinal("IEquatable"));
 
     public static bool IsEqualsOverridden(this ITypeSymbol symbol)
         => symbol
@@ -83,6 +81,8 @@ internal static class TypeSymbolExtensions
     public static bool IsContainedInNamespace(this ITypeSymbol symbol, string ns)
         => symbol.GetFullNamespace().EqualsOrdinal(ns);
 
+    [SuppressMessage("Critical Code Smell", "S3776:Cognitive Complexity of methods should not be too high")]
+    [SuppressMessage("Critical Code Smell", "S134:Control flow statements \"if\", \"switch\", \"for\", \"foreach\", \"while\", \"do\"  and \"try\" should not be nested too deeply")]
     public static bool ImplementsOrIsInterface(this ITypeSymbol symbol, string interfaceNamespace, string interfaceName, params ITypeSymbol[] typeArguments)
     {
         if (symbol.IsContainedInNamespace(interfaceNamespace) && symbol.Name.EqualsOrdinal(interfaceName))
@@ -113,8 +113,7 @@ internal static class TypeSymbolExtensions
 
         return symbol.AllInterfaces
                      .Where(a => a.TypeParameters.Length == typeArguments.Length)
-                     .Where(a => a.ContainingNamespace.ToString().EqualsOrdinal(interfaceNamespace))
-                     .Where(a => a.Name.EqualsOrdinal(interfaceName))
+                     .Where(a => a.ContainingNamespace.ToString().EqualsOrdinal(interfaceNamespace) && a.Name.EqualsOrdinal(interfaceName))
                      .Any(a =>
                       {
                           if (a.TypeArguments.Length != typeArguments.Length)
@@ -134,8 +133,7 @@ internal static class TypeSymbolExtensions
                           }
 
                           return true;
-                      })
-            ;
+                      });
     }
 
     public static string GetSimplifiedName(this INamedTypeSymbol symbol)

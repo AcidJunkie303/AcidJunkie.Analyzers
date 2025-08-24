@@ -15,24 +15,24 @@ internal static class GenericKeyParameterNameProvider
                         "Enumerable",
                         new[]
                         {
-                            ("AggregateBy", "TKey"),
-                            ("Contains", "TSource"),
-                            ("CountBy", "TSource"),
-                            ("Distinct", "TSource"),
-                            ("DistinctBy", "TKey"),
-                            ("Except", "TSource"),
-                            ("ExceptBy", "TKey"),
-                            ("GroupBy", "TKey"),
-                            ("GroupJoin", "TKey"),
-                            ("Intersect", "TSource"),
-                            ("IntersectBy", "TKey"),
-                            ("Join", "TKey"),
-                            ("SequenceEqual", "TSource"),
-                            ("ToDictionary", "TKey"),
-                            ("ToHashSet", "TSource"),
-                            ("ToLookup", "TKey"),
-                            ("Union", "TSource"),
-                            ("UnionBy", "TKey")
+                            ("AggregateBy", TypeNames.Key),
+                            ("Contains", TypeNames.Source),
+                            ("CountBy", TypeNames.Source),
+                            ("Distinct", TypeNames.Source),
+                            ("DistinctBy", TypeNames.Key),
+                            ("Except", TypeNames.Source),
+                            ("ExceptBy", TypeNames.Key),
+                            ("GroupBy", TypeNames.Key),
+                            ("GroupJoin", TypeNames.Key),
+                            ("Intersect", TypeNames.Source),
+                            ("IntersectBy", TypeNames.Key),
+                            ("Join", TypeNames.Key),
+                            ("SequenceEqual", TypeNames.Source),
+                            ("ToDictionary", TypeNames.Key),
+                            ("ToHashSet", TypeNames.Source),
+                            ("ToLookup", TypeNames.Key),
+                            ("Union", TypeNames.Source),
+                            ("UnionBy", TypeNames.Key)
                         }.ToImmutableDictionary(a => a.Item1, a => a.Item2, StringComparer.Ordinal)
                     )
                 }.ToImmutableDictionary(a => a.Item1, a => a.Item2, StringComparer.Ordinal)
@@ -45,20 +45,20 @@ internal static class GenericKeyParameterNameProvider
                         "ImmutableDictionary",
                         new[]
                         {
-                            ("Create", "TKey"),
-                            ("CreateRange", "TKey"),
-                            ("CreateBuilder", "TKey"),
-                            ("ToImmutableDictionary", "TKey")
+                            ("Create", TypeNames.Key),
+                            ("CreateRange", TypeNames.Key),
+                            ("CreateBuilder", TypeNames.Key),
+                            ("ToImmutableDictionary", TypeNames.Key)
                         }.ToImmutableDictionary(a => a.Item1, a => a.Item2, StringComparer.Ordinal)
                     ),
                     (
                         "ImmutableHashSet",
                         new[]
                         {
-                            ("Create", "T"),
-                            ("CreateRange", "T"),
-                            ("CreateBuilder", "T"),
-                            ("ToImmutableHashSet", "TSource")
+                            ("Create", TypeNames.T),
+                            ("CreateRange", TypeNames.T),
+                            ("CreateBuilder", TypeNames.T),
+                            ("ToImmutableHashSet", TypeNames.Source)
                         }.ToImmutableDictionary(a => a.Item1, a => a.Item2, StringComparer.Ordinal)
                     )
                 }.ToImmutableDictionary(a => a.Item1, a => a.Item2, StringComparer.Ordinal)
@@ -68,17 +68,17 @@ internal static class GenericKeyParameterNameProvider
                 new[]
                 {
                     (
-                        "ImmutableDictionary",
+                        "FrozenDictionary",
                         new[]
                         {
-                            ("ToImmutableDictionary", "TKey")
+                            ("ToFrozenDictionary", TypeNames.Key)
                         }.ToImmutableDictionary(a => a.Item1, a => a.Item2, StringComparer.Ordinal)
                     ),
                     (
                         "FrozenSet",
                         new[]
                         {
-                            ("ToFrozenSet", "T")
+                            ("ToFrozenSet", TypeNames.T)
                         }.ToImmutableDictionary(a => a.Item1, a => a.Item2, StringComparer.Ordinal)
                     )
                 }.ToImmutableDictionary(a => a.Item1, a => a.Item2, StringComparer.Ordinal)
@@ -91,8 +91,8 @@ internal static class GenericKeyParameterNameProvider
                         "EntityFrameworkQueryableExtensions",
                         new[]
                         {
-                            ("ToDictionaryAsync", "TKey"),
-                            ("ToHashSetAsync", "TKey")
+                            ("ToDictionaryAsync", TypeNames.Key),
+                            ("ToHashSetAsync", TypeNames.Key)
                         }.ToImmutableDictionary(a => a.Item1, a => a.Item2, StringComparer.Ordinal)
                     )
                 }.ToImmutableDictionary(a => a.Item1, a => a.Item2, StringComparer.Ordinal)
@@ -112,7 +112,7 @@ internal static class GenericKeyParameterNameProvider
                             new[]
                             {
                                 (
-                                    2, "TKey"
+                                    2, TypeNames.Key
                                 )
                             }.ToImmutableDictionary(a => a.Item1, a => a.Item2)
                         ),
@@ -121,7 +121,7 @@ internal static class GenericKeyParameterNameProvider
                             new[]
                             {
                                 (
-                                    1, "T"
+                                    1, TypeNames.T
                                 )
                             }.ToImmutableDictionary(a => a.Item1, a => a.Item2)
                         ),
@@ -130,7 +130,7 @@ internal static class GenericKeyParameterNameProvider
                             new[]
                             {
                                 (
-                                    2, "TKey"
+                                    2, TypeNames.Key
                                 )
                             }.ToImmutableDictionary(a => a.Item1, a => a.Item2)
                         ),
@@ -139,7 +139,7 @@ internal static class GenericKeyParameterNameProvider
                             new[]
                             {
                                 (
-                                    2, "TKey"
+                                    2, TypeNames.Key
                                 )
                             }.ToImmutableDictionary(a => a.Item1, a => a.Item2)
                         )
@@ -179,5 +179,12 @@ internal static class GenericKeyParameterNameProvider
         return genericKeyByMethodName.TryGetValue(genericParameterCount, out var genericKeyName)
             ? genericKeyName
             : null;
+    }
+
+    private static class TypeNames
+    {
+        public const string Key = "TKey";
+        public const string Source = "TSource";
+        public const string T = "T";
     }
 }

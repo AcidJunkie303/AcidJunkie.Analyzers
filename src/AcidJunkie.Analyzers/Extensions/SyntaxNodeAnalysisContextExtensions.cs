@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
+using AcidJunkie.Analyzers.Configuration;
 using AcidJunkie.Analyzers.Logging;
 using Microsoft.CodeAnalysis.Diagnostics;
 
@@ -41,23 +42,23 @@ internal static class SyntaxNodeAnalysisContextExtensions
         }
     }.ToImmutableDictionary(StringComparer.OrdinalIgnoreCase);
 
-    public static ILogger<TAnalyzer> CreateLogger<TAnalyzer>(this SyntaxNodeAnalysisContext analysisContext)
+    public static ILogger<TAnalyzer> CreateLogger<TAnalyzer>(this in SyntaxNodeAnalysisContext analysisContext)
         where TAnalyzer : class
         => LoggerFactory.CreateLogger<TAnalyzer>(analysisContext);
 
     [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Used to get the type argument for the logger")]
-    public static ILogger<TAnalyzer> CreateLogger<TAnalyzer>(this SyntaxNodeAnalysisContext analysisContext, TAnalyzer analyzer)
+    public static ILogger<TAnalyzer> CreateLogger<TAnalyzer>(this in SyntaxNodeAnalysisContext analysisContext, TAnalyzer _)
         where TAnalyzer : class
         => LoggerFactory.CreateLogger<TAnalyzer>(analysisContext);
 
-    public static string? GetOptionsValueOrDefault(this SyntaxNodeAnalysisContext context, string key)
+    public static string? GetOptionsValueOrDefault(this in SyntaxNodeAnalysisContext context, string key)
     {
         var options = context.Options.AnalyzerConfigOptionsProvider.GetOptions(context.Node.SyntaxTree);
         options.TryGetValue(key, out var value);
         return value;
     }
 
-    public static bool GetOptionsBooleanValue(this SyntaxNodeAnalysisContext context, string key, bool defaultValue = true)
+    public static bool GetOptionsBooleanValue(this in SyntaxNodeAnalysisContext context, string key, bool defaultValue = false)
     {
         var value = context.GetOptionsValueOrDefault(key);
         if (value.IsNullOrWhiteSpace())
@@ -69,4 +70,7 @@ internal static class SyntaxNodeAnalysisContextExtensions
             ? result
             : defaultValue;
     }
+
+    public static bool IsDiagnosticEnabled(this in SyntaxNodeAnalysisContext context, string diagnosticId)
+        => GenericConfigurationProvider.GetConfiguration(context, diagnosticId).IsEnabled;
 }

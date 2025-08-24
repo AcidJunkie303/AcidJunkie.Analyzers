@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace AcidJunkie.Analyzers.Configuration.Aj0007;
 
-internal sealed class Aj0007ConfigurationProvider : IConfigurationProvider<Aj0007Configuration>
+internal sealed class Aj0007ConfigurationProvider : ConfigurationProviderBase<Aj0007Configuration>
 {
     public static Aj0007ConfigurationProvider Instance { get; } = new();
 
@@ -11,7 +11,7 @@ internal sealed class Aj0007ConfigurationProvider : IConfigurationProvider<Aj000
     {
     }
 
-    public Aj0007Configuration GetConfiguration(SyntaxNodeAnalysisContext context)
+    protected override Aj0007Configuration GetConfigurationCore(in SyntaxNodeAnalysisContext context)
     {
         if (!IsEnabled(context))
         {
@@ -39,7 +39,7 @@ internal sealed class Aj0007ConfigurationProvider : IConfigurationProvider<Aj000
         return new Aj0007Configuration(true, parameterOrderFlat, ParameterOrderParser.Parse(parameterOrder));
     }
 
-    private static (IReadOnlyList<string> ParameterOrder, string ParameterOrderFlat) GetParameterOrdering(SyntaxNodeAnalysisContext context)
+    private static (IReadOnlyList<string> ParameterOrder, string ParameterOrderFlat) GetParameterOrdering(in SyntaxNodeAnalysisContext context)
     {
         var value = context.GetOptionsValueOrDefault(Aj0007Configuration.KeyNames.ParameterOrderingFlat);
         return value.IsNullOrWhiteSpace()
@@ -47,6 +47,6 @@ internal sealed class Aj0007ConfigurationProvider : IConfigurationProvider<Aj000
             : (ParameterOrderParser.SplitConfigurationParameterOrder(value), value);
     }
 
-    private static bool IsEnabled(SyntaxNodeAnalysisContext context)
-        => context.GetOptionsBooleanValue(Aj0007Configuration.KeyNames.IsEnabled);
+    private static bool IsEnabled(in SyntaxNodeAnalysisContext context)
+        => context.GetOptionsBooleanValue(Aj0007Configuration.KeyNames.IsEnabled, defaultValue: true);
 }

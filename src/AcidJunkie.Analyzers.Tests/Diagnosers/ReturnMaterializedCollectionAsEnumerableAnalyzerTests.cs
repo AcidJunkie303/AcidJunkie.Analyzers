@@ -10,7 +10,7 @@ public sealed class ReturnMaterializedCollectionAsEnumerableAnalyzerTests(ITestO
     : TestBase<ReturnMaterializedCollectionAsEnumerableAnalyzer>(testOutputHelper)
 {
     [Fact]
-    public async Task WhenReturningPureEnumerable_ThenOk()
+    public Task WhenReturningPureEnumerable_ThenOk()
     {
         const string code = """
                             using System;
@@ -29,14 +29,11 @@ public sealed class ReturnMaterializedCollectionAsEnumerableAnalyzerTests(ITestO
                             }
                             """;
 
-        await CreateTesterBuilder()
-             .WithTestCode(code)
-             .Build()
-             .RunAsync();
+        return RunTestAsync(code, true);
     }
 
     [Fact]
-    public async Task WhenUsingYieldReturn_ThenOk()
+    public Task WhenUsingYieldReturn_ThenOk()
     {
         const string code = """
                             using System;
@@ -55,14 +52,11 @@ public sealed class ReturnMaterializedCollectionAsEnumerableAnalyzerTests(ITestO
                             }
                             """;
 
-        await CreateTesterBuilder()
-             .WithTestCode(code)
-             .Build()
-             .RunAsync();
+        return RunTestAsync(code, true);
     }
 
     [Fact]
-    public async Task WhenReturningCollectionAsEnumerable_ThenOk()
+    public Task WhenReturningCollectionAsEnumerable_ThenOk()
     {
         const string code = """
                             using System;
@@ -82,14 +76,11 @@ public sealed class ReturnMaterializedCollectionAsEnumerableAnalyzerTests(ITestO
                             }
                             """;
 
-        await CreateTesterBuilder()
-             .WithTestCode(code)
-             .Build()
-             .RunAsync();
+        return RunTestAsync(code, true);
     }
 
     [Fact]
-    public async Task WhenReturningMaterializedCollection_ThenDiagnose()
+    public Task WhenReturningMaterializedCollection_ThenDiagnose()
     {
         const string code = """
                             using System;
@@ -108,14 +99,11 @@ public sealed class ReturnMaterializedCollectionAsEnumerableAnalyzerTests(ITestO
                             }
                             """;
 
-        await CreateTesterBuilder()
-             .WithTestCode(code)
-             .Build()
-             .RunAsync();
+        return RunTestAsync(code, true);
     }
 
     [Fact]
-    public async Task WhenReturningMaterializedCollectionThroughLambda_ThenDiagnose()
+    public Task WhenReturningMaterializedCollectionThroughLambda_ThenDiagnose()
     {
         const string code = """
                             using System;
@@ -132,14 +120,11 @@ public sealed class ReturnMaterializedCollectionAsEnumerableAnalyzerTests(ITestO
                             }
                             """;
 
-        await CreateTesterBuilder()
-             .WithTestCode(code)
-             .Build()
-             .RunAsync();
+        return RunTestAsync(code, true);
     }
 
     [Fact]
-    public async Task WhenInterfaceImplementation_WhenReturningMaterializedCollection_ThenOk()
+    public Task WhenInterfaceImplementation_WhenReturningMaterializedCollection_ThenOk()
     {
         const string code = """
                             using System;
@@ -164,14 +149,11 @@ public sealed class ReturnMaterializedCollectionAsEnumerableAnalyzerTests(ITestO
                             }
                             """;
 
-        await CreateTesterBuilder()
-             .WithTestCode(code)
-             .Build()
-             .RunAsync();
+        return RunTestAsync(code, true);
     }
 
     [Fact]
-    public async Task WhenMethodIsOverridden_WhenReturningMaterializedCollection_ThenOk()
+    public Task WhenMethodIsOverridden_WhenReturningMaterializedCollection_ThenOk()
     {
         const string code = """
                             using System;
@@ -199,9 +181,51 @@ public sealed class ReturnMaterializedCollectionAsEnumerableAnalyzerTests(ITestO
                             }
                             """;
 
-        await CreateTesterBuilder()
-             .WithTestCode(code)
-             .Build()
-             .RunAsync();
+        return RunTestAsync(code, true);
     }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public Task Theory_IsEnabled(bool isEnabled)
+    {
+        var code = isEnabled
+            ? """
+              using System;
+              using System.Collections.Generic;
+              using System.Linq;
+              using System.Threading.Tasks;
+
+              namespace Tests;
+
+              public class Test
+              {
+                  public IEnumerable<int> TestMethod() {|AJ0003:=>|} Enumerable.Range(0, 10).ToList(); // returning materialized collection as IEnumerable is not ok
+              }
+              """
+            : """
+              using System;
+              using System.Collections.Generic;
+              using System.Linq;
+              using System.Threading.Tasks;
+
+              namespace Tests;
+
+              public class Test
+              {
+                  public IEnumerable<int> TestMethod() => Enumerable.Range(0, 10); // returning IEnumerable directly is ok
+              }
+              """;
+
+        return RunTestAsync(code, isEnabled);
+    }
+
+    private static string CreateIsEnabledConfigurationLine(bool isEnabled) => $"AJ0003.is_enabled = {(isEnabled ? "true" : "false")}";
+
+    private Task RunTestAsync(string code, bool isEnabled)
+        => CreateTesterBuilder()
+          .WithTestCode(code)
+          .WithEditorConfigLine(CreateIsEnabledConfigurationLine(isEnabled))
+          .Build()
+          .RunAsync();
 }

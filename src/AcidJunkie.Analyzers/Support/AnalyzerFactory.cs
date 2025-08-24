@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
+using System.Reflection;
 using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace AcidJunkie.Analyzers.Support;
@@ -10,11 +11,11 @@ public static class AnalyzerFactory<T>
 {
     private static readonly Func<SyntaxNodeAnalysisContext, T> Factory = CreateCompiledFactory();
 
-    public static T Create(SyntaxNodeAnalysisContext context) => Factory(context);
+    public static T Create(in SyntaxNodeAnalysisContext context) => Factory(context);
 
     private static Func<SyntaxNodeAnalysisContext, T> CreateCompiledFactory()
     {
-        var ctor = typeof(T).GetConstructor([typeof(SyntaxNodeAnalysisContext)])
+        var ctor = GetConstructor()
                    ?? throw new InvalidOperationException($"No suitable constructor found for type {typeof(T).FullName}");
 
         var contextParameter = Expression.Parameter(typeof(SyntaxNodeAnalysisContext), "context");
@@ -25,5 +26,16 @@ public static class AnalyzerFactory<T>
         );
 
         return lambda.Compile();
+
+        ConstructorInfo? GetConstructor() =>
+            typeof(T)
+               .GetConstructors()
+               .Where(a => a.GetParameters().Length == 1)
+               .FirstOrDefault(a =>
+                {
+                    var parameter = a.GetParameters()[0];
+                    return parameter.ParameterType == typeof(SyntaxNodeAnalysisContext)
+                           || parameter.ParameterType == typeof(SyntaxNodeAnalysisContext).MakeByRefType();
+                });
     }
 }

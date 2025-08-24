@@ -8,7 +8,7 @@ namespace AcidJunkie.Analyzers.Tests.Diagnosers;
 public sealed class TaskCreationWithMaterializedCollectionAsEnumerableAnalyzerTests(ITestOutputHelper testOutputHelper) : TestBase<TaskCreationWithMaterializedCollectionAsEnumerableAnalyzer>(testOutputHelper)
 {
     [Fact]
-    public async Task WhenCreatingEnumerableTaskWithMaterializedCollection_ThenDiagnose()
+    public Task WhenCreatingEnumerableTaskWithMaterializedCollection_ThenDiagnose()
     {
         const string code = """
                             using System;
@@ -27,14 +27,11 @@ public sealed class TaskCreationWithMaterializedCollectionAsEnumerableAnalyzerTe
                             }
                             """;
 
-        await CreateTesterBuilder()
-            .WithTestCode(code)
-            .Build()
-            .RunAsync();
+        return RunTestAsync(code, true);
     }
 
     [Fact]
-    public async Task WhenCreatingEnumerableValueTaskWithMaterializedCollection_ThenDiagnose()
+    public Task WhenCreatingEnumerableValueTaskWithMaterializedCollection_ThenDiagnose()
     {
         const string code = """
                             using System;
@@ -52,14 +49,11 @@ public sealed class TaskCreationWithMaterializedCollectionAsEnumerableAnalyzerTe
                                 }
                             }
                             """;
-        await CreateTesterBuilder()
-            .WithTestCode(code)
-            .Build()
-            .RunAsync();
+        return RunTestAsync(code, true);
     }
 
     [Fact]
-    public async Task WhenCreatingTaskOfTypeCollectionWithMaterializedCollection_ThenOk()
+    public Task WhenCreatingTaskOfTypeCollectionWithMaterializedCollection_ThenOk()
     {
         const string code = """
                             using System;
@@ -78,9 +72,57 @@ public sealed class TaskCreationWithMaterializedCollectionAsEnumerableAnalyzerTe
                             }
                             """;
 
-        await CreateTesterBuilder()
-            .WithTestCode(code)
-            .Build()
-            .RunAsync();
+        return RunTestAsync(code, true);
     }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public Task Theory_IsEnabled(bool isEnabled)
+    {
+        var code = isEnabled
+            ? """
+              using System;
+              using System.Collections.Generic;
+              using System.Linq;
+              using System.Threading.Tasks;
+
+              namespace Tests;
+
+              public class Test
+              {
+                  public void TestMethod()
+                  {
+                      var task = {|AJ0004:ValueTask.FromResult|}( (IEnumerable<int>) (List<int>) Enumerable.Range(0, 10).ToList() ); // returning materialized collection as IEnumerable is not ok
+                  }
+              }
+              """
+            : """
+              using System;
+              using System.Collections.Generic;
+              using System.Linq;
+              using System.Threading.Tasks;
+
+              namespace Tests;
+
+              public class Test
+              {
+                  public void TestMethod()
+                  {
+                      var task = ValueTask.FromResult( (IEnumerable<int>) (List<int>) Enumerable.Range(0, 10).ToList() );
+                  }
+              }
+              """;
+
+        return RunTestAsync(code, isEnabled);
+    }
+
+    private static string CreateIsEnabledConfigurationLine(bool isEnabled) => $"AJ0004.is_enabled = {(isEnabled ? "true" : "false")}";
+
+    private Task RunTestAsync(string code, bool isEnabled)
+        => CreateTesterBuilder()
+          .WithTestCode(code)
+          .WithEditorConfigLine(CreateIsEnabledConfigurationLine(isEnabled))
+          .Build()
+          .RunAsync();
 }

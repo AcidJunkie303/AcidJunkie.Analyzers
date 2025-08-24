@@ -1,6 +1,5 @@
 using System.Collections.Immutable;
 using AcidJunkie.Analyzers.Extensions;
-using AcidJunkie.Analyzers.Tests.Runtime;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Testing;

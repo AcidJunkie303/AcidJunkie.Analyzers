@@ -12,7 +12,7 @@ internal sealed class Aj0007Configuration : IAnalyzerConfiguration
     public string ParameterOrderFlat { get; }
     public ImmutableArray<ParameterDescription> ParameterDescriptions { get; }
 
-    public Aj0007Configuration(bool isEnabled, string parameterOrderFlat, ImmutableArray<ParameterDescription> parameterDescriptions)
+    public Aj0007Configuration(bool isEnabled, string parameterOrderFlat, in ImmutableArray<ParameterDescription> parameterDescriptions)
     {
         IsEnabled = isEnabled;
         ParameterOrderFlat = parameterOrderFlat;

@@ -7,12 +7,11 @@ internal static class MethodSymbolExtensions
 {
     public static string GetSimplifiedName(this IMethodSymbol methodSymbol)
     {
-        var buffer = new StringBuilder();
-        buffer.Append(methodSymbol.ContainingType.GetSimplifiedName());
-        buffer.Append('.');
-        buffer.Append(methodSymbol.Name);
-
-        return buffer.ToString();
+        return new StringBuilder()
+              .Append(methodSymbol.ContainingType.GetSimplifiedName())
+              .Append('.')
+              .Append(methodSymbol.Name)
+              .ToString();
     }
 
     public static string GetFullName(this IMethodSymbol methodSymbol)

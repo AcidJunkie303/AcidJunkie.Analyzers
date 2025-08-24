@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
+using AcidJunkie.Analyzers.Configuration;
 using AcidJunkie.Analyzers.Extensions;
 using AcidJunkie.Analyzers.Logging;
 using Microsoft.CodeAnalysis;
@@ -12,12 +13,20 @@ namespace AcidJunkie.Analyzers.Diagnosers.ReturnMaterializedCollectionAsEnumerab
 [SuppressMessage("ReSharper", "UseCollectionExpression", Justification = "Not supported in lower versions of Roslyn")]
 internal sealed class ReturnMaterializedCollectionAsEnumerableAnalyzerImplementation : SyntaxNodeAnalyzerImplementationBase<ReturnMaterializedCollectionAsEnumerableAnalyzerImplementation>
 {
-    public ReturnMaterializedCollectionAsEnumerableAnalyzerImplementation(SyntaxNodeAnalysisContext context) : base(context)
+    private readonly IAnalyzerConfiguration _configuration;
+
+    public ReturnMaterializedCollectionAsEnumerableAnalyzerImplementation(in SyntaxNodeAnalysisContext context) : base(context)
     {
+        _configuration = GenericConfigurationProvider.GetConfiguration(context, DiagnosticRules.Default.DiagnosticId);
     }
 
     public void AnalyzeArrowExpression()
     {
+        if (!_configuration.IsEnabled)
+        {
+            return;
+        }
+
         var arrowExpression = (ArrowExpressionClauseSyntax)Context.Node;
 
         var methodOrLocalFunction = arrowExpression.Parent switch
@@ -44,8 +53,12 @@ internal sealed class ReturnMaterializedCollectionAsEnumerableAnalyzerImplementa
 
     public void AnalyzeReturn()
     {
-        var returnStatement = (ReturnStatementSyntax)Context.Node;
+        if (!_configuration.IsEnabled)
+        {
+            return;
+        }
 
+        var returnStatement = (ReturnStatementSyntax)Context.Node;
         if (returnStatement.Expression is null)
         {
             Logger.WriteLine(() => "return statement has no expression");
@@ -90,15 +103,16 @@ internal sealed class ReturnMaterializedCollectionAsEnumerableAnalyzerImplementa
                || (namedTypeSymbol.Arity == 1 && ns.EqualsOrdinal("System.Collections.Generic"));
     }
 
+    [SuppressMessage("Critical Code Smell", "S131:\"switch/Select\" statements should contain a \"default/Case Else\" clauses")]
     private static MethodDeclarationSyntaxOrLocalFunctionDeclaration? GetContainingMethodOrLocalFunction(ReturnStatementSyntax node)
     {
         foreach (var parent in node.Ancestors())
         {
             switch (parent)
             {
-                case ReturnStatementSyntax:                      return null;
-                case LambdaExpressionSyntax:                     return null;
-                case ArrowExpressionClauseSyntax:                return null;
+                case ReturnStatementSyntax:
+                case LambdaExpressionSyntax:
+                case ArrowExpressionClauseSyntax: return null;
                 case MethodDeclarationSyntax methodDeclaration:  return new MethodDeclarationSyntaxOrLocalFunctionDeclaration(methodDeclaration);
                 case LocalFunctionStatementSyntax localFunction: return new MethodDeclarationSyntaxOrLocalFunctionDeclaration(localFunction);
             }

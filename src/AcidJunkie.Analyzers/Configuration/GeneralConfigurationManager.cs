@@ -7,6 +7,6 @@ internal static class GeneralConfigurationManager
 {
     private const string LoggingEnabledKeyName = "AcidJunkie_Analyzers.is_logging_enabled";
 
-    public static bool IsLoggingEnabled(SyntaxNodeAnalysisContext context)
-        => context.GetOptionsBooleanValue(LoggingEnabledKeyName, defaultValue: false);
+    public static bool IsLoggingEnabled(in SyntaxNodeAnalysisContext context)
+        => context.GetOptionsBooleanValue(LoggingEnabledKeyName);
 }

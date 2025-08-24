@@ -1,9 +1,11 @@
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
+using AcidJunkie.Analyzers.Configuration.Aj0002;
 using AcidJunkie.Analyzers.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
+using EntityTypesByNamespaceName = System.Collections.Generic.IReadOnlyDictionary<string, System.Collections.Generic.IReadOnlyList<Microsoft.CodeAnalysis.INamedTypeSymbol>>;
 
 namespace AcidJunkie.Analyzers.Diagnosers.EnforceEntityFrameworkTrackingType;
 
@@ -16,12 +18,23 @@ internal sealed class EnforceEntityFrameworkTrackingTypeAnalyzerImplementation :
         "AsNoTracking"
     }.ToImmutableHashSet(StringComparer.OrdinalIgnoreCase);
 
-    public EnforceEntityFrameworkTrackingTypeAnalyzerImplementation(SyntaxNodeAnalysisContext context) : base(context)
+    private readonly Aj0002Configuration _configuration;
+
+    public EnforceEntityFrameworkTrackingTypeAnalyzerImplementation(in SyntaxNodeAnalysisContext context) : base(context)
     {
+        _configuration = Aj0002ConfigurationProvider.Instance.GetConfiguration(context);
     }
 
+    [SuppressMessage("Critical Code Smell", "S134:Control flow statements \"if\", \"switch\", \"for\", \"foreach\", \"while\", \"do\"  and \"try\" should not be nested too deeply")]
+    [SuppressMessage("Minor Code Smell", "S1227:break statements should not be used except for switch cases")]
+    [SuppressMessage("Critical Code Smell", "S3776:Cognitive Complexity of methods should not be too high")]
     public void AnalyzeMemberAccessExpression()
     {
+        if (!_configuration.IsEnabled)
+        {
+            return;
+        }
+
         var memberAccessExpression = (MemberAccessExpressionSyntax)Context.Node;
         if (!IsDbSetType(memberAccessExpression, out var dbContextType, out _))
         {
@@ -52,14 +65,17 @@ internal sealed class EnforceEntityFrameworkTrackingTypeAnalyzerImplementation :
                     }
                 }
 
-                if (IsSelectStatement(invocation, out var resultType))
+                if (_configuration.Mode != Mode.Strict)
                 {
-                    if (IsEntityTypeOrContainsEntityProperties(resultType, entitiesOfDbContextByNamespaceNameLazy.Value))
+                    if (IsSelectStatement(invocation, out var resultType))
                     {
-                        break; // the select returns an entity. So we abort and report the diagnostic
-                    }
+                        if (IsEntityTypeOrContainsEntityProperties(resultType, entitiesOfDbContextByNamespaceNameLazy.Value))
+                        {
+                            break; // the select returns an entity. So we abort and report the diagnostic
+                        }
 
-                    return; // if the select statement does not return an entity, we're good
+                        return; // if the select statement does not return an entity, we're good
+                    }
                 }
             }
 
@@ -70,7 +86,7 @@ internal sealed class EnforceEntityFrameworkTrackingTypeAnalyzerImplementation :
         Context.ReportDiagnostic(Diagnostic.Create(DiagnosticRules.Default.Rule, memberAccessExpression.GetLocation()));
     }
 
-    private static bool IsEntityTypeOrContainsEntityProperties(ITypeSymbol type, IReadOnlyDictionary<string, IReadOnlyList<INamedTypeSymbol>> entityTypesByNamespaceName)
+    private static bool IsEntityTypeOrContainsEntityProperties(ITypeSymbol type, EntityTypesByNamespaceName entityTypesByNamespaceName)
     {
 #pragma warning disable RS1024 // We want to do it by reference in this case
         var visitedTypes = new HashSet<ITypeSymbol>(EqualityComparer<ITypeSymbol>.Default);
@@ -79,7 +95,7 @@ internal sealed class EnforceEntityFrameworkTrackingTypeAnalyzerImplementation :
         return IsEntityTypeOrContainsEntityProperties(type, entityTypesByNamespaceName, visitedTypes);
     }
 
-    private static bool IsEntityTypeOrContainsEntityProperties(ITypeSymbol type, IReadOnlyDictionary<string, IReadOnlyList<INamedTypeSymbol>> entityTypesByNamespaceName, HashSet<ITypeSymbol> visitedTypes)
+    private static bool IsEntityTypeOrContainsEntityProperties(ITypeSymbol type, EntityTypesByNamespaceName entityTypesByNamespaceName, HashSet<ITypeSymbol> visitedTypes)
     {
         if (visitedTypes.Contains(type))
         {
@@ -163,8 +179,7 @@ internal sealed class EnforceEntityFrameworkTrackingTypeAnalyzerImplementation :
             return false;
         }
 
-        var identifierName = memberAccessExpression.Expression as IdentifierNameSyntax;
-        if (identifierName is null)
+        if (memberAccessExpression.Expression is not IdentifierNameSyntax identifierName)
         {
             return false;
         }

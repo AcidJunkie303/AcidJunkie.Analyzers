@@ -10,7 +10,7 @@ internal abstract class SyntaxNodeAnalyzerImplementationBase<TImplementation>
     protected ILogger<TImplementation> Logger { get; }
     protected SyntaxNodeAnalysisContext Context { get; }
 
-    protected SyntaxNodeAnalyzerImplementationBase(SyntaxNodeAnalysisContext context)
+    protected SyntaxNodeAnalyzerImplementationBase(in SyntaxNodeAnalysisContext context)
     {
         Context = context;
         Logger = context.CreateLogger<TImplementation>();
