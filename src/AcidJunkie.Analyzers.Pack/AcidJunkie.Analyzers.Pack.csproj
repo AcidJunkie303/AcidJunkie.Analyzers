@@ -8,10 +8,10 @@
         <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
         <GenerateDependencyFile>false</GenerateDependencyFile>
         <IncludeBuildOutput>false</IncludeBuildOutput>
-        <!--<IsPackable>false</IsPackable>-->
         <NoPackageAnalysis>true</NoPackageAnalysis>
         <PackageIcon>icon.png</PackageIcon>
         <PackageId>AcidJunkie.Analyzers</PackageId>
+        <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
         <PackageProjectUrl>https://github.com/AcidJunkie303/AcidJunkie.Analyzerss</PackageProjectUrl>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageReleaseNotes>Initial version.</PackageReleaseNotes>
@@ -41,61 +41,61 @@
     </ItemGroup>
 
     <ItemGroup>
-        <!--
-                <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers\bin\roslyn3.8\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn3.8/cs/"/>
-                <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers.CodeFixers\bin\roslyn3.8\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.CodeFixers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn3.8/cs/"/>
 
-                <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers\bin\roslyn3.9\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn3.9/cs/"/>
-                <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers.CodeFixers\bin\roslyn3.9\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.CodeFixers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn3.9/cs/"/>
+        <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers\bin\roslyn3.8\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn3.8/cs/"/>
+        <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers.CodeFixers\bin\roslyn3.8\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.CodeFixers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn3.8/cs/"/>
 
-                <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers\bin\roslyn3.10\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn3.10/cs/"/>
-                <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers.CodeFixers\bin\roslyn3.10\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.CodeFixers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn3.10/cs/"/>
+        <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers\bin\roslyn3.9\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn3.9/cs/"/>
+        <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers.CodeFixers\bin\roslyn3.9\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.CodeFixers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn3.9/cs/"/>
 
-                <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers\bin\roslyn3.11\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn3.11/cs/"/>
-                <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers.CodeFixers\bin\roslyn3.11\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.CodeFixers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn3.11/cs/"/>
+        <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers\bin\roslyn3.10\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn3.10/cs/"/>
+        <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers.CodeFixers\bin\roslyn3.10\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.CodeFixers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn3.10/cs/"/>
 
-                <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers\bin\roslyn4.0.1\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.0.1/cs/"/>
-                <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers.CodeFixers\bin\roslyn4.0.1\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.CodeFixers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.0.1/cs/"/>
+        <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers\bin\roslyn3.11\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn3.11/cs/"/>
+        <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers.CodeFixers\bin\roslyn3.11\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.CodeFixers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn3.11/cs/"/>
 
-                <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers\bin\roslyn4.1\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.1/cs/"/>
-                <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers.CodeFixers\bin\roslyn4.1\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.CodeFixers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.1/cs/"/>
+        <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers\bin\roslyn4.0.1\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.0.1/cs/"/>
+        <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers.CodeFixers\bin\roslyn4.0.1\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.CodeFixers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.0.1/cs/"/>
 
-                <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers\bin\roslyn4.2\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.2/cs/"/>
-                <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers.CodeFixers\bin\roslyn4.2\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.CodeFixers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.2/cs/"/>
+        <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers\bin\roslyn4.1\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.1/cs/"/>
+        <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers.CodeFixers\bin\roslyn4.1\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.CodeFixers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.1/cs/"/>
 
-                <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers\bin\roslyn4.3.1\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.3.1/cs/"/>
-                <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers.CodeFixers\bin\roslyn4.3.1\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.CodeFixers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.3.1/cs/"/>
+        <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers\bin\roslyn4.2\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.2/cs/"/>
+        <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers.CodeFixers\bin\roslyn4.2\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.CodeFixers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.2/cs/"/>
 
-                <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers\bin\roslyn4.4\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.4/cs/"/>
-                <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers.CodeFixers\bin\roslyn4.4\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.CodeFixers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.4/cs/"/>
+        <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers\bin\roslyn4.3.1\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.3.1/cs/"/>
+        <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers.CodeFixers\bin\roslyn4.3.1\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.CodeFixers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.3.1/cs/"/>
 
-                <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers\bin\roslyn4.5\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.5/cs/"/>
-                <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers.CodeFixers\bin\roslyn4.5\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.CodeFixers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.5/cs/"/>
+        <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers\bin\roslyn4.4\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.4/cs/"/>
+        <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers.CodeFixers\bin\roslyn4.4\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.CodeFixers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.4/cs/"/>
 
-                <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers\bin\roslyn4.6\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.6/cs/"/>
-                <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers.CodeFixers\bin\roslyn4.6\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.CodeFixers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.6/cs/"/>
+        <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers\bin\roslyn4.5\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.5/cs/"/>
+        <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers.CodeFixers\bin\roslyn4.5\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.CodeFixers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.5/cs/"/>
 
-                <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers\bin\roslyn4.7\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.7/cs/"/>
-                <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers.CodeFixers\bin\roslyn4.7\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.CodeFixers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.7/cs/"/>
+        <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers\bin\roslyn4.6\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.6/cs/"/>
+        <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers.CodeFixers\bin\roslyn4.6\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.CodeFixers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.6/cs/"/>
 
-                <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers\bin\roslyn4.8\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.8/cs/"/>
-                <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers.CodeFixers\bin\roslyn4.8\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.CodeFixers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.8/cs/"/>
+        <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers\bin\roslyn4.7\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.7/cs/"/>
+        <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers.CodeFixers\bin\roslyn4.7\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.CodeFixers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.7/cs/"/>
 
-                <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers\bin\roslyn4.9.2\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.9.2/cs/"/>
-                <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers.CodeFixers\bin\roslyn4.9.2\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.CodeFixers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.9.2/cs/"/>
+        <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers\bin\roslyn4.8\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.8/cs/"/>
+        <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers.CodeFixers\bin\roslyn4.8\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.CodeFixers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.8/cs/"/>
 
-                <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers\bin\roslyn4.10\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.10/cs/"/>
-                <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers.CodeFixers\bin\roslyn4.10\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.CodeFixers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.10/cs/"/>
+        <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers\bin\roslyn4.9.2\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.9.2/cs/"/>
+        <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers.CodeFixers\bin\roslyn4.9.2\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.CodeFixers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.9.2/cs/"/>
 
-                <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers\bin\roslyn4.11\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.11/cs/"/>
-                <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers.CodeFixers\bin\roslyn4.11\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.CodeFixers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.11/cs/"/>
+        <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers\bin\roslyn4.10\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.10/cs/"/>
+        <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers.CodeFixers\bin\roslyn4.10\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.CodeFixers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.10/cs/"/>
 
-                <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers\bin\roslyn4.12\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.12/cs/"/>
-                <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers.CodeFixers\bin\roslyn4.12\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.CodeFixers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.12/cs/"/>
+        <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers\bin\roslyn4.11\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.11/cs/"/>
+        <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers.CodeFixers\bin\roslyn4.11\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.CodeFixers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.11/cs/"/>
 
-                <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers\bin\roslyn4.13\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.13/cs/"/>
-                <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers.CodeFixers\bin\roslyn4.13\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.CodeFixers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.13/cs/"/>
-        -->
+        <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers\bin\roslyn4.12\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.12/cs/"/>
+        <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers.CodeFixers\bin\roslyn4.12\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.CodeFixers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.12/cs/"/>
+
+        <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers\bin\roslyn4.13\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.13/cs/"/>
+        <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers.CodeFixers\bin\roslyn4.13\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.CodeFixers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.13/cs/"/>
+
         <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers\bin\roslyn4.14\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.14/cs/"/>
         <None Include="$(MSBuildThisFileDirectory)\..\AcidJunkie.Analyzers.CodeFixers\bin\roslyn4.14\$(Configuration)\netstandard2.0\AcidJunkie.Analyzers.CodeFixers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.14/cs/"/>
 
