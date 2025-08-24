@@ -28,6 +28,8 @@ jobs:
         run: |
           echo "ASSEMBLY_VERSION=1.0.0-${GITHUB_RUN_NUMBER}" >> $GITHUB_ENV
           echo "NUGET_VERSION=1.0.0-prerelease-${GITHUB_RUN_NUMBER}" >> $GITHUB_ENV
+          ECHO "ASSEMBLY_VERSION=$ASSEMBLY_VERSION"
+          ECHO "NUGET_VERSION=$NUGET_VERSION"
 
       - name: Test
         run: dotnet test --no-build --configuration Release --verbosity normal
@@ -131,6 +133,7 @@ jobs:
       - name: Compile and Pack Analyzers.Pack
         run: |
           dotnet restore src/AcidJunkie.Analyzers.Pack/AcidJunkie.Analyzers.Pack.csproj
+          dotnet build src/AcidJunkie.Analyzers.Pack/AcidJunkie.Analyzers.Pack.csproj --configuration Release /p:Version=$NUGET_VERSION
           dotnet pack src/AcidJunkie.Analyzers.Pack/AcidJunkie.Analyzers.Pack.csproj --configuration Release /p:Version=$NUGET_VERSION
 
       - name: Publish to NuGet
