@@ -24,12 +24,16 @@ jobs:
         with:
           dotnet-version: '9.0.x'
 
-      - name: Set Assembly Version
+      - name: Set Environment Variables
         run: |
           echo "ASSEMBLY_VERSION=1.0.0-${GITHUB_RUN_NUMBER}" >> $GITHUB_ENV
           echo "NUGET_VERSION=1.0.0-prerelease-${GITHUB_RUN_NUMBER}" >> $GITHUB_ENV
-          echo "ASSEMBLY_VERSION=$ASSEMBLY_VERSION"
-          echo "NUGET_VERSION=$NUGET_VERSION"
+
+      - name: Show Environment Variables
+        run: |
+          echo "GITHUB_RUN_NUMBER = ${GITHUB_RUN_NUMBER}"
+          echo "ASSEMBLY_VERSION = ${ASSEMBLY_VERSION}"
+          echo "NUGET_VERSION = ${NUGET_VERSION}"
 
       - name: Test
         run: dotnet test --no-build --configuration Release --verbosity normal
