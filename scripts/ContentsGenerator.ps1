@@ -2,8 +2,23 @@ $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 
 function Get-RoslynVersions {
+
     $path = Join-Path $PSScriptRoot "ContentsGenerator.csv"
-    Get-Content $path | ConvertFrom-Csv
+    $versions = Get-Content $path | ConvertFrom-Csv 
+    $latestRoslynVersion = $versions | Select-Object -ExpandProperty "RoslynVersion" -Last 1
+
+    $versions `
+        | ForEach-Object {
+            [PSCustomObject]@{
+                Include                 = [boolean]::Parse($_.Include)
+                IsLast                  = ($_.RoslynVersion -eq $latestRoslynVersion)
+                RoslynVersion           = $_.RoslynVersion
+                CSharpVersion           = $_.CSharpVersion
+                AnalyzersPackageVersion = $_.AnalyzersPackageVersion
+                NoWarn                  = $_.NoWarn
+            } `
+        } `
+        | Where-Object { $_.Include }
 }
 
 function Get-Node([bool] $IsLast, [string] $RoslynVersion) {
@@ -112,16 +127,11 @@ function Build-TargetFileNodes {
     $previusCSharpPreprocessorVersions = [System.Collections.ArrayList]::new()
 
     foreach ($roslynVersionInfo in Get-RoslynVersions) {
-        $include = [boolean]::Parse($roslynVersionInfo.Include)
-        if (!$include) {
-            continue
-        }
 
         $roslynVersion = $roslynVersionInfo.RoslynVersion
         $trimmedRoslynVersion = Remove-TrailingZeroDigitsFromSemVer($roslynVersionInfo.RoslynVersion)
         $cSharpVersion = $roslynVersionInfo.CSharpVersion
         $analyzersPackageVersion = $roslynVersionInfo.AnalyzersPackageVersion
-        $isLast = [boolean]::Parse($roslynVersionInfo.IsLast)
         $noWarn = $roslynVersionInfo.NoWarn
         $preprocessorRoslynVersion = $trimmedRoslynVersion.Replace(".", "_")
         $preprocessorCSharpVersion = $cSharpVersion.Replace(".", "_")
@@ -129,7 +139,7 @@ function Build-TargetFileNodes {
         $roslynPreprocessorDefinitions = Build-PreprocessorDefinitions "ROSLYN" $preprocessorRoslynVersion $previusRoslynPreprocessorVersions
         $cSharpPreprocessorDefinitions = Build-PreprocessorDefinitions "CSHARP" $preprocessorCSharpVersion $previusCSharpPreprocessorVersions
 
-        Get-NodeContents $roslynVersion $trimmedRoslynVersion $cSharpVersion $roslynPreprocessorDefinitions $cSharpPreprocessorDefinitions $analyzersPackageVersion $noWarn $isLast
+        Get-NodeContents $roslynVersion $trimmedRoslynVersion $cSharpVersion $roslynPreprocessorDefinitions $cSharpPreprocessorDefinitions $analyzersPackageVersion $noWarn $roslynVersionInfo.IsLast
 
         if (!($previusRoslynPreprocessorVersions.Contains($preprocessorRoslynVersion))) {
             $previusRoslynPreprocessorVersions.Add($preprocessorRoslynVersion) | Out-Null
@@ -145,10 +155,7 @@ function Create-BuildCommands {
 
     foreach ($roslynVersionInfo in Get-RoslynVersions) {
 
-        if (!([boolean]::Parse($roslynVersionInfo.Include))) {
-            continue
-        }
-        if ([boolean]::Parse($roslynVersionInfo.IsLast)) {
+        if ($roslynVersionInfo.IsLast) {
             continue
         }
 
@@ -163,14 +170,10 @@ function Create-BuildCommands {
 }
 
 
-function Create-PackProjectFileReferences
-{
+function Create-PackProjectFileReferences {
     foreach ($roslynVersionInfo in Get-RoslynVersions) {
 
-        if (!([boolean]::Parse($roslynVersionInfo.Include))) {
-            continue
-        }
-        if ([boolean]::Parse($roslynVersionInfo.IsLast)) {
+        if ($roslynVersionInfo.IsLast) {
             continue
         }
 
@@ -183,14 +186,10 @@ function Create-PackProjectFileReferences
     } 
 }
 
-function Create-BuildCommandsForPipeline
-{
+function Create-BuildCommandsForPipeline {
     foreach ($roslynVersionInfo in Get-RoslynVersions) {
 
-        if (!([boolean]::Parse($roslynVersionInfo.Include))) {
-            continue
-        }
-        if ([boolean]::Parse($roslynVersionInfo.IsLast)) {
+        if ($roslynVersionInfo.IsLast) {
             continue
         }
 
@@ -202,18 +201,23 @@ function Create-BuildCommandsForPipeline
         "          dotnet build src/AcidJunkie.Analyzers.CodeFixers/AcidJunkie.Analyzers.CodeFixers.csproj --configuration Release /p:RoslynVersion=roslyn$roslynVersion /p:Version=`$ASSEMBLY_VERSION"
         ""
     }
-
-    <#
-      - name: Compile Analyzers and Fixers for Roslyn <<version>>
-        run: dotnet build src/AcidJunkie.Analyzers/AcidJunkie.Analyzers.csproj --configuration Release /p:RoslynVersion=roslyn<<version>> /p:Version=$ASSEMBLY_VERSION
-    
-    #>
-
-
-
 }
 
-#Build-TargetFileNodes | Clip
-#Create-BuildCommands | Clip
-Create-PackProjectFileReferences | Clip
-#Create-BuildCommandsForPipeline | Clip
+"********************************************************************************************************************************"
+"* Directory.Build.Target contents"
+"********************************************************************************************************************************"
+Build-TargetFileNodes
+"********************************************************************************************************************************"
+"* Local Build Commands"
+"********************************************************************************************************************************"
+Create-BuildCommands
+"********************************************************************************************************************************"
+"* Analyzers.Pack project file references"
+"********************************************************************************************************************************"
+Create-PackProjectFileReferences
+"********************************************************************************************************************************"
+"* Pipeline contents"
+"********************************************************************************************************************************"
+Create-BuildCommandsForPipeline
+"********************************************************************************************************************************"
+"********************************************************************************************************************************"
