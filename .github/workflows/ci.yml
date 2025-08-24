@@ -128,12 +128,16 @@ jobs:
           dotnet build src/AcidJunkie.Analyzers/AcidJunkie.Analyzers.csproj --configuration Release /p:RoslynVersion=roslyn4.14 /p:Version=$ASSEMBLY_VERSION
           dotnet build src/AcidJunkie.Analyzers.CodeFixers/AcidJunkie.Analyzers.CodeFixers.csproj --configuration Release /p:RoslynVersion=roslyn4.14 /p:Version=$ASSEMBLY_VERSION
 
-      - name: Pack NuGet package
-        working-directory: src/AcidJunkie.Analyzers.Pack
+      - name: Compile and Pack Analyzers.Pack
         run: |
           dotnet restore AcidJunkie.Analyzers.Pack.csproj
-          dotnet pack AcidJunkie.Analyzers.Pack.csproj --configuration Release --no-build /p:Version=$NUGET_VERSION
+          dotnet build src/AcidJunkie.Analyzers.Pack/AcidJunkie.Analyzers.Pack.csproj --configuration Release /p:Version=$ASSEMBLY_VERSION
+          dotnet pack src/AcidJunkie.Analyzers.Pack/AcidJunkie.Analyzers.Pack.csproj --configuration Release --no-build /p:Version=$NUGET_VERSION
           ls -lR
+
+      - name: Show files
+        run: dotnet pack AcidJunkie.Analyzers.Pack.csproj --configuration Release --no-build /p:Version=$NUGET_VERSION
+        working-directory: src/AcidJunkie.Analyzers.Pack
 
       - name: Publish to NuGet
         if: ${{ startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/heads/release-') }}
