@@ -32,96 +32,96 @@ jobs:
       - name: Test
         run: dotnet test --no-build --configuration Release --verbosity normal
         working-directory: ./src/AcidJunkie.Analyzers
-
-      - name: Compile Analyzers and Fixers for Roslyn 3.8
-        run: |
-          dotnet build src/AcidJunkie.Analyzers/AcidJunkie.Analyzers.csproj --configuration Release /p:RoslynVersion=roslyn3.8 /p:Version=$ASSEMBLY_VERSION
-          dotnet build src/AcidJunkie.Analyzers.CodeFixers/AcidJunkie.Analyzers.CodeFixers.csproj --configuration Release /p:RoslynVersion=roslyn3.8 /p:Version=$ASSEMBLY_VERSION
-
-      - name: Compile Analyzers and Fixers for Roslyn 3.9
-        run: |
-          dotnet build src/AcidJunkie.Analyzers/AcidJunkie.Analyzers.csproj --configuration Release /p:RoslynVersion=roslyn3.9 /p:Version=$ASSEMBLY_VERSION
-          dotnet build src/AcidJunkie.Analyzers.CodeFixers/AcidJunkie.Analyzers.CodeFixers.csproj --configuration Release /p:RoslynVersion=roslyn3.9 /p:Version=$ASSEMBLY_VERSION
-
-      - name: Compile Analyzers and Fixers for Roslyn 3.10
-        run: |
-          dotnet build src/AcidJunkie.Analyzers/AcidJunkie.Analyzers.csproj --configuration Release /p:RoslynVersion=roslyn3.10 /p:Version=$ASSEMBLY_VERSION
-          dotnet build src/AcidJunkie.Analyzers.CodeFixers/AcidJunkie.Analyzers.CodeFixers.csproj --configuration Release /p:RoslynVersion=roslyn3.10 /p:Version=$ASSEMBLY_VERSION
-
-      - name: Compile Analyzers and Fixers for Roslyn 3.11
-        run: |
-          dotnet build src/AcidJunkie.Analyzers/AcidJunkie.Analyzers.csproj --configuration Release /p:RoslynVersion=roslyn3.11 /p:Version=$ASSEMBLY_VERSION
-          dotnet build src/AcidJunkie.Analyzers.CodeFixers/AcidJunkie.Analyzers.CodeFixers.csproj --configuration Release /p:RoslynVersion=roslyn3.11 /p:Version=$ASSEMBLY_VERSION
-
-      - name: Compile Analyzers and Fixers for Roslyn 4.0.1
-        run: |
-          dotnet build src/AcidJunkie.Analyzers/AcidJunkie.Analyzers.csproj --configuration Release /p:RoslynVersion=roslyn4.0.1 /p:Version=$ASSEMBLY_VERSION
-          dotnet build src/AcidJunkie.Analyzers.CodeFixers/AcidJunkie.Analyzers.CodeFixers.csproj --configuration Release /p:RoslynVersion=roslyn4.0.1 /p:Version=$ASSEMBLY_VERSION
-
-      - name: Compile Analyzers and Fixers for Roslyn 4.1
-        run: |
-          dotnet build src/AcidJunkie.Analyzers/AcidJunkie.Analyzers.csproj --configuration Release /p:RoslynVersion=roslyn4.1 /p:Version=$ASSEMBLY_VERSION
-          dotnet build src/AcidJunkie.Analyzers.CodeFixers/AcidJunkie.Analyzers.CodeFixers.csproj --configuration Release /p:RoslynVersion=roslyn4.1 /p:Version=$ASSEMBLY_VERSION
-
-      - name: Compile Analyzers and Fixers for Roslyn 4.2
-        run: |
-          dotnet build src/AcidJunkie.Analyzers/AcidJunkie.Analyzers.csproj --configuration Release /p:RoslynVersion=roslyn4.2 /p:Version=$ASSEMBLY_VERSION
-          dotnet build src/AcidJunkie.Analyzers.CodeFixers/AcidJunkie.Analyzers.CodeFixers.csproj --configuration Release /p:RoslynVersion=roslyn4.2 /p:Version=$ASSEMBLY_VERSION
-
-      - name: Compile Analyzers and Fixers for Roslyn 4.3.1
-        run: |
-          dotnet build src/AcidJunkie.Analyzers/AcidJunkie.Analyzers.csproj --configuration Release /p:RoslynVersion=roslyn4.3.1 /p:Version=$ASSEMBLY_VERSION
-          dotnet build src/AcidJunkie.Analyzers.CodeFixers/AcidJunkie.Analyzers.CodeFixers.csproj --configuration Release /p:RoslynVersion=roslyn4.3.1 /p:Version=$ASSEMBLY_VERSION
-
-      - name: Compile Analyzers and Fixers for Roslyn 4.4
-        run: |
-          dotnet build src/AcidJunkie.Analyzers/AcidJunkie.Analyzers.csproj --configuration Release /p:RoslynVersion=roslyn4.4 /p:Version=$ASSEMBLY_VERSION
-          dotnet build src/AcidJunkie.Analyzers.CodeFixers/AcidJunkie.Analyzers.CodeFixers.csproj --configuration Release /p:RoslynVersion=roslyn4.4 /p:Version=$ASSEMBLY_VERSION
-
-      - name: Compile Analyzers and Fixers for Roslyn 4.5
-        run: |
-          dotnet build src/AcidJunkie.Analyzers/AcidJunkie.Analyzers.csproj --configuration Release /p:RoslynVersion=roslyn4.5 /p:Version=$ASSEMBLY_VERSION
-          dotnet build src/AcidJunkie.Analyzers.CodeFixers/AcidJunkie.Analyzers.CodeFixers.csproj --configuration Release /p:RoslynVersion=roslyn4.5 /p:Version=$ASSEMBLY_VERSION
-
-      - name: Compile Analyzers and Fixers for Roslyn 4.6
-        run: |
-          dotnet build src/AcidJunkie.Analyzers/AcidJunkie.Analyzers.csproj --configuration Release /p:RoslynVersion=roslyn4.6 /p:Version=$ASSEMBLY_VERSION
-          dotnet build src/AcidJunkie.Analyzers.CodeFixers/AcidJunkie.Analyzers.CodeFixers.csproj --configuration Release /p:RoslynVersion=roslyn4.6 /p:Version=$ASSEMBLY_VERSION
-
-      - name: Compile Analyzers and Fixers for Roslyn 4.7
-        run: |
-          dotnet build src/AcidJunkie.Analyzers/AcidJunkie.Analyzers.csproj --configuration Release /p:RoslynVersion=roslyn4.7 /p:Version=$ASSEMBLY_VERSION
-          dotnet build src/AcidJunkie.Analyzers.CodeFixers/AcidJunkie.Analyzers.CodeFixers.csproj --configuration Release /p:RoslynVersion=roslyn4.7 /p:Version=$ASSEMBLY_VERSION
-
-      - name: Compile Analyzers and Fixers for Roslyn 4.8
-        run: |
-          dotnet build src/AcidJunkie.Analyzers/AcidJunkie.Analyzers.csproj --configuration Release /p:RoslynVersion=roslyn4.8 /p:Version=$ASSEMBLY_VERSION
-          dotnet build src/AcidJunkie.Analyzers.CodeFixers/AcidJunkie.Analyzers.CodeFixers.csproj --configuration Release /p:RoslynVersion=roslyn4.8 /p:Version=$ASSEMBLY_VERSION
-
-      - name: Compile Analyzers and Fixers for Roslyn 4.9.2
-        run: |
-          dotnet build src/AcidJunkie.Analyzers/AcidJunkie.Analyzers.csproj --configuration Release /p:RoslynVersion=roslyn4.9.2 /p:Version=$ASSEMBLY_VERSION
-          dotnet build src/AcidJunkie.Analyzers.CodeFixers/AcidJunkie.Analyzers.CodeFixers.csproj --configuration Release /p:RoslynVersion=roslyn4.9.2 /p:Version=$ASSEMBLY_VERSION
-
-      - name: Compile Analyzers and Fixers for Roslyn 4.10
-        run: |
-          dotnet build src/AcidJunkie.Analyzers/AcidJunkie.Analyzers.csproj --configuration Release /p:RoslynVersion=roslyn4.10 /p:Version=$ASSEMBLY_VERSION
-          dotnet build src/AcidJunkie.Analyzers.CodeFixers/AcidJunkie.Analyzers.CodeFixers.csproj --configuration Release /p:RoslynVersion=roslyn4.10 /p:Version=$ASSEMBLY_VERSION
-
-      - name: Compile Analyzers and Fixers for Roslyn 4.11
-        run: |
-          dotnet build src/AcidJunkie.Analyzers/AcidJunkie.Analyzers.csproj --configuration Release /p:RoslynVersion=roslyn4.11 /p:Version=$ASSEMBLY_VERSION
-          dotnet build src/AcidJunkie.Analyzers.CodeFixers/AcidJunkie.Analyzers.CodeFixers.csproj --configuration Release /p:RoslynVersion=roslyn4.11 /p:Version=$ASSEMBLY_VERSION
-
-      - name: Compile Analyzers and Fixers for Roslyn 4.12
-        run: |
-          dotnet build src/AcidJunkie.Analyzers/AcidJunkie.Analyzers.csproj --configuration Release /p:RoslynVersion=roslyn4.12 /p:Version=$ASSEMBLY_VERSION
-          dotnet build src/AcidJunkie.Analyzers.CodeFixers/AcidJunkie.Analyzers.CodeFixers.csproj --configuration Release /p:RoslynVersion=roslyn4.12 /p:Version=$ASSEMBLY_VERSION
-
-      - name: Compile Analyzers and Fixers for Roslyn 4.13
-        run: |
-          dotnet build src/AcidJunkie.Analyzers/AcidJunkie.Analyzers.csproj --configuration Release /p:RoslynVersion=roslyn4.13 /p:Version=$ASSEMBLY_VERSION
-          dotnet build src/AcidJunkie.Analyzers.CodeFixers/AcidJunkie.Analyzers.CodeFixers.csproj --configuration Release /p:RoslynVersion=roslyn4.13 /p:Version=$ASSEMBLY_VERSION
+      
+      #      - name: Compile Analyzers and Fixers for Roslyn 3.8
+      #        run: |
+      #          dotnet build src/AcidJunkie.Analyzers/AcidJunkie.Analyzers.csproj --configuration Release /p:RoslynVersion=roslyn3.8 /p:Version=$ASSEMBLY_VERSION
+      #          dotnet build src/AcidJunkie.Analyzers.CodeFixers/AcidJunkie.Analyzers.CodeFixers.csproj --configuration Release /p:RoslynVersion=roslyn3.8 /p:Version=$ASSEMBLY_VERSION
+      #
+      #      - name: Compile Analyzers and Fixers for Roslyn 3.9
+      #        run: |
+      #          dotnet build src/AcidJunkie.Analyzers/AcidJunkie.Analyzers.csproj --configuration Release /p:RoslynVersion=roslyn3.9 /p:Version=$ASSEMBLY_VERSION
+      #          dotnet build src/AcidJunkie.Analyzers.CodeFixers/AcidJunkie.Analyzers.CodeFixers.csproj --configuration Release /p:RoslynVersion=roslyn3.9 /p:Version=$ASSEMBLY_VERSION
+      #
+      #      - name: Compile Analyzers and Fixers for Roslyn 3.10
+      #        run: |
+      #          dotnet build src/AcidJunkie.Analyzers/AcidJunkie.Analyzers.csproj --configuration Release /p:RoslynVersion=roslyn3.10 /p:Version=$ASSEMBLY_VERSION
+      #          dotnet build src/AcidJunkie.Analyzers.CodeFixers/AcidJunkie.Analyzers.CodeFixers.csproj --configuration Release /p:RoslynVersion=roslyn3.10 /p:Version=$ASSEMBLY_VERSION
+      #
+      #      - name: Compile Analyzers and Fixers for Roslyn 3.11
+      #        run: |
+      #          dotnet build src/AcidJunkie.Analyzers/AcidJunkie.Analyzers.csproj --configuration Release /p:RoslynVersion=roslyn3.11 /p:Version=$ASSEMBLY_VERSION
+      #          dotnet build src/AcidJunkie.Analyzers.CodeFixers/AcidJunkie.Analyzers.CodeFixers.csproj --configuration Release /p:RoslynVersion=roslyn3.11 /p:Version=$ASSEMBLY_VERSION
+      #
+      #      - name: Compile Analyzers and Fixers for Roslyn 4.0.1
+      #        run: |
+      #          dotnet build src/AcidJunkie.Analyzers/AcidJunkie.Analyzers.csproj --configuration Release /p:RoslynVersion=roslyn4.0.1 /p:Version=$ASSEMBLY_VERSION
+      #          dotnet build src/AcidJunkie.Analyzers.CodeFixers/AcidJunkie.Analyzers.CodeFixers.csproj --configuration Release /p:RoslynVersion=roslyn4.0.1 /p:Version=$ASSEMBLY_VERSION
+      #
+      #      - name: Compile Analyzers and Fixers for Roslyn 4.1
+      #        run: |
+      #          dotnet build src/AcidJunkie.Analyzers/AcidJunkie.Analyzers.csproj --configuration Release /p:RoslynVersion=roslyn4.1 /p:Version=$ASSEMBLY_VERSION
+      #          dotnet build src/AcidJunkie.Analyzers.CodeFixers/AcidJunkie.Analyzers.CodeFixers.csproj --configuration Release /p:RoslynVersion=roslyn4.1 /p:Version=$ASSEMBLY_VERSION
+      #
+      #      - name: Compile Analyzers and Fixers for Roslyn 4.2
+      #        run: |
+      #          dotnet build src/AcidJunkie.Analyzers/AcidJunkie.Analyzers.csproj --configuration Release /p:RoslynVersion=roslyn4.2 /p:Version=$ASSEMBLY_VERSION
+      #          dotnet build src/AcidJunkie.Analyzers.CodeFixers/AcidJunkie.Analyzers.CodeFixers.csproj --configuration Release /p:RoslynVersion=roslyn4.2 /p:Version=$ASSEMBLY_VERSION
+      #
+      #      - name: Compile Analyzers and Fixers for Roslyn 4.3.1
+      #        run: |
+      #          dotnet build src/AcidJunkie.Analyzers/AcidJunkie.Analyzers.csproj --configuration Release /p:RoslynVersion=roslyn4.3.1 /p:Version=$ASSEMBLY_VERSION
+      #          dotnet build src/AcidJunkie.Analyzers.CodeFixers/AcidJunkie.Analyzers.CodeFixers.csproj --configuration Release /p:RoslynVersion=roslyn4.3.1 /p:Version=$ASSEMBLY_VERSION
+      #
+      #      - name: Compile Analyzers and Fixers for Roslyn 4.4
+      #        run: |
+      #          dotnet build src/AcidJunkie.Analyzers/AcidJunkie.Analyzers.csproj --configuration Release /p:RoslynVersion=roslyn4.4 /p:Version=$ASSEMBLY_VERSION
+      #          dotnet build src/AcidJunkie.Analyzers.CodeFixers/AcidJunkie.Analyzers.CodeFixers.csproj --configuration Release /p:RoslynVersion=roslyn4.4 /p:Version=$ASSEMBLY_VERSION
+      #
+      #      - name: Compile Analyzers and Fixers for Roslyn 4.5
+      #        run: |
+      #          dotnet build src/AcidJunkie.Analyzers/AcidJunkie.Analyzers.csproj --configuration Release /p:RoslynVersion=roslyn4.5 /p:Version=$ASSEMBLY_VERSION
+      #          dotnet build src/AcidJunkie.Analyzers.CodeFixers/AcidJunkie.Analyzers.CodeFixers.csproj --configuration Release /p:RoslynVersion=roslyn4.5 /p:Version=$ASSEMBLY_VERSION
+      #
+      #      - name: Compile Analyzers and Fixers for Roslyn 4.6
+      #        run: |
+      #          dotnet build src/AcidJunkie.Analyzers/AcidJunkie.Analyzers.csproj --configuration Release /p:RoslynVersion=roslyn4.6 /p:Version=$ASSEMBLY_VERSION
+      #          dotnet build src/AcidJunkie.Analyzers.CodeFixers/AcidJunkie.Analyzers.CodeFixers.csproj --configuration Release /p:RoslynVersion=roslyn4.6 /p:Version=$ASSEMBLY_VERSION
+      #
+      #      - name: Compile Analyzers and Fixers for Roslyn 4.7
+      #        run: |
+      #          dotnet build src/AcidJunkie.Analyzers/AcidJunkie.Analyzers.csproj --configuration Release /p:RoslynVersion=roslyn4.7 /p:Version=$ASSEMBLY_VERSION
+      #          dotnet build src/AcidJunkie.Analyzers.CodeFixers/AcidJunkie.Analyzers.CodeFixers.csproj --configuration Release /p:RoslynVersion=roslyn4.7 /p:Version=$ASSEMBLY_VERSION
+      #
+      #      - name: Compile Analyzers and Fixers for Roslyn 4.8
+      #        run: |
+      #          dotnet build src/AcidJunkie.Analyzers/AcidJunkie.Analyzers.csproj --configuration Release /p:RoslynVersion=roslyn4.8 /p:Version=$ASSEMBLY_VERSION
+      #          dotnet build src/AcidJunkie.Analyzers.CodeFixers/AcidJunkie.Analyzers.CodeFixers.csproj --configuration Release /p:RoslynVersion=roslyn4.8 /p:Version=$ASSEMBLY_VERSION
+      #
+      #      - name: Compile Analyzers and Fixers for Roslyn 4.9.2
+      #        run: |
+      #          dotnet build src/AcidJunkie.Analyzers/AcidJunkie.Analyzers.csproj --configuration Release /p:RoslynVersion=roslyn4.9.2 /p:Version=$ASSEMBLY_VERSION
+      #          dotnet build src/AcidJunkie.Analyzers.CodeFixers/AcidJunkie.Analyzers.CodeFixers.csproj --configuration Release /p:RoslynVersion=roslyn4.9.2 /p:Version=$ASSEMBLY_VERSION
+      #
+      #      - name: Compile Analyzers and Fixers for Roslyn 4.10
+      #        run: |
+      #          dotnet build src/AcidJunkie.Analyzers/AcidJunkie.Analyzers.csproj --configuration Release /p:RoslynVersion=roslyn4.10 /p:Version=$ASSEMBLY_VERSION
+      #          dotnet build src/AcidJunkie.Analyzers.CodeFixers/AcidJunkie.Analyzers.CodeFixers.csproj --configuration Release /p:RoslynVersion=roslyn4.10 /p:Version=$ASSEMBLY_VERSION
+      #
+      #      - name: Compile Analyzers and Fixers for Roslyn 4.11
+      #        run: |
+      #          dotnet build src/AcidJunkie.Analyzers/AcidJunkie.Analyzers.csproj --configuration Release /p:RoslynVersion=roslyn4.11 /p:Version=$ASSEMBLY_VERSION
+      #          dotnet build src/AcidJunkie.Analyzers.CodeFixers/AcidJunkie.Analyzers.CodeFixers.csproj --configuration Release /p:RoslynVersion=roslyn4.11 /p:Version=$ASSEMBLY_VERSION
+      #
+      #      - name: Compile Analyzers and Fixers for Roslyn 4.12
+      #        run: |
+      #          dotnet build src/AcidJunkie.Analyzers/AcidJunkie.Analyzers.csproj --configuration Release /p:RoslynVersion=roslyn4.12 /p:Version=$ASSEMBLY_VERSION
+      #          dotnet build src/AcidJunkie.Analyzers.CodeFixers/AcidJunkie.Analyzers.CodeFixers.csproj --configuration Release /p:RoslynVersion=roslyn4.12 /p:Version=$ASSEMBLY_VERSION
+      #
+      #      - name: Compile Analyzers and Fixers for Roslyn 4.13
+      #        run: |
+      #          dotnet build src/AcidJunkie.Analyzers/AcidJunkie.Analyzers.csproj --configuration Release /p:RoslynVersion=roslyn4.13 /p:Version=$ASSEMBLY_VERSION
+      #         dotnet build src/AcidJunkie.Analyzers.CodeFixers/AcidJunkie.Analyzers.CodeFixers.csproj --configuration Release /p:RoslynVersion=roslyn4.13 /p:Version=$ASSEMBLY_VERSION
 
       - name: Compile Analyzers and Fixers for Roslyn 4.14
         run: |
@@ -130,7 +130,7 @@ jobs:
 
       - name: Compile and Pack Analyzers.Pack
         run: |
-          dotnet restore AcidJunkie.Analyzers.Pack.csproj
+          dotnet restore src/AcidJunkie.Analyzers.Pack/AcidJunkie.Analyzers.Pack.csproj
           dotnet build src/AcidJunkie.Analyzers.Pack/AcidJunkie.Analyzers.Pack.csproj --configuration Release /p:Version=$ASSEMBLY_VERSION
           dotnet pack src/AcidJunkie.Analyzers.Pack/AcidJunkie.Analyzers.Pack.csproj --configuration Release --no-build /p:Version=$NUGET_VERSION
           ls -lR
