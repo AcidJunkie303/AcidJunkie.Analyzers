@@ -27,4 +27,13 @@
         <Using Include="Xunit"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <Compile Update="Diagnosers\NonNullableBlazorReferenceMemberInitializationAnalyzerTests.setup.cs">
+            <DependentUpon>NonNullableBlazorReferenceMemberInitializationAnalyzerTests.cs</DependentUpon>
+        </Compile>
+        <Compile Update="Diagnosers\AssignmentOrIsNullTestedCheckerTests.setup.cs">
+            <DependentUpon>AssignmentOrIsNullTestedCheckerTests.cs</DependentUpon>
+        </Compile>
+    </ItemGroup>
+
 </Project>

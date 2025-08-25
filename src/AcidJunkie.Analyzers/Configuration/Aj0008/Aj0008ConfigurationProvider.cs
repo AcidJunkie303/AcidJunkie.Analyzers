@@ -22,11 +22,11 @@ internal sealed class Aj0008ConfigurationProvider : ConfigurationProviderBase<Aj
         try
         {
             var methodsToCheck = GetMethodsToCheck(context);
-            return methodsToCheck switch
+            return methodsToCheck.Count switch
             {
-                MethodKinds.None => Aj0008Configuration.Disabled,
-                null             => Aj0008Configuration.Default,
-                _                => new Aj0008Configuration(true, methodsToCheck.Value)
+                0 => Aj0008Configuration.Default,
+                1 => methodsToCheck[0] == MethodKinds.None ? Aj0008Configuration.Disabled : new Aj0008Configuration(true, methodsToCheck[0]),
+                _ => new Aj0008Configuration(true, methodsToCheck)
             };
         }
         catch (Exception ex)
@@ -36,12 +36,12 @@ internal sealed class Aj0008ConfigurationProvider : ConfigurationProviderBase<Aj
         }
     }
 
-    private static IReadOnlyList<MethodKinds> GetMethodsToCheck(in SyntaxNodeAnalysisContext context)
+    private static List<MethodKinds> GetMethodsToCheck(in SyntaxNodeAnalysisContext context)
     {
         var value = context.GetOptionsValueOrDefault(Aj0008Configuration.KeyNames.MethodsToCheck);
         if (value.IsNullOrWhiteSpace())
         {
-            return null;
+            return [];
         }
 
         return value

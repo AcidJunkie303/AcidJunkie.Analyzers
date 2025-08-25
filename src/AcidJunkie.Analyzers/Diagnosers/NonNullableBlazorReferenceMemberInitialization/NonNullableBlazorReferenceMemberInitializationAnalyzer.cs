@@ -18,6 +18,6 @@ public sealed class NonNullableBlazorReferenceMemberInitializationAnalyzer : Dia
         context.EnableConcurrentExecutionInReleaseMode();
         context.RegisterSyntaxNodeActionAndAnalyze<NonNullableBlazorReferenceMemberInitializationAnalyzerImplementation>(
             implementation => implementation.AnalyzeClassDeclaration,
-            SyntaxKind.ParameterList);
+            SyntaxKind.ClassDeclaration);
     }
 }

@@ -20,7 +20,6 @@ public static class FieldDeclarationSyntaxExtensions
             return false;
         }
 
-        return typeSymbol.NullableAnnotation == NullableAnnotation.Annotated // -> #nullable enabled
-               || typeSymbol.NullableAnnotation == NullableAnnotation.None; // -> #nullable disabled
+        return typeSymbol.NullableAnnotation == NullableAnnotation.NotAnnotated;
     }
 }

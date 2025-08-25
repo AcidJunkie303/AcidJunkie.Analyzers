@@ -27,6 +27,7 @@ internal sealed class NonNullableBlazorReferenceMemberInitializationAnalyzerImpl
     {
         if (!_configuration.IsEnabled)
         {
+            return;
         }
 
         var classDeclaration = (ClassDeclarationSyntax)Context.Node;
@@ -36,13 +37,25 @@ internal sealed class NonNullableBlazorReferenceMemberInitializationAnalyzerImpl
             Logger.WriteLine(() => $"{classDeclaration.Identifier.ValueText} is not a Blazor component. Aborting");
         }
 
-        var initializationMethodsByKind = new ComponentMethodExtractor(Context.SemanticModel).Extract(classDeclaration);
+        var methodsToCheck = new ComponentMethodExtractor(Context.SemanticModel)
+                            .Extract(classDeclaration)
+                            .Where(a => _configuration.MethodsToCheck.Contains(a.MethodKind))
+                            .Select(a => a)
+                            .ToList();
 
-        var methodsToCheck = initializationMethodsByKind
-           .Where(a => _configuration.MethodsToCheck.Contains(a.Key));
+        Lazy<string> allMethodNamesToCheck = new(() => string.Join(", ", methodsToCheck.Select(a => a.MethodKind)));
 
         foreach (var (location, memberName) in GetMembersToCheck(classDeclaration))
         {
+            var isMemberHandledInAllPaths = methodsToCheck
+               .Any(method => AssignmentOrIsNullTestedChecker.IsMemberAssignedOrNullCheckedOnAllExecutionPaths(Context.SemanticModel, method.MethodDeclaration, memberName));
+            if (isMemberHandledInAllPaths)
+            {
+                continue;
+            }
+
+            Logger.WriteLine(() => $"Property or field {memberName} of class {classDeclaration.Identifier.ValueText} is not initialized/assigned in all execution paths of any of the following methods: {allMethodNamesToCheck}");
+            Context.ReportDiagnostic(Diagnostic.Create(DiagnosticRules.Default.Rule, location, memberName, allMethodNamesToCheck.Value));
         }
     }
 
@@ -172,7 +185,7 @@ internal sealed class NonNullableBlazorReferenceMemberInitializationAnalyzerImpl
 #pragma warning restore S1075
 
             public static readonly LocalizableString Title = "Non-nullable reference member not initialized/assigned";
-            public static readonly LocalizableString MessageFormat = "The non-nullable reference type member `{0}` is either not checked for null or no value was assigned in all execution paths of {1}";
+            public static readonly LocalizableString MessageFormat = "The non-nullable reference type member `{0}` is either not checked for null or no value was assigned in all execution paths of the checked methods {1}";
             public static readonly LocalizableString Description = MessageFormat;
             public static readonly DiagnosticDescriptor Rule = new(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, true, Description, HelpLinkUri);
         }

@@ -18,7 +18,6 @@ public static class PropertyDeclarationSyntaxExtensions
             return false;
         }
 
-        return typeSymbol.NullableAnnotation == NullableAnnotation.Annotated // -> #nullable enabled
-               || typeSymbol.NullableAnnotation == NullableAnnotation.None; // -> #nullable disabled
+        return typeSymbol.NullableAnnotation == NullableAnnotation.NotAnnotated;
     }
 }
