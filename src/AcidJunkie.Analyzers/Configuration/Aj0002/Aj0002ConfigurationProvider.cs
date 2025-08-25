@@ -31,7 +31,7 @@ internal sealed class Aj0002ConfigurationProvider : ConfigurationProviderBase<Aj
         }
         catch (Exception ex)
         {
-            var error = ConfigurationError.CreateWithDefaultEditorConfigFile(Aj0002Configuration.KeyNames.ParameterOrderingFlat, ex.Message);
+            var error = ex.CreateConfigurationError(Aj0002Configuration.KeyNames.ParameterOrderingFlat);
             return new Aj0002Configuration(error);
         }
     }
