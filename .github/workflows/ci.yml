@@ -36,8 +36,8 @@ jobs:
           echo "NUGET_VERSION = ${NUGET_VERSION}"
 
       - name: Test
-        run: dotnet test src/AcidJunkie.Analyzers.Tests/AcidJunkie.Analyzers.Tests.csproj --configuration Release --verbosity normal
-        working-directory: ./src
+        run: dotnet test --configuration Release --verbosity normal
+        working-directory: ./src/AcidJunkie.Analyzers.Tests/
 
       - name: Compile Analyzers and Fixers for Roslyn 4.8
         run: |
