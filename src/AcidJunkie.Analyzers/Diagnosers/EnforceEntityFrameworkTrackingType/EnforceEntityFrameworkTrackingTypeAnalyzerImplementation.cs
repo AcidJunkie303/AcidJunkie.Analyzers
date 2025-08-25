@@ -12,11 +12,25 @@ namespace AcidJunkie.Analyzers.Diagnosers.EnforceEntityFrameworkTrackingType;
 [SuppressMessage("ReSharper", "UseCollectionExpression", Justification = "Not supported in lower versions of Roslyn")]
 internal sealed class EnforceEntityFrameworkTrackingTypeAnalyzerImplementation : SyntaxNodeAnalyzerImplementationBase<EnforceEntityFrameworkTrackingTypeAnalyzer>
 {
+    private static readonly ImmutableHashSet<string> IgnoredDbSetMethodNames = new[]
+    {
+        "Add",
+        "AddAsync",
+        "AddRange",
+        "AddRangeAsync",
+        "Attach",
+        "AttachRange",
+        "Remove",
+        "RemoveRange",
+        "Update",
+        "UpdateRange"
+    }.ToImmutableHashSet(StringComparer.Ordinal);
+
     private static readonly ImmutableHashSet<string> TrackingMethodNames = new[]
     {
         "AsTracking",
         "AsNoTracking"
-    }.ToImmutableHashSet(StringComparer.OrdinalIgnoreCase);
+    }.ToImmutableHashSet(StringComparer.Ordinal);
 
     private readonly Aj0002Configuration _configuration;
 
@@ -62,6 +76,12 @@ internal sealed class EnforceEntityFrameworkTrackingTypeAnalyzerImplementation :
                     if (isTrackingMethod)
                     {
                         return; // we found an AsTracking or AsNoTracking method. So we're good
+                    }
+
+                    var isIgnoredMethodName = IgnoredDbSetMethodNames.Contains(methodName);
+                    if (isIgnoredMethodName)
+                    {
+                        return; // For Update, Add, Remove etc. we don't care about tracking
                     }
                 }
 

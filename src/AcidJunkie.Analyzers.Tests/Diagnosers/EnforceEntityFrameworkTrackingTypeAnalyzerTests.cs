@@ -94,6 +94,29 @@ public sealed class EnforceEntityFrameworkTrackingTypeAnalyzerTests(ITestOutputH
         await RunTestAsync(code, "Strict", isEnabled);
     }
 
+    [Theory]
+    [InlineData("dbContext.Entities.Add(entity)")]
+    [InlineData("dbContext.Entities.AddAsync(entity)")]
+    [InlineData("dbContext.Entities.AddRange(entity)")]
+    [InlineData("dbContext.Entities.AddRangeAsync(entity)")]
+    [InlineData("dbContext.Entities.Attach(entity)")]
+    [InlineData("dbContext.Entities.AttachRange(entity)")]
+    [InlineData("dbContext.Entities.Remove(entity)")]
+    [InlineData("dbContext.Entities.RemoveRange(entity)")]
+    [InlineData("dbContext.Entities.Update(entity)")]
+    [InlineData("dbContext.Entities.UpdateRange(entity)")]
+    [InlineData("{|AJ0002:dbContext.Entities|}.Where(a=> true)")]
+    public async Task WithoutTrackingType_WhenIgnoredMethodIsCalled_ThenOk(string part)
+    {
+        var code = $$"""
+                     var entity = new Entity{ Name = "Test" };
+                     using var dbContext = new TestContext();
+                     {{part}};
+                     """;
+
+        await RunTestAsync(code, "Strict", true);
+    }
+
     private static string CreateTestCode(string insertionCode)
     {
         return $$"""
