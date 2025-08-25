@@ -6,8 +6,6 @@ using AcidJunkie.Analyzers.Diagnosers.TaskCreationWithMaterializedCollectionAsEn
 
 namespace AcidJunkie.Analyzers.Logging;
 
-#pragma warning disable
-
 [SuppressMessage("MicrosoftCodeAnalysisCorrectness", "RS1035: Do not use APIs banned for analyzers.", Justification = "We need to do file system access for logging")]
 internal static class DefaultLogger
 {
@@ -43,12 +41,15 @@ internal static class DefaultLogger
         => nameof(TaskCreationWithMaterializedCollectionAsEnumerableAnalyzerImplementation).Length;
 }
 
+[SuppressMessage("MicrosoftCodeAnalysisCorrectness", "RS1035:Do not use APIs banned for analyzers")]
+[SuppressMessage("Major Code Smell", "S6354:Use a testable date/time provider")]
 internal sealed class DefaultLogger<TContext> : ILogger<TContext>
     where TContext : class
 {
     public bool IsLoggingEnabled => true;
 
-    [SuppressMessage("MicrosoftCodeAnalysisCorrectness", "RS1035: Do not use APIs banned for analyzers.", Justification = "We need to do file system access for logging")]
+    [SuppressMessage("Major Code Smell", "S6354:Use a testable date/time provider")]
+    [SuppressMessage("Major Code Smell", "S6566:Use \"DateTimeOffset\" instead of \"DateTime\"")]
     public void WriteLine(Func<string> messageFactory, [CallerMemberName] string memberName = "")
     {
         var message = messageFactory();
