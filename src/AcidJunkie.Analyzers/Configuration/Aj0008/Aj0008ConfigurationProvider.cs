@@ -31,12 +31,12 @@ internal sealed class Aj0008ConfigurationProvider : ConfigurationProviderBase<Aj
         }
         catch (Exception ex)
         {
-            var error =  ex.CreateConfigurationError(Aj0008Configuration.KeyNames.MethodsToCheck);
+            var error = ex.CreateConfigurationError(Aj0008Configuration.KeyNames.MethodsToCheck);
             return new Aj0008Configuration(error);
         }
     }
 
-    private static MethodKinds? GetMethodsToCheck(in SyntaxNodeAnalysisContext context)
+    private static IReadOnlyList<MethodKinds> GetMethodsToCheck(in SyntaxNodeAnalysisContext context)
     {
         var value = context.GetOptionsValueOrDefault(Aj0008Configuration.KeyNames.MethodsToCheck);
         if (value.IsNullOrWhiteSpace())
@@ -48,7 +48,8 @@ internal sealed class Aj0008ConfigurationProvider : ConfigurationProviderBase<Aj
               .Split(['|'], StringSplitOptions.RemoveEmptyEntries)
               .Select(a => a.Trim())
               .Where(a => a.Length > 0)
-              .Aggregate(MethodKinds.None, (current, part) => current | ParseMethodKind(part));
+              .Select(ParseMethodKind)
+              .ToList();
     }
 
     private static MethodKinds ParseMethodKind(string value)

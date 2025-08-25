@@ -2,14 +2,20 @@ namespace AcidJunkie.Analyzers.Configuration.Aj0008;
 
 internal sealed class Aj0008Configuration : IAnalyzerConfiguration
 {
-    public static Aj0008Configuration Default { get; } = new(true, MethodKinds.OnInitialized | MethodKinds.OnInitializedAsync);
+    public static Aj0008Configuration Default { get; } = new(true, MethodKinds.OnInitialized, MethodKinds.OnInitializedAsync);
     public static Aj0008Configuration Disabled { get; } = new(false, MethodKinds.None);
 
     public bool IsEnabled { get; }
     public ConfigurationError? ConfigurationError { get; }
-    public MethodKinds MethodsToCheck { get; }
+    public IReadOnlyCollection<MethodKinds> MethodsToCheck { get; }
 
-    public Aj0008Configuration(bool isEnabled, MethodKinds methodsToCheck)
+    public Aj0008Configuration(bool isEnabled, IReadOnlyCollection<MethodKinds> methodsToCheck)
+    {
+        IsEnabled = isEnabled;
+        MethodsToCheck = methodsToCheck;
+    }
+
+    public Aj0008Configuration(bool isEnabled, params MethodKinds[] methodsToCheck)
     {
         IsEnabled = isEnabled;
         MethodsToCheck = methodsToCheck;
@@ -19,7 +25,7 @@ internal sealed class Aj0008Configuration : IAnalyzerConfiguration
     {
         ConfigurationError = configurationError;
         IsEnabled = false;
-        MethodsToCheck = MethodKinds.None;
+        MethodsToCheck = [];
     }
 
     public static class KeyNames
