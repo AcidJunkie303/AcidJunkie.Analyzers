@@ -37,7 +37,7 @@ jobs:
 
       - name: Test
         run: dotnet test --no-build --configuration Release --verbosity normal
-        working-directory: ./src/AcidJunkie.Analyzers
+        working-directory: ./src
 
       - name: Compile Analyzers and Fixers for Roslyn 4.8
         run: |
