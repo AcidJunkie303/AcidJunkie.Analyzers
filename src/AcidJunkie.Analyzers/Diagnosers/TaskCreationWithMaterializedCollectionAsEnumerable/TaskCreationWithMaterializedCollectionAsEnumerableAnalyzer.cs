@@ -16,6 +16,8 @@ public sealed class TaskCreationWithMaterializedCollectionAsEnumerableAnalyzer :
     {
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze);
         context.EnableConcurrentExecutionInReleaseMode();
-        context.RegisterSyntaxNodeActionAndAnalyze<TaskCreationWithMaterializedCollectionAsEnumerableAnalyzerImplementation>(a => a.AnalyzeInvocation, SyntaxKind.InvocationExpression);
+        context.RegisterSyntaxNodeActionAndAnalyze<TaskCreationWithMaterializedCollectionAsEnumerableAnalyzerImplementation>(
+            implementation => implementation.AnalyzeInvocation,
+            syntaxKinds: SyntaxKind.InvocationExpression);
     }
 }

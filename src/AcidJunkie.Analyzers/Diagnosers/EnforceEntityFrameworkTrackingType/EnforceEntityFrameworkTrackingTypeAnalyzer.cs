@@ -17,6 +17,8 @@ public sealed class EnforceEntityFrameworkTrackingTypeAnalyzer : DiagnosticAnaly
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze);
         context.EnableConcurrentExecutionInReleaseMode();
 
-        context.RegisterSyntaxNodeActionAndAnalyze<EnforceEntityFrameworkTrackingTypeAnalyzerImplementation>(a => a.AnalyzeMemberAccessExpression, SyntaxKind.SimpleMemberAccessExpression);
+        context.RegisterSyntaxNodeActionAndAnalyze<EnforceEntityFrameworkTrackingTypeAnalyzerImplementation>(
+            implementation => implementation.AnalyzeMemberAccessExpression,
+            syntaxKinds: SyntaxKind.SimpleMemberAccessExpression);
     }
 }

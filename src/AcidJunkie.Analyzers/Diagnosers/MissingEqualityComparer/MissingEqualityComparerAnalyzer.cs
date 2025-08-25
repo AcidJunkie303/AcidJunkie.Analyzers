@@ -17,12 +17,20 @@ public sealed class MissingEqualityComparerAnalyzer : DiagnosticAnalyzer
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze);
         context.EnableConcurrentExecutionInReleaseMode();
 
-        context.RegisterSyntaxNodeActionAndAnalyze<MissingEqualityComparerAnalyzerImplementation>(a => a.AnalyzeInvocation, SyntaxKind.InvocationExpression);
-        context.RegisterSyntaxNodeActionAndAnalyze<MissingEqualityComparerAnalyzerImplementation>(a => a.AnalyzeObjectCreation, SyntaxKind.ObjectCreationExpression);
-        context.RegisterSyntaxNodeActionAndAnalyze<MissingEqualityComparerAnalyzerImplementation>(a => a.AnalyzeImplicitObjectCreation, SyntaxKind.ImplicitObjectCreationExpression);
+        context.RegisterSyntaxNodeActionAndAnalyze<MissingEqualityComparerAnalyzerImplementation>(
+            implementation => implementation.AnalyzeInvocation,
+            syntaxKinds: SyntaxKind.InvocationExpression);
+        context.RegisterSyntaxNodeActionAndAnalyze<MissingEqualityComparerAnalyzerImplementation>(
+            implementation => implementation.AnalyzeObjectCreation,
+            syntaxKinds: SyntaxKind.ObjectCreationExpression);
+        context.RegisterSyntaxNodeActionAndAnalyze<MissingEqualityComparerAnalyzerImplementation>(
+            implementation => implementation.AnalyzeImplicitObjectCreation,
+            syntaxKinds: SyntaxKind.ImplicitObjectCreationExpression);
 
 #if CSHARP_12_OR_GREATER
-        context.RegisterSyntaxNodeActionAndAnalyze<MissingEqualityComparerAnalyzerImplementation>(a => a.AnalyzeCollectionExpression, SyntaxKind.CollectionExpression);
+        context.RegisterSyntaxNodeActionAndAnalyze<MissingEqualityComparerAnalyzerImplementation>(
+            implementation => implementation.AnalyzeCollectionExpression,
+            syntaxKinds: SyntaxKind.CollectionExpression);
 #endif
     }
 }

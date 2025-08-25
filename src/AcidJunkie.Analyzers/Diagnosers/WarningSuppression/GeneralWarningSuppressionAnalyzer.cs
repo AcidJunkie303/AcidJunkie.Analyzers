@@ -16,6 +16,8 @@ public sealed class GeneralWarningSuppressionAnalyzer : DiagnosticAnalyzer
     {
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze);
         context.EnableConcurrentExecutionInReleaseMode();
-        context.RegisterSyntaxNodeActionAndAnalyze<GeneralWarningSuppressionAnalyzerImplementation>(a => a.AnalyzePragma, SyntaxKind.PragmaWarningDirectiveTrivia);
+        context.RegisterSyntaxNodeActionAndAnalyze<GeneralWarningSuppressionAnalyzerImplementation>(
+            implementation => implementation.AnalyzePragma,
+            syntaxKinds: SyntaxKind.PragmaWarningDirectiveTrivia);
     }
 }
