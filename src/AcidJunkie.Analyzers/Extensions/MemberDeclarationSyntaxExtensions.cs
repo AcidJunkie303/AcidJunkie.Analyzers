@@ -1,4 +1,5 @@
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
@@ -28,6 +29,8 @@ internal static class MemberDeclarationSyntaxExtensions
             return null;
         }
 
-        return semanticModel.GetDeclaredSymbol(typeDeclaration) as INamedTypeSymbol;
+        return ModelExtensions.GetDeclaredSymbol(semanticModel, typeDeclaration) as INamedTypeSymbol;
     }
+
+    public static bool IsStatic(this MemberDeclarationSyntax member) => member.Modifiers.Any(SyntaxKind.StaticKeyword);
 }
