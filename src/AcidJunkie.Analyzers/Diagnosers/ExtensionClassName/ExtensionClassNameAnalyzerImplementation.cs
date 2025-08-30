@@ -1,7 +1,6 @@
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using AcidJunkie.Analyzers.Configuration;
-using AcidJunkie.Analyzers.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -43,10 +42,10 @@ internal sealed class ExtensionClassNameAnalyzerImplementation : SyntaxNodeAnaly
         Context.ReportDiagnostic(Diagnostic.Create(DiagnosticRules.Default.Rule, classDeclaration.Identifier.GetLocation(), className, suggestedClassName));
     }
 
-    private static bool ContainsOldStyleExtensionMethods(ClassDeclarationSyntax classDeclaration) // "old" means "pre .net 10.0"
+    private bool ContainsOldStyleExtensionMethods(ClassDeclarationSyntax classDeclaration)
         => classDeclaration
           .Members.OfType<MethodDeclarationSyntax>()
-          .Any(a => a.IsStatic() && a.ParameterList.Parameters.Count > 0 && a.ParameterList.Parameters[0].HasThisKeyword());
+          .Any(a => Context.SemanticModel.GetDeclaredSymbol(a) is IMethodSymbol { IsExtensionMethod: true });
 
     internal static class DiagnosticRules
     {
