@@ -1,6 +1,4 @@
-using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
-using AcidJunkie.Analyzers.Configuration;
 using AcidJunkie.Analyzers.Logging;
 using Microsoft.CodeAnalysis.Diagnostics;
 
@@ -8,40 +6,6 @@ namespace AcidJunkie.Analyzers.Extensions;
 
 internal static class SyntaxNodeAnalysisContextExtensions
 {
-    private static readonly ImmutableDictionary<string, bool> BooleanValuesByValue = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase)
-    {
-        {
-            "false", false
-        },
-        {
-            "0", false
-        },
-        {
-            "disable", false
-        },
-        {
-            "disabled", false
-        },
-        {
-            "no", false
-        },
-        {
-            "true", true
-        },
-        {
-            "1", true
-        },
-        {
-            "enable", true
-        },
-        {
-            "enabled", true
-        },
-        {
-            "yes", true
-        }
-    }.ToImmutableDictionary(StringComparer.OrdinalIgnoreCase);
-
     public static ILogger<TAnalyzer> CreateLogger<TAnalyzer>(this in SyntaxNodeAnalysisContext analysisContext)
         where TAnalyzer : class
         => LoggerFactory.CreateLogger<TAnalyzer>(analysisContext);
@@ -54,23 +18,18 @@ internal static class SyntaxNodeAnalysisContextExtensions
     public static string? GetOptionsValueOrDefault(this in SyntaxNodeAnalysisContext context, string key)
     {
         var options = context.Options.AnalyzerConfigOptionsProvider.GetOptions(context.Node.SyntaxTree);
-        options.TryGetValue(key, out var value);
-        return value;
+        return options.GetOptionsValueOrDefault(key);
     }
 
-    public static bool GetOptionsBooleanValue(this in SyntaxNodeAnalysisContext context, string key, bool defaultValue = false)
+    public static bool GetOptionsBooleanValue(this in SyntaxNodeAnalysisContext context, string key, bool defaultValue)
     {
-        var value = context.GetOptionsValueOrDefault(key);
-        if (value.IsNullOrWhiteSpace())
-        {
-            return defaultValue;
-        }
-
-        return BooleanValuesByValue.TryGetValue(value, out var result)
-            ? result
-            : defaultValue;
+        var options = context.Options.AnalyzerConfigOptionsProvider.GetOptions(context.Node.SyntaxTree);
+        return options.GetOptionsBooleanValue(key, defaultValue);
     }
 
     public static bool IsDiagnosticEnabled(this in SyntaxNodeAnalysisContext context, string diagnosticId)
-        => GenericConfigurationProvider.GetConfiguration(context, diagnosticId).IsEnabled;
+    {
+        var options = context.Options.AnalyzerConfigOptionsProvider.GetOptions(context.Node.SyntaxTree);
+        return options.IsDiagnosticEnabled(diagnosticId);
+    }
 }

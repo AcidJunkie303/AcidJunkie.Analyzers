@@ -16,6 +16,7 @@
     <File Path="..\docs\Rules\AJ0005.md" />
     <File Path="..\docs\Rules\AJ9999.md" />
     <File Path="..\docs\Rules\AJ0002.md" />
+    <File Path="..\docs\Rules\AJ0007.md" />
   </Folder>
   <Project Path="AcidJunkie.Analyzers.CodeFixers\AcidJunkie.Analyzers.CodeFixers.csproj" Type="Classic C#" />
   <Project Path="AcidJunkie.Analyzers.Pack\AcidJunkie.Analyzers.Pack.csproj" Type="Classic C#" />

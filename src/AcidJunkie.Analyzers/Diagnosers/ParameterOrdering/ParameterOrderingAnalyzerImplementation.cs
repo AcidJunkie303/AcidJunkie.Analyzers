@@ -51,14 +51,17 @@ internal sealed class ParameterOrderingAnalyzerImplementation : SyntaxNodeAnalyz
         var previousIndex = -1;
         foreach (var parameter in GetParameters(parameterList))
         {
-            var index = GetOrderIndex(parameter, _configuration, fallbackIndex);
-            if (index < previousIndex)
+            if (!parameter.IsParams)
             {
-                Context.ReportDiagnostic(Diagnostic.Create(DiagnosticRules.Default.Rule, parameterList.GetLocation(), _configuration.ParameterOrderFlat));
-                return;
-            }
+                var index = GetOrderIndex(parameter, _configuration, fallbackIndex);
+                if (index < previousIndex)
+                {
+                    Context.ReportDiagnostic(Diagnostic.Create(DiagnosticRules.Default.Rule, parameterList.GetLocation(), _configuration.ParameterOrderFlat));
+                    return;
+                }
 
-            previousIndex = index;
+                previousIndex = index;
+            }
         }
     }
 
@@ -88,12 +91,13 @@ internal sealed class ParameterOrderingAnalyzerImplementation : SyntaxNodeAnalyz
                       {
                           if (param.Type is null)
                           {
-                              return new Parameter(param, null);
+                              return new Parameter(param, null, false);
                           }
 
+                          var isParams = param.IsParams();
                           return Context.SemanticModel.GetTypeInfo(param.Type).Type is not INamedTypeSymbol parameterType
-                              ? new Parameter(param, null)
-                              : new Parameter(param, parameterType.GetSimplifiedName());
+                              ? new Parameter(param, null, isParams)
+                              : new Parameter(param, parameterType.GetSimplifiedName(), isParams);
                       })
                      .ToList();
 
@@ -101,11 +105,13 @@ internal sealed class ParameterOrderingAnalyzerImplementation : SyntaxNodeAnalyz
     {
         public ParameterSyntax Node { get; }
         public string? FullTypeName { get; }
+        public bool IsParams { get; }
 
-        public Parameter(ParameterSyntax node, string? fullTypeName)
+        public Parameter(ParameterSyntax node, string? fullTypeName, bool isParams)
         {
             Node = node;
             FullTypeName = fullTypeName;
+            IsParams = isParams;
         }
     }
 
@@ -124,7 +130,7 @@ internal sealed class ParameterOrderingAnalyzerImplementation : SyntaxNodeAnalyz
             public const string HelpLinkUri = "https://github.com/AcidJunkie303/AcidJunkie.Analyzers/blob/main/docs/Rules/AJ0007.md";
 #pragma warning restore S1075
 
-            public static readonly LocalizableString Title = "Invalid parameter order";
+            public static readonly LocalizableString Title = "Non-compliant parameter order";
             public static readonly LocalizableString MessageFormat = "Parameter order should be {0}";
             public static readonly LocalizableString Description = MessageFormat;
             public static readonly DiagnosticDescriptor Rule = new(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, true, Description, HelpLinkUri);
