@@ -3,102 +3,40 @@ Set-StrictMode -Version "Latest"
 $PSNativeCommandUseErrorActionPreference = $true
 $ErrorActionPreference = "Stop"
 
-function Compile 
+function CleanUp
 {
-    Write-Host "Compiling 'AcidJunkie.Analyzers' for roslyn3.8" -ForegroundColor Cyan
-    dotnet.exe build AcidJunkie.Analyzers/AcidJunkie.Analyzers.csproj --configuration Release /p:RoslynVersion=roslyn3.8
-    Write-Host "Compiling 'AcidJunkie.Analyzers.CodeFixers' for roslyn3.8" -ForegroundColor Cyan
-    dotnet.exe build AcidJunkie.Analyzers.CodeFixers/AcidJunkie.Analyzers.CodeFixers.csproj --configuration Release /p:RoslynVersion=roslyn3.8
+    Get-ChildItem -Recurse -Filter "obj" -Directory | Remove-Item -Recurse
+    Get-ChildItem -Recurse -Filter "bin" -Directory | Remove-Item -Recurse
+}
 
-    Write-Host "Compiling 'AcidJunkie.Analyzers' for roslyn3.9" -ForegroundColor Cyan
-    dotnet build AcidJunkie.Analyzers/AcidJunkie.Analyzers.csproj --configuration Release /p:RoslynVersion=roslyn3.9
-    Write-Host "Compiling 'AcidJunkie.Analyzers.CodeFixers' for roslyn3.9" -ForegroundColor Cyan
-    dotnet build AcidJunkie.Analyzers.CodeFixers/AcidJunkie.Analyzers.CodeFixers.csproj --configuration Release /p:RoslynVersion=roslyn3.9
+function CompileForSpecificRoslynVersion([string] $RoslynVersion) {
+    Write-Host "Compiling 'AcidJunkie.Analyzers' for roslyn$RoslynVersion" -ForegroundColor Cyan
+    dotnet.exe build AcidJunkie.Analyzers/AcidJunkie.Analyzers.csproj --configuration Release /p:RoslynVersion=roslyn$RoslynVersion
+    Write-Host "Compiling 'AcidJunkie.Analyzers.CodeFixers' for roslyn$RoslynVersion" -ForegroundColor Cyan
+    dotnet.exe build AcidJunkie.Analyzers.CodeFixers/AcidJunkie.Analyzers.CodeFixers.csproj --configuration Release /p:RoslynVersion=roslyn$RoslynVersion
+}
 
-    Write-Host "Compiling 'AcidJunkie.Analyzers' for roslyn3.10" -ForegroundColor Cyan
-    dotnet build AcidJunkie.Analyzers/AcidJunkie.Analyzers.csproj --configuration Release /p:RoslynVersion=roslyn3.10
-    Write-Host "Compiling 'AcidJunkie.Analyzers.CodeFixers' for roslyn3.10" -ForegroundColor Cyan
-    dotnet build AcidJunkie.Analyzers.CodeFixers/AcidJunkie.Analyzers.CodeFixers.csproj --configuration Release /p:RoslynVersion=roslyn3.10
+function CompileAll {
 
-    Write-Host "Compiling 'AcidJunkie.Analyzers' for roslyn3.11" -ForegroundColor Cyan
-    dotnet build AcidJunkie.Analyzers/AcidJunkie.Analyzers.csproj --configuration Release /p:RoslynVersion=roslyn3.11
-    Write-Host "Compiling 'AcidJunkie.Analyzers.CodeFixers' for roslyn3.11" -ForegroundColor Cyan
-    dotnet build AcidJunkie.Analyzers.CodeFixers/AcidJunkie.Analyzers.CodeFixers.csproj --configuration Release /p:RoslynVersion=roslyn3.11
-
-    Write-Host "Compiling 'AcidJunkie.Analyzers' for roslyn4.0.1" -ForegroundColor Cyan
-    dotnet build AcidJunkie.Analyzers/AcidJunkie.Analyzers.csproj --configuration Release /p:RoslynVersion=roslyn4.0.1
-    Write-Host "Compiling 'AcidJunkie.Analyzers.CodeFixers' for roslyn4.0.1" -ForegroundColor Cyan
-    dotnet build AcidJunkie.Analyzers.CodeFixers/AcidJunkie.Analyzers.CodeFixers.csproj --configuration Release /p:RoslynVersion=roslyn4.0.1
-
-    Write-Host "Compiling 'AcidJunkie.Analyzers' for roslyn4.1" -ForegroundColor Cyan
-    dotnet build AcidJunkie.Analyzers/AcidJunkie.Analyzers.csproj --configuration Release /p:RoslynVersion=roslyn4.1
-    Write-Host "Compiling 'AcidJunkie.Analyzers.CodeFixers' for roslyn4.1" -ForegroundColor Cyan
-    dotnet build AcidJunkie.Analyzers.CodeFixers/AcidJunkie.Analyzers.CodeFixers.csproj --configuration Release /p:RoslynVersion=roslyn4.1
-
-    Write-Host "Compiling 'AcidJunkie.Analyzers' for roslyn4.2" -ForegroundColor Cyan
-    dotnet build AcidJunkie.Analyzers/AcidJunkie.Analyzers.csproj --configuration Release /p:RoslynVersion=roslyn4.2
-    Write-Host "Compiling 'AcidJunkie.Analyzers.CodeFixers' for roslyn4.2" -ForegroundColor Cyan
-    dotnet build AcidJunkie.Analyzers.CodeFixers/AcidJunkie.Analyzers.CodeFixers.csproj --configuration Release /p:RoslynVersion=roslyn4.2
-
-    Write-Host "Compiling 'AcidJunkie.Analyzers' for roslyn4.3.1" -ForegroundColor Cyan
-    dotnet build AcidJunkie.Analyzers/AcidJunkie.Analyzers.csproj --configuration Release /p:RoslynVersion=roslyn4.3.1
-    Write-Host "Compiling 'AcidJunkie.Analyzers.CodeFixers' for roslyn4.3.1" -ForegroundColor Cyan
-    dotnet build AcidJunkie.Analyzers.CodeFixers/AcidJunkie.Analyzers.CodeFixers.csproj --configuration Release /p:RoslynVersion=roslyn4.3.1
-
-    Write-Host "Compiling 'AcidJunkie.Analyzers' for roslyn4.4" -ForegroundColor Cyan
-    dotnet build AcidJunkie.Analyzers/AcidJunkie.Analyzers.csproj --configuration Release /p:RoslynVersion=roslyn4.4
-    Write-Host "Compiling 'AcidJunkie.Analyzers.CodeFixers' for roslyn4.4" -ForegroundColor Cyan
-    dotnet build AcidJunkie.Analyzers.CodeFixers/AcidJunkie.Analyzers.CodeFixers.csproj --configuration Release /p:RoslynVersion=roslyn4.4
-
-    Write-Host "Compiling 'AcidJunkie.Analyzers' for roslyn4.5" -ForegroundColor Cyan
-    dotnet build AcidJunkie.Analyzers/AcidJunkie.Analyzers.csproj --configuration Release /p:RoslynVersion=roslyn4.5
-    Write-Host "Compiling 'AcidJunkie.Analyzers.CodeFixers' for roslyn4.5" -ForegroundColor Cyan
-    dotnet build AcidJunkie.Analyzers.CodeFixers/AcidJunkie.Analyzers.CodeFixers.csproj --configuration Release /p:RoslynVersion=roslyn4.5
-
-    Write-Host "Compiling 'AcidJunkie.Analyzers' for roslyn4.6" -ForegroundColor Cyan
-    dotnet build AcidJunkie.Analyzers/AcidJunkie.Analyzers.csproj --configuration Release /p:RoslynVersion=roslyn4.6
-    Write-Host "Compiling 'AcidJunkie.Analyzers.CodeFixers' for roslyn4.6" -ForegroundColor Cyan
-    dotnet build AcidJunkie.Analyzers.CodeFixers/AcidJunkie.Analyzers.CodeFixers.csproj --configuration Release /p:RoslynVersion=roslyn4.6
-
-    Write-Host "Compiling 'AcidJunkie.Analyzers' for roslyn4.7" -ForegroundColor Cyan
-    dotnet build AcidJunkie.Analyzers/AcidJunkie.Analyzers.csproj --configuration Release /p:RoslynVersion=roslyn4.7
-    Write-Host "Compiling 'AcidJunkie.Analyzers.CodeFixers' for roslyn4.7" -ForegroundColor Cyan
-    dotnet build AcidJunkie.Analyzers.CodeFixers/AcidJunkie.Analyzers.CodeFixers.csproj --configuration Release /p:RoslynVersion=roslyn4.7
-
-    Write-Host "Compiling 'AcidJunkie.Analyzers' for roslyn4.8" -ForegroundColor Cyan
-    dotnet build AcidJunkie.Analyzers/AcidJunkie.Analyzers.csproj --configuration Release /p:RoslynVersion=roslyn4.8
-    Write-Host "Compiling 'AcidJunkie.Analyzers.CodeFixers' for roslyn4.8" -ForegroundColor Cyan
-    dotnet build AcidJunkie.Analyzers.CodeFixers/AcidJunkie.Analyzers.CodeFixers.csproj --configuration Release /p:RoslynVersion=roslyn4.8
-
-    Write-Host "Compiling 'AcidJunkie.Analyzers' for roslyn4.9.2" -ForegroundColor Cyan
-    dotnet build AcidJunkie.Analyzers/AcidJunkie.Analyzers.csproj --configuration Release /p:RoslynVersion=roslyn4.9.2
-    Write-Host "Compiling 'AcidJunkie.Analyzers.CodeFixers' for roslyn4.9.2" -ForegroundColor Cyan
-    dotnet build AcidJunkie.Analyzers.CodeFixers/AcidJunkie.Analyzers.CodeFixers.csproj --configuration Release /p:RoslynVersion=roslyn4.9.2
-
-    Write-Host "Compiling 'AcidJunkie.Analyzers' for roslyn4.10" -ForegroundColor Cyan
-    dotnet build AcidJunkie.Analyzers/AcidJunkie.Analyzers.csproj --configuration Release /p:RoslynVersion=roslyn4.10
-    Write-Host "Compiling 'AcidJunkie.Analyzers.CodeFixers' for roslyn4.10" -ForegroundColor Cyan
-    dotnet build AcidJunkie.Analyzers.CodeFixers/AcidJunkie.Analyzers.CodeFixers.csproj --configuration Release /p:RoslynVersion=roslyn4.10
-
-    Write-Host "Compiling 'AcidJunkie.Analyzers' for roslyn4.11" -ForegroundColor Cyan
-    dotnet build AcidJunkie.Analyzers/AcidJunkie.Analyzers.csproj --configuration Release /p:RoslynVersion=roslyn4.11
-    Write-Host "Compiling 'AcidJunkie.Analyzers.CodeFixers' for roslyn4.11" -ForegroundColor Cyan
-    dotnet build AcidJunkie.Analyzers.CodeFixers/AcidJunkie.Analyzers.CodeFixers.csproj --configuration Release /p:RoslynVersion=roslyn4.11
-
-    Write-Host "Compiling 'AcidJunkie.Analyzers' for roslyn4.12" -ForegroundColor Cyan
-    dotnet build AcidJunkie.Analyzers/AcidJunkie.Analyzers.csproj --configuration Release /p:RoslynVersion=roslyn4.12
-    Write-Host "Compiling 'AcidJunkie.Analyzers.CodeFixers' for roslyn4.12" -ForegroundColor Cyan
-    dotnet build AcidJunkie.Analyzers.CodeFixers/AcidJunkie.Analyzers.CodeFixers.csproj --configuration Release /p:RoslynVersion=roslyn4.12
-
-    Write-Host "Compiling 'AcidJunkie.Analyzers' for roslyn4.13" -ForegroundColor Cyan
-    dotnet build AcidJunkie.Analyzers/AcidJunkie.Analyzers.csproj --configuration Release /p:RoslynVersion=roslyn4.13
-    Write-Host "Compiling 'AcidJunkie.Analyzers.CodeFixers' for roslyn4.13" -ForegroundColor Cyan
-    dotnet build AcidJunkie.Analyzers.CodeFixers/AcidJunkie.Analyzers.CodeFixers.csproj --configuration Release /p:RoslynVersion=roslyn4.13
-
-    Write-Host "Compiling 'AcidJunkie.Analyzers' for roslyn4.14" -ForegroundColor Cyan
-    dotnet build AcidJunkie.Analyzers/AcidJunkie.Analyzers.csproj --configuration Release /p:RoslynVersion=roslyn4.14
-    Write-Host "Compiling 'AcidJunkie.Analyzers.CodeFixers' for roslyn4.14" -ForegroundColor Cyan
-    dotnet build AcidJunkie.Analyzers.CodeFixers/AcidJunkie.Analyzers.CodeFixers.csproj --configuration Release /p:RoslynVersion=roslyn4.14
+    CompileForSpecificRoslynVersion "3.8"
+    CompileForSpecificRoslynVersion "3.9"
+    CompileForSpecificRoslynVersion "3.10"
+    CompileForSpecificRoslynVersion "3.11"
+    CompileForSpecificRoslynVersion "4.01"
+    CompileForSpecificRoslynVersion "4.1"
+    CompileForSpecificRoslynVersion "4.2"
+    CompileForSpecificRoslynVersion "4.3.1"
+    CompileForSpecificRoslynVersion "4.4"
+    CompileForSpecificRoslynVersion "4.5"
+    CompileForSpecificRoslynVersion "4.6"
+    CompileForSpecificRoslynVersion "4.7"
+    CompileForSpecificRoslynVersion "4.8"
+    CompileForSpecificRoslynVersion "4.9.2"
+    CompileForSpecificRoslynVersion "4.10"
+    CompileForSpecificRoslynVersion "4.11"
+    CompileForSpecificRoslynVersion "4.12"
+    CompileForSpecificRoslynVersion "4.13"
+    CompileForSpecificRoslynVersion "4.14"
 
     dotnet restore AcidJunkie.Analyzers.Pack/AcidJunkie.Analyzers.Pack.csproj
     dotnet pack AcidJunkie.Analyzers.Pack/AcidJunkie.Analyzers.Pack.csproj --configuration Release --no-build 
@@ -107,7 +45,8 @@ function Compile
 Push-Location $PSScriptRoot
 
 try {
-    Compile
+    CleanUp
+    CompileAll
 }
 finally {
     Pop-Location
