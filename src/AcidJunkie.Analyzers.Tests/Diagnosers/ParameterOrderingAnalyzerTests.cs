@@ -15,6 +15,7 @@ public sealed class ParameterOrderingAnalyzerTests(ITestOutputHelper testOutputH
     [InlineData("{|AJ0007:(ILogger logger, string value)|}")]
     [InlineData("{|AJ0007:(ILogger<TestClass> logger, string value, CancellationToken cancellationToken)|}")]
     [InlineData("{|AJ0007:(CancellationToken cancellationToken, ILogger logger, string value)|}")]
+    [InlineData("(string value, ILogger logger, CancellationToken cancellationToken, params string[] values)")]
     public Task Theory_OnMethod(string parameters)
     {
         var code = $$"""
