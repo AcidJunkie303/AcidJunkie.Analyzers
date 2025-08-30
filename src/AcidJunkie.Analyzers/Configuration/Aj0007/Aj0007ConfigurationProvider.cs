@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace AcidJunkie.Analyzers.Configuration.Aj0007;
 
-internal sealed class Aj0007ConfigurationProvider : ConfigurationProviderBase<Aj0007Configuration>
+internal sealed class Aj0007ConfigurationProvider : ConfigurationProvider<Aj0007Configuration>
 {
     public static Aj0007ConfigurationProvider Instance { get; } = new();
 
@@ -11,14 +11,14 @@ internal sealed class Aj0007ConfigurationProvider : ConfigurationProviderBase<Aj
     {
     }
 
-    protected override Aj0007Configuration GetConfigurationCore(in SyntaxNodeAnalysisContext context)
+    protected override Aj0007Configuration GetConfigurationCore(AnalyzerConfigOptions options)
     {
-        if (!IsEnabled(context))
+        if (!options.IsDiagnosticEnabled("AJ0007"))
         {
             return Aj0007Configuration.Disabled;
         }
 
-        var (parameterOrder, parameterOrderFlat) = GetParameterOrdering(context);
+        var (parameterOrder, parameterOrderFlat) = GetParameterOrdering(options);
         if (parameterOrder.Count == 0)
         {
             return Aj0007Configuration.Default;
@@ -39,14 +39,11 @@ internal sealed class Aj0007ConfigurationProvider : ConfigurationProviderBase<Aj
         return new Aj0007Configuration(true, parameterOrderFlat, ParameterOrderParser.Parse(parameterOrder));
     }
 
-    private static (IReadOnlyList<string> ParameterOrder, string ParameterOrderFlat) GetParameterOrdering(in SyntaxNodeAnalysisContext context)
+    private static (IReadOnlyList<string> ParameterOrder, string ParameterOrderFlat) GetParameterOrdering(AnalyzerConfigOptions options)
     {
-        var value = context.GetOptionsValueOrDefault(Aj0007Configuration.KeyNames.ParameterOrderingFlat);
+        var value = options.GetOptionsValueOrDefault(Aj0007Configuration.KeyNames.ParameterOrderingFlat);
         return value.IsNullOrWhiteSpace()
             ? ([], string.Empty)
             : (ParameterOrderParser.SplitConfigurationParameterOrder(value), value);
     }
-
-    private static bool IsEnabled(in SyntaxNodeAnalysisContext context)
-        => context.GetOptionsBooleanValue(Aj0007Configuration.KeyNames.IsEnabled, defaultValue: true);
 }

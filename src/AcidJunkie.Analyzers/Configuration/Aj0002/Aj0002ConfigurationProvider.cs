@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace AcidJunkie.Analyzers.Configuration.Aj0002;
 
-internal sealed class Aj0002ConfigurationProvider : ConfigurationProviderBase<Aj0002Configuration>
+internal sealed class Aj0002ConfigurationProvider : ConfigurationProvider<Aj0002Configuration>
 {
     public static Aj0002ConfigurationProvider Instance { get; } = new();
 
@@ -12,16 +12,16 @@ internal sealed class Aj0002ConfigurationProvider : ConfigurationProviderBase<Aj
     {
     }
 
-    protected override Aj0002Configuration GetConfigurationCore(in SyntaxNodeAnalysisContext context)
+    protected override Aj0002Configuration GetConfigurationCore(AnalyzerConfigOptions options)
     {
-        if (!IsEnabled(context))
+        if (!options.IsDiagnosticEnabled("AJ0002"))
         {
             return Aj0002Configuration.Disabled;
         }
 
         try
         {
-            var mode = GetMode(context);
+            var mode = GetMode(options);
             return mode switch
             {
                 Mode.Strict  => Aj0002Configuration.Strict,
@@ -36,9 +36,9 @@ internal sealed class Aj0002ConfigurationProvider : ConfigurationProviderBase<Aj
         }
     }
 
-    private static Mode GetMode(in SyntaxNodeAnalysisContext context)
+    private static Mode GetMode(AnalyzerConfigOptions options)
     {
-        var value = context.GetOptionsValueOrDefault(Aj0002Configuration.KeyNames.ParameterOrderingFlat);
+        var value = options.GetOptionsValueOrDefault(Aj0002Configuration.KeyNames.ParameterOrderingFlat);
         if (value.IsNullOrWhiteSpace())
         {
             return Mode.Strict;
@@ -48,7 +48,4 @@ internal sealed class Aj0002ConfigurationProvider : ConfigurationProviderBase<Aj
             ? mode
             : throw new InvalidOperationException($"Unknown mode: {value}");
     }
-
-    private static bool IsEnabled(in SyntaxNodeAnalysisContext context)
-        => context.GetOptionsBooleanValue(Aj0002Configuration.KeyNames.IsEnabled, defaultValue: true);
 }
