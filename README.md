@@ -15,6 +15,7 @@ Source: https://github.com/AcidJunkie303/AcidJunkie.Analyzers
 | [AJ0005](https://github.com/AcidJunkie303/AcidJunkie.Analyzers/blob/main/docs/Rules/AJ0005.md) | Style                   | General          |    ⚠️    |      ❌       | Do not use general warning suppression                                      | 
 | [AJ0006](https://github.com/AcidJunkie303/AcidJunkie.Analyzers/blob/main/docs/Rules/AJ0006.md) | Style                   | General          |    ⚠️    |      ❌       | Classes containing extension methods should have an `Extensions` suffix     | 
 | [AJ0007](https://github.com/AcidJunkie303/AcidJunkie.Analyzers/blob/main/docs/Rules/AJ0007.md) | Style                   | General          |    ⚠️    |      ❌       | Non-compliant parameter order                                               | 
+| [AJ0008](https://github.com/AcidJunkie303/AcidJunkie.Analyzers/blob/main/docs/Rules/AJ0008.md) | Performance             | General          |    ⚠️    |      ❌       | Do not await Task.FromResult()                                              | 
 | [AJ9999](https://github.com/AcidJunkie303/AcidJunkie.Analyzers/blob/main/docs/Rules/AJ9999.md) | Analyzer Error          | General          |    ⚠️    |      ❌       | Unexpected error in AcidJunkie.Analyzers                                    | 
 
 # Logging
