@@ -164,7 +164,6 @@ public sealed class EnforceEntityFrameworkTrackingTypeAnalyzerTests(ITestOutputH
     }
 
     private static string CreateModeConfigurationLine(string mode) => $"dotnet_diagnostic.AJ0002.mode = {mode}";
-    private static string CreateIsEnabledConfigurationLine(bool isEnabled) => $"AJ0002.is_enabled = {(isEnabled ? "true" : "false")}";
 
     private Task RunTestAsync(string insertionCode, string mode)
         => RunTestAsync(insertionCode, mode, true);
@@ -176,7 +175,7 @@ public sealed class EnforceEntityFrameworkTrackingTypeAnalyzerTests(ITestOutputH
         await CreateTesterBuilder()
              .WithTestCode(code)
              .WithEditorConfigLine(CreateModeConfigurationLine(mode))
-             .WithEditorConfigLine(CreateIsEnabledConfigurationLine(isEnabled))
+             .SetEnabled(isEnabled, "AJ0002")
              .WithNugetPackage("Microsoft.EntityFrameworkCore", "9.0.8")
              .Build()
              .RunAsync();

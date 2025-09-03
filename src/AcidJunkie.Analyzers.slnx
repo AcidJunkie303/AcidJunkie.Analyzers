@@ -18,6 +18,7 @@
     <File Path="..\docs\Rules\AJ0007.md" />
     <File Path="..\docs\Rules\AJ0008.md" />
     <File Path="..\docs\Rules\AJ9999.md" />
+    <File Path="..\docs\Rules\AJ0009.md" />
   </Folder>
   <Folder Name="/2. Analyzers/">
     <Project Path="AcidJunkie.Analyzers.CodeFixers\AcidJunkie.Analyzers.CodeFixers.csproj" Type="Classic C#" />

@@ -8,7 +8,8 @@ using Xunit.Abstractions;
 namespace AcidJunkie.Analyzers.Tests.Diagnosers;
 
 [SuppressMessage("Code Smell", "S2699:Tests should include assertions", Justification = "This is done internally by AnalyzerTest.RunAsync()")]
-public sealed class ParameterOrderingAnalyzerTests(ITestOutputHelper testOutputHelper) : TestBase<ParameterOrderingAnalyzer>(testOutputHelper)
+public sealed class ParameterOrderingAnalyzerTests(ITestOutputHelper testOutputHelper)
+    : TestBase<ParameterOrderingAnalyzer>(testOutputHelper)
 {
     [Theory]
     [InlineData("(string value)")]
@@ -38,23 +39,17 @@ public sealed class ParameterOrderingAnalyzerTests(ITestOutputHelper testOutputH
     }
 
     [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
-    public Task Theory_IsEnabled(bool isEnabled)
+    [InlineData(true, "{|AJ0007:(ILogger<TestClass> logger, string value)|}")]
+    [InlineData(false, "(ILogger<TestClass> logger, string value)")]
+    public Task Theory_IsEnabled(bool isEnabled, string parameterCode)
     {
-        const string parameters = "(ILogger<TestClass> logger, string value)";
-
-        var p = isEnabled
-            ? "{|AJ0007:" + parameters + "|}"
-            : parameters;
-
         var code = $$"""
                      using System.Threading;
                      using Microsoft.Extensions.Logging;
 
                      public class TestClass
                      {
-                         public TestClass{{p}}
+                         public TestClass{{parameterCode}}
                          {
                          }
                      }
@@ -63,13 +58,11 @@ public sealed class ParameterOrderingAnalyzerTests(ITestOutputHelper testOutputH
         return CreateTester(code, isEnabled).RunAsync();
     }
 
-    private static string CreateIsEnabledConfigurationLine(bool isEnabled) => $"AJ0007.is_enabled = {(isEnabled ? "true" : "false")}";
-
     private CSharpAnalyzerTest<ParameterOrderingAnalyzer, DefaultVerifier> CreateTester(string code, bool isEnabled, string? configValueForLoggerParameterPlacement = null)
         => CreateTesterBuilder()
           .WithTestCode(code)
           .WithNugetPackage("Microsoft.Extensions.Logging.Abstractions", "9.0.8")
-          .WithEditorConfigLine(CreateIsEnabledConfigurationLine(isEnabled))
+          .SetEnabled(isEnabled, "AJ0007")
           .WithEditorConfigLine($"{Aj0007Configuration.KeyNames.ParameterOrderingFlat} = {configValueForLoggerParameterPlacement ?? string.Empty}")
           .Build();
 }

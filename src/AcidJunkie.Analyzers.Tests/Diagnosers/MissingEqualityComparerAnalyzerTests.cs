@@ -232,8 +232,6 @@ public sealed class MissingEqualityComparerAnalyzerTests(ITestOutputHelper testO
         await RunTestAsync(insertionCode, isEnabled);
     }
 
-    private static string CreateIsEnabledConfigurationLine(bool isEnabled) => $"AJ0001.is_enabled = {(isEnabled ? "true" : "false")}";
-
     private static string CreateTestCode(string insertionCode) =>
         $$"""
           using System;
@@ -346,7 +344,7 @@ public sealed class MissingEqualityComparerAnalyzerTests(ITestOutputHelper testO
 
         return CreateTesterBuilder()
               .WithTestCode(code)
-              .WithEditorConfigLine(CreateIsEnabledConfigurationLine(isEnabled))
+              .SetEnabled(isEnabled, "AJ0001")
               .Build()
               .RunAsync();
     }

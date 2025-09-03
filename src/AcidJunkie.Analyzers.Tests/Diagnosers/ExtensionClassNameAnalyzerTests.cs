@@ -53,9 +53,30 @@ public sealed class ExtensionClassNameAnalyzerTests(ITestOutputHelper testOutput
         return ValidateAsync(code);
     }
 
+    [Theory]
+    [InlineData(true, "{|AJ0006:My|}")]
+    [InlineData(false, "My")]
+    public Task Theory_IsEnabled(bool isEnabled, string className)
+    {
+        var code = $$"""
+                     public static class {{className}}
+                     {
+                         public static void DoSomething(this string input)
+                         {
+                         }
+                     }
+                     """;
+
+        return ValidateAsync(code, isEnabled);
+    }
+
     private Task ValidateAsync(string code)
+        => ValidateAsync(code, true);
+
+    private Task ValidateAsync(string code, bool isEnabled)
         => CreateTesterBuilder()
           .WithTestCode(code)
+          .SetEnabled(isEnabled, "AJ0006")
           .Build()
           .RunAsync();
 }

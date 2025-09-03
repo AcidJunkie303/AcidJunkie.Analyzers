@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using AcidJunkie.Analyzers.Configuration;
 using AcidJunkie.Analyzers.Extensions;
 using AcidJunkie.Analyzers.Logging;
+using AcidJunkie.Analyzers.Support;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -252,10 +253,7 @@ internal sealed class MissingEqualityComparerAnalyzerImplementation : SyntaxNode
         {
             private const string Category = "Predictability";
             public const string DiagnosticId = "AJ0001";
-#pragma warning disable S1075 // Refactor your code not to use hardcoded absolution paths or URIs
-            public const string HelpLinkUri = "https://github.com/AcidJunkie303/AcidJunkie.Analyzers/blob/main/docs/Rules/AJ0001.md";
-#pragma warning restore S1075
-
+            public static readonly string HelpLinkUri = HelpLinkFactory.CreateForDiagnosticId(DiagnosticId);
             public static readonly LocalizableString Title = "Provide an equality comparer argument";
             public static readonly LocalizableString MessageFormat = "To prevent unexpected results, use a IEqualityComparer argument because the type used for hash-matching does not fully implement IEquatable<T> together with GetHashCode()";
             public static readonly LocalizableString Description = MessageFormat;

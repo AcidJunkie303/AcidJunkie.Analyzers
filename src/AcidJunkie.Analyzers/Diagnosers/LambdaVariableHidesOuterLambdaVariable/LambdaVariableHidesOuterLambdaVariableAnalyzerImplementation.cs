@@ -6,14 +6,14 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
-namespace AcidJunkie.Analyzers.Diagnosers.ExtensionClassName;
+namespace AcidJunkie.Analyzers.Diagnosers.LambdaVariableHidesOuterLambdaVariable;
 
 [SuppressMessage("ReSharper", "UseCollectionExpression", Justification = "Not supported in lower versions of Roslyn")]
-internal sealed class ExtensionClassNameAnalyzerImplementation : SyntaxNodeAnalyzerImplementationBase<ExtensionClassNameAnalyzer>
+internal sealed class LambdaVariableHidesOuterLambdaVariableAnalyzerImplementation : SyntaxNodeAnalyzerImplementationBase<LambdaVariableHidesOuterLambdaVariableAnalyzer>
 {
     private readonly IAnalyzerConfiguration _configuration;
 
-    public ExtensionClassNameAnalyzerImplementation(in SyntaxNodeAnalysisContext context) : base(context)
+    public LambdaVariableHidesOuterLambdaVariableAnalyzerImplementation(in SyntaxNodeAnalysisContext context) : base(context)
     {
         _configuration = GenericConfigurationProvider.GetConfiguration(context, DiagnosticRules.Default.DiagnosticId);
     }
@@ -26,27 +26,19 @@ internal sealed class ExtensionClassNameAnalyzerImplementation : SyntaxNodeAnaly
         }
 
         var classDeclaration = (ClassDeclarationSyntax)Context.Node;
-        var className = classDeclaration.Identifier.Text;
-        var endsWithExtensions = className.EndsWith("Extensions", StringComparison.Ordinal);
-        if (endsWithExtensions)
+        foreach (var lambda in TopLevelLambdaFinder.Find(classDeclaration))
         {
-            return;
+            CheckLambda(lambda);
         }
-
-        if (!ContainsOldStyleExtensionMethods(classDeclaration))
-        {
-            return;
-        }
-
-        var suggestedClassName = $"{className}Extensions";
-
-        Context.ReportDiagnostic(Diagnostic.Create(DiagnosticRules.Default.Rule, classDeclaration.Identifier.GetLocation(), className, suggestedClassName));
     }
 
-    private bool ContainsOldStyleExtensionMethods(ClassDeclarationSyntax classDeclaration)
-        => classDeclaration
-          .Members.OfType<MethodDeclarationSyntax>()
-          .Any(a => Context.SemanticModel.GetDeclaredSymbol(a) is IMethodSymbol { IsExtensionMethod: true });
+    private void CheckLambda(SyntaxNode lambda)
+    {
+        foreach (var violation in ViolationChecker.GetViolations(lambda))
+        {
+            Context.ReportDiagnostic(Diagnostic.Create(DiagnosticRules.Default.Rule, violation.Location, violation.VariableName));
+        }
+    }
 
     internal static class DiagnosticRules
     {
@@ -57,11 +49,11 @@ internal sealed class ExtensionClassNameAnalyzerImplementation : SyntaxNodeAnaly
 
         internal static class Default
         {
-            private const string Category = "Intention";
-            public const string DiagnosticId = "AJ0006";
+            private const string Category = "Readability";
+            public const string DiagnosticId = "AJ0009";
             public static readonly string HelpLinkUri = HelpLinkFactory.CreateForDiagnosticId(DiagnosticId);
-            public static readonly LocalizableString Title = "Classes containing extension methods should have an `Extensions` suffix";
-            public static readonly LocalizableString MessageFormat = "Rename the class `{0}` to `{1}` to indicate it contains extension methods";
+            public static readonly LocalizableString Title = "Lambda variable declaration hides outer lambda variable that share the same name";
+            public static readonly LocalizableString MessageFormat = "The lambda variable `{0}` hides outer lambda variable that share the same name";
             public static readonly LocalizableString Description = MessageFormat;
             public static readonly DiagnosticDescriptor Rule = new(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, true, Description, HelpLinkUri);
         }

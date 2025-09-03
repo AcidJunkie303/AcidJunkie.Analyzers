@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using AcidJunkie.Analyzers.Configuration;
 using AcidJunkie.Analyzers.Extensions;
 using AcidJunkie.Analyzers.Logging;
+using AcidJunkie.Analyzers.Support;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -128,10 +129,7 @@ internal sealed class TaskCreationWithMaterializedCollectionAsEnumerableAnalyzer
         {
             private const string Category = "Performance";
             public const string DiagnosticId = "AJ0004";
-#pragma warning disable S1075 // Refactor your code not to use hardcoded absolution paths or URIs
-            public const string HelpLinkUri = "https://github.com/AcidJunkie303/AcidJunkie.Analyzers/blob/main/docs/Rules/AJ0004.md";
-#pragma warning restore S1075
-
+            public static readonly string HelpLinkUri = HelpLinkFactory.CreateForDiagnosticId(DiagnosticId);
             public static readonly LocalizableString Title = "Do not create tasks of enumerable type containing a materialized collection";
             public static readonly LocalizableString MessageFormat = "Do not create tasks of type IEnumerable or IEnumerable<T> containing a materialized collection";
             public static readonly LocalizableString Description = MessageFormat;

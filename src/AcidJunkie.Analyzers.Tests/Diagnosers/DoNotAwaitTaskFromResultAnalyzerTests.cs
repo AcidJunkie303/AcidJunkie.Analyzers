@@ -11,7 +11,12 @@ public sealed class DoNotAwaitTaskFromResultAnalyzerTests(ITestOutputHelper test
     [Theory]
     [InlineData("await {|AJ0008:Task.FromResult(303)|};")]
     [InlineData("await OtherMethod();")]
-    public async Task Theory_ReturningEntity(string insertionCode) => await RunTestAsync(insertionCode);
+    public async Task Theory(string insertionCode) => await RunTestAsync(insertionCode);
+
+    [Theory]
+    [InlineData(true, "await {|AJ0008:Task.FromResult(303)|};")]
+    [InlineData(false, "await OtherMethod();")]
+    public async Task Theory_IsEnabled(bool isEnabled, string methodContents) => await RunTestAsync(methodContents, isEnabled);
 
     private static string CreateTestCode(string insertionCode)
     {
@@ -36,8 +41,6 @@ public sealed class DoNotAwaitTaskFromResultAnalyzerTests(ITestOutputHelper test
                  """;
     }
 
-    private static string CreateIsEnabledConfigurationLine(bool isEnabled) => $"AJ0008.is_enabled = {(isEnabled ? "true" : "false")}";
-
     private Task RunTestAsync(string insertionCode)
         => RunTestAsync(insertionCode, true);
 
@@ -47,8 +50,7 @@ public sealed class DoNotAwaitTaskFromResultAnalyzerTests(ITestOutputHelper test
 
         await CreateTesterBuilder()
              .WithTestCode(code)
-             .WithEditorConfigLine(CreateIsEnabledConfigurationLine(isEnabled))
-             .WithNugetPackage("Microsoft.EntityFrameworkCore", "9.0.8")
+             .SetEnabled(isEnabled, "AJ0008")
              .Build()
              .RunAsync();
     }

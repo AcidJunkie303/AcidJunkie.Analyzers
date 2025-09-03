@@ -2,6 +2,7 @@ using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using AcidJunkie.Analyzers.Configuration;
 using AcidJunkie.Analyzers.Logging;
+using AcidJunkie.Analyzers.Support;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -44,10 +45,7 @@ internal sealed class GeneralWarningSuppressionAnalyzerImplementation : SyntaxNo
         {
             private const string Category = "Code Smell";
             public const string DiagnosticId = "AJ0005";
-#pragma warning disable S1075 // Refactor your code not to use hardcoded absolution paths or URIs
-            public const string HelpLinkUri = "https://github.com/AcidJunkie303/AcidJunkie.Analyzers/blob/main/docs/Rules/AJ0005.md";
-#pragma warning restore S1075
-
+            public static readonly string HelpLinkUri = HelpLinkFactory.CreateForDiagnosticId(DiagnosticId);
             public static readonly LocalizableString Title = "Do not use general warning suppression";
             public static readonly LocalizableString MessageFormat = Title;
             public static readonly LocalizableString Description = MessageFormat;
