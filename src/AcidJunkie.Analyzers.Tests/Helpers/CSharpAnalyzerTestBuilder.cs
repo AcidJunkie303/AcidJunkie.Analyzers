@@ -32,6 +32,8 @@ internal sealed class CSharpAnalyzerTestBuilder<TAnalyzer>
     private readonly List<Type> _additionalTypes = [];
     private readonly ITestOutputHelper _testOutputHelper;
     private string? _code;
+    private string? _enabledOrDisabledDiagnosticId;
+    private bool? _isEnabled;
 
     public CSharpAnalyzerTestBuilder(ITestOutputHelper testOutputHelper)
     {
@@ -48,6 +50,13 @@ internal sealed class CSharpAnalyzerTestBuilder<TAnalyzer>
     {
         var package = new PackageIdentity(packageName, packageVersion);
         _additionalPackages.Add(package);
+        return this;
+    }
+
+    public CSharpAnalyzerTestBuilder<TAnalyzer> SetEnabled(bool isEnabled, string diagnosticId)
+    {
+        _isEnabled = isEnabled;
+        _enabledOrDisabledDiagnosticId = diagnosticId;
         return this;
     }
 
@@ -96,13 +105,29 @@ internal sealed class CSharpAnalyzerTestBuilder<TAnalyzer>
             analyzerTest.TestState.AdditionalReferences.Add(reference);
         }
 
-        if (_additionalEditorConfigLines.Count > 0)
+        var additionalEditorConfigLines = GetAdditionalConfigurationLines().ToList();
+        if (additionalEditorConfigLines.Count > 0)
         {
-            var content = EditorConfigHeader + string.Join(Environment.NewLine, _additionalEditorConfigLines);
+            var content = EditorConfigHeader + string.Join(Environment.NewLine, additionalEditorConfigLines);
             analyzerTest.TestState.AnalyzerConfigFiles.Add(("/.editorconfig", content));
         }
 
         return analyzerTest;
+    }
+
+    private IEnumerable<string> GetAdditionalConfigurationLines()
+    {
+        foreach (var line in _additionalEditorConfigLines)
+        {
+            yield return line;
+        }
+
+        if (_isEnabled == null)
+        {
+            yield break;
+        }
+
+        yield return $"{_enabledOrDisabledDiagnosticId}.is_enabled = {(_isEnabled.Value ? "true" : "false")}";
     }
 
     private void LogSyntaxTree(string code)

@@ -117,12 +117,10 @@ public sealed class TaskCreationWithMaterializedCollectionAsEnumerableAnalyzerTe
         return RunTestAsync(code, isEnabled);
     }
 
-    private static string CreateIsEnabledConfigurationLine(bool isEnabled) => $"AJ0004.is_enabled = {(isEnabled ? "true" : "false")}";
-
     private Task RunTestAsync(string code, bool isEnabled)
         => CreateTesterBuilder()
           .WithTestCode(code)
-          .WithEditorConfigLine(CreateIsEnabledConfigurationLine(isEnabled))
+          .SetEnabled(isEnabled, "AJ0004")
           .Build()
           .RunAsync();
 }

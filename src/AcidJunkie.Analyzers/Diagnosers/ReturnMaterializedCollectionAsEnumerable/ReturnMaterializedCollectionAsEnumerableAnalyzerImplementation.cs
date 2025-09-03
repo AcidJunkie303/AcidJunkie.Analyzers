@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using AcidJunkie.Analyzers.Configuration;
 using AcidJunkie.Analyzers.Extensions;
 using AcidJunkie.Analyzers.Logging;
+using AcidJunkie.Analyzers.Support;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -227,10 +228,7 @@ internal sealed class ReturnMaterializedCollectionAsEnumerableAnalyzerImplementa
         {
             private const string Category = "Performance";
             public const string DiagnosticId = "AJ0003";
-#pragma warning disable S1075 // Refactor your code not to use hardcoded absolution paths or URIs
-            public const string HelpLinkUri = "https://github.com/AcidJunkie303/AcidJunkie.Analyzers/blob/main/docs/Rules/AJ0003.md";
-#pragma warning restore S1075
-
+            public static readonly string HelpLinkUri = HelpLinkFactory.CreateForDiagnosticId(DiagnosticId);
             public static readonly LocalizableString Title = "Do not return materialized collection as enumerable";
             public static readonly LocalizableString MessageFormat = "Do not return materialized collection as enumerable";
             public static readonly LocalizableString Description = MessageFormat;

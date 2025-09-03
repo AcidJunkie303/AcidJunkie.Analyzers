@@ -7,4 +7,6 @@ public static class CollectionExtensions
         => source
           .Where(a => a is not null)
           .Select(a => a!);
+
+    public static IEnumerable<T> EmptyIfNull<T>(this IEnumerable<T>? source) => source ?? [];
 }

@@ -13,19 +13,31 @@ public sealed class GeneralWarningSuppressionAnalyzerTests(ITestOutputHelper tes
         const string code = "{|AJ0005:#pragma warning disable|}";
 
         await CreateTesterBuilder()
-            .WithTestCode(code)
-            .Build()
-            .RunAsync();
+             .WithTestCode(code)
+             .Build()
+             .RunAsync();
     }
 
     [Fact]
-    public async Task WhenUsingSpecificWarningSuppression_ThenOk()
+    public Task WhenUsingSpecificWarningSuppression_ThenOk()
     {
         const string code = "#pragma warning disable TB303";
 
-        await CreateTesterBuilder()
-            .WithTestCode(code)
-            .Build()
-            .RunAsync();
+        return ValidateAsync(code);
     }
+
+    [Theory]
+    [InlineData(true, "{|AJ0005:#pragma warning disable|}")]
+    [InlineData(false, "#pragma warning disable")]
+    public Task Theory_IsEnabled(bool isEnabled, string code) => ValidateAsync(code, isEnabled);
+
+    private Task ValidateAsync(string code)
+        => ValidateAsync(code, true);
+
+    private Task ValidateAsync(string code, bool isEnabled)
+        => CreateTesterBuilder()
+          .WithTestCode(code)
+          .SetEnabled(isEnabled, "AJ0005")
+          .Build()
+          .RunAsync();
 }
