@@ -20,13 +20,13 @@ public sealed class ConstFirstAnalyzerTests(ITestOutputHelper testOutputHelper)
                 """)]
     [InlineData("""
                 string value1 = "tb";
-                {|AJ0011:const string value2 = "303";|}
+                {|AJ0010:const string value2 = "303";|}
                 TestMethod();
                 """)]
     [InlineData("""
                 TestMethod();
                 string value1 = "tb";
-                {|AJ0011:const string value2 = "303";|}
+                {|AJ0010:const string value2 = "303";|}
                 """)]
     public async Task Theory(string methodContents) => await RunTestAsync(methodContents);
 
@@ -38,7 +38,7 @@ public sealed class ConstFirstAnalyzerTests(ITestOutputHelper testOutputHelper)
     [InlineData(true,
         """
         TestMethod();
-        {|AJ0011:const string value2 = "303";|}
+        {|AJ0010:const string value2 = "303";|}
         """)]
     public async Task Theory_IsEnabled(bool isEnabled, string methodContents) => await RunTestAsync(methodContents, isEnabled);
 
@@ -69,7 +69,7 @@ public sealed class ConstFirstAnalyzerTests(ITestOutputHelper testOutputHelper)
 
         await CreateTesterBuilder()
              .WithTestCode(code)
-             .SetEnabled(isEnabled, "AJ0011")
+             .SetEnabled(isEnabled, "AJ0010")
              .Build()
              .RunAsync();
     }

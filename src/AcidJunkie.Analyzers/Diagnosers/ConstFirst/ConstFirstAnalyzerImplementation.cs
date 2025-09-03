@@ -70,7 +70,7 @@ internal sealed class ConstFirstAnalyzerImplementation : SyntaxNodeAnalyzerImple
         internal static class Default
         {
             private const string Category = "Style";
-            public const string DiagnosticId = "AJ0011";
+            public const string DiagnosticId = "AJ0010";
             public static readonly string HelpLinkUri = HelpLinkFactory.CreateForDiagnosticId(DiagnosticId);
             public static readonly LocalizableString Title = "Declare constants at the top of the method";
             public static readonly LocalizableString MessageFormat = "Declare constants at the top of the method";
