@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using AcidJunkie.Analyzers.Extensions;
 
 namespace AcidJunkie.Analyzers.Diagnosers.MissingEqualityComparer;
 
@@ -109,39 +110,27 @@ internal static class GenericKeyParameterNameProvider
                     {
                         (
                             "Dictionary",
-                            new[]
-                            {
-                                (
-                                    2, TypeNames.Key
-                                )
-                            }.ToImmutableDictionary(a => a.Item1, a => a.Item2)
+                            ImmutableDictionary.CreateBuilder<int, string>()
+                                               .AddFluent(2, TypeNames.Key)
+                                               .ToImmutable()
                         ),
                         (
                             "HashSet",
-                            new[]
-                            {
-                                (
-                                    1, TypeNames.T
-                                )
-                            }.ToImmutableDictionary(a => a.Item1, a => a.Item2)
+                            ImmutableDictionary.CreateBuilder<int, string>()
+                                               .AddFluent(1, TypeNames.T)
+                                               .ToImmutable()
                         ),
                         (
                             "OrderedDictionary",
-                            new[]
-                            {
-                                (
-                                    2, TypeNames.Key
-                                )
-                            }.ToImmutableDictionary(a => a.Item1, a => a.Item2)
+                            ImmutableDictionary.CreateBuilder<int, string>()
+                                               .AddFluent(2, TypeNames.Key)
+                                               .ToImmutable()
                         ),
                         (
                             "SortedDictionary",
-                            new[]
-                            {
-                                (
-                                    2, TypeNames.Key
-                                )
-                            }.ToImmutableDictionary(a => a.Item1, a => a.Item2)
+                            ImmutableDictionary.CreateBuilder<int, string>()
+                                               .AddFluent(2, TypeNames.Key)
+                                               .ToImmutable()
                         )
                     }.ToImmutableDictionary(a => a.Item1, a => a.Item2, StringComparer.Ordinal)
                 )
