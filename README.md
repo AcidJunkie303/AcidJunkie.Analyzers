@@ -16,8 +16,8 @@ Source: https://github.com/AcidJunkie303/AcidJunkie.Analyzers
 | [AJ0006](https://github.com/AcidJunkie303/AcidJunkie.Analyzers/blob/main/docs/Rules/AJ0006.md) | Style                   | General          |    ⚠️    |      ❌       | Classes containing extension methods should have an `Extensions` suffix          | 
 | [AJ0007](https://github.com/AcidJunkie303/AcidJunkie.Analyzers/blob/main/docs/Rules/AJ0007.md) | Style                   | General          |    ⚠️    |      ❌       | Non-compliant parameter order                                                    | 
 | [AJ0008](https://github.com/AcidJunkie303/AcidJunkie.Analyzers/blob/main/docs/Rules/AJ0008.md) | Performance             | General          |    ⚠️    |      ❌       | Do not await Task.FromResult()                                                   | 
-| [AJ0009](https://github.com/AcidJunkie303/AcidJunkie.Analyzers/blob/main/docs/Rules/AJ0008.md) | Readability / Clarity   | General          |    ⚠️    |      ❌       | Lambda variable declaration hides outer lambda variable that share the same name | 
-| [AJ0010](https://github.com/AcidJunkie303/AcidJunkie.Analyzers/blob/main/docs/Rules/AJ0008.md) | Readability             | General          |    ⚠️    |      ❌       | Declare constants at the top of the method                                       | 
+| [AJ0009](https://github.com/AcidJunkie303/AcidJunkie.Analyzers/blob/main/docs/Rules/AJ0009.md) | Readability / Clarity   | General          |    ⚠️    |      ❌       | Lambda variable declaration hides outer lambda variable that share the same name | 
+| [AJ0010](https://github.com/AcidJunkie303/AcidJunkie.Analyzers/blob/main/docs/Rules/AJ0010.md) | Readability             | General          |    ⚠️    |      ❌       | Declare constants at the top of the method                                       | 
 | [AJ9999](https://github.com/AcidJunkie303/AcidJunkie.Analyzers/blob/main/docs/Rules/AJ9999.md) | Analyzer Error          | General          |    ⚠️    |      ❌       | Unexpected error in AcidJunkie.Analyzers                                         | 
 
 # Logging
