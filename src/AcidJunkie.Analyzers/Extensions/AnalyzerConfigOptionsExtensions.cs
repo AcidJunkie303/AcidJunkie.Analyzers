@@ -1,48 +1,24 @@
 using System.Collections.Immutable;
 using AcidJunkie.Analyzers.Configuration;
-using AcidJunkie.Analyzers.Configuration.Aj0002;
 using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace AcidJunkie.Analyzers.Extensions;
 
 public static class AnalyzerConfigOptionsExtensions
 {
-    private static readonly ImmutableDictionary<string, bool> BooleanValuesByValue = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase)
-    {
-        {
-            "false", false
-        },
-        {
-            "0", false
-        },
-        {
-            "disable", false
-        },
-        {
-            "disabled", false
-        },
-        {
-            "no", false
-        },
-        {
-            "true", true
-        },
-        {
-            "1", true
-        },
-        {
-            "enable", true
-        },
-        {
-            "enabled", true
-        },
-        {
-            "yes", true
-        }
-    }.ToImmutableDictionary(StringComparer.OrdinalIgnoreCase);
-
-    public static bool IsEnabled(AnalyzerConfigOptions options)
-        => options.GetOptionsBooleanValue(Aj0002Configuration.KeyNames.IsEnabled, defaultValue: true);
+    private static readonly ImmutableDictionary<string, bool> BooleanValuesByValue
+        = ImmutableDictionary.CreateBuilder<string, bool>(StringComparer.OrdinalIgnoreCase)
+                             .AddFluent("false", false)
+                             .AddFluent("0", false)
+                             .AddFluent("disable", false)
+                             .AddFluent("disabled", false)
+                             .AddFluent("no", false)
+                             .AddFluent("true", true)
+                             .AddFluent("1", true)
+                             .AddFluent("enable", true)
+                             .AddFluent("enabled", true)
+                             .AddFluent("yes", true)
+                             .ToImmutable();
 
     public static string? GetOptionsValueOrDefault(this AnalyzerConfigOptions options, string key)
     {
