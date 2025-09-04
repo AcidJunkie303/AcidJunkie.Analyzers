@@ -9,12 +9,13 @@ public sealed class LambdaVariableHidesOuterLambdaVariableAnalyzerTests(ITestOut
     : TestBase<LambdaVariableHidesOuterLambdaVariableAnalyzer>(testOutputHelper)
 {
     [Theory]
-    [InlineData("Enumerable.Range(0,10).Where(x => true).Where(x => true);")]
-    [InlineData("Enumerable.Range(0,10).Where(x => true).Select( (i,x) => true);")]
-    [InlineData("new[] {string.Empty}.Select(x => x.Select({|AJ0009:x|} => x));")]
-    [InlineData("new[] {string.Empty}.Select((x,i) => x.Select(({|AJ0009:x|},{|AJ0009:i|}) => x));")]
-    [InlineData("new[] {string.Empty}.Select((x,i) => x.Select({|AJ0009:x|} =>x));")]
-    [InlineData("new[] {string.Empty}.Select((x,i) => x.Select((_,{|AJ0009:i|}) => i));")]
+    [InlineData("/* 01 */ Enumerable.Range(0,10).Where(x => true).Where(x => true);")]
+    [InlineData("/* 02 */ Enumerable.Range(0,10).Where(x => true).Select( (i,x) => true);")]
+    [InlineData("/* 03 */ new[] {string.Empty}.Select(x => x.Select({|AJ0009:x|} => x));")]
+    [InlineData("/* 04 */ new[] {string.Empty}.Select((x,i) => x.Select(({|AJ0009:x|},{|AJ0009:i|}) => x));")]
+    [InlineData("/* 05 */ new[] {string.Empty}.Select((x,i) => x.Select({|AJ0009:x|} =>x));")]
+    [InlineData("/* 06 */ new[] {string.Empty}.Select((x,i) => x.Select((_,{|AJ0009:i|}) => i));")]
+    [InlineData("/* 07 */ new[] {string.Empty}.Select((x,_) => x.Select((y,_) => x));")]
     public async Task Theory(string insertionCode)
         => await ValidateAsync(insertionCode);
 
