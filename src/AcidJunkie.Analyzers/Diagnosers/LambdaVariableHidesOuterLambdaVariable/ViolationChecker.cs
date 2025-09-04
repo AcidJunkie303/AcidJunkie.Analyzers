@@ -1,3 +1,4 @@
+using AcidJunkie.Analyzers.Extensions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -24,7 +25,10 @@ internal static class ViolationChecker
         {
             BeginScope();
 
-            RegisterVariableAndCheck(node.Parameter);
+            if (!IsDiscardedParameter(node.Parameter))
+            {
+                RegisterVariableAndCheck(node.Parameter);
+            }
 
             base.VisitSimpleLambdaExpression(node);
 
@@ -35,7 +39,7 @@ internal static class ViolationChecker
         {
             BeginScope();
 
-            foreach (var parameter in node.ParameterList.Parameters)
+            foreach (var parameter in node.ParameterList.Parameters.WhereNot(IsDiscardedParameter))
             {
                 RegisterVariableAndCheck(parameter);
             }
@@ -44,6 +48,9 @@ internal static class ViolationChecker
 
             EndScope();
         }
+
+        private static bool IsDiscardedParameter(ParameterSyntax parameter)
+            => parameter.Identifier.Text.EqualsOrdinal("_");
 
         private void RegisterVariableAndCheck(ParameterSyntax parameter)
         {

@@ -9,4 +9,7 @@ public static class CollectionExtensions
           .Select(a => a!);
 
     public static IEnumerable<T> EmptyIfNull<T>(this IEnumerable<T>? source) => source ?? [];
+
+    public static IEnumerable<T> WhereNot<T>(this IEnumerable<T> source, Func<T, bool> predicate)
+        => source.Where(a => !predicate(a));
 }
