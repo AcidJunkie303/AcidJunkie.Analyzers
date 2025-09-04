@@ -1,152 +1,10 @@
 using System.Collections.Immutable;
+using AcidJunkie.Analyzers.Extensions;
 
 namespace AcidJunkie.Analyzers.Diagnosers.MissingEqualityComparer;
 
 internal static class GenericKeyParameterNameProvider
 {
-    private static readonly ImmutableDictionary<string, ImmutableDictionary<string, ImmutableDictionary<string, string>>> GenericKeyByMethodNameByContainingTypeByContainingTypeNameSpace =
-        new[]
-        {
-            (
-                "System.Linq",
-                new[]
-                {
-                    (
-                        "Enumerable",
-                        new[]
-                        {
-                            ("AggregateBy", TypeNames.Key),
-                            ("Contains", TypeNames.Source),
-                            ("CountBy", TypeNames.Source),
-                            ("Distinct", TypeNames.Source),
-                            ("DistinctBy", TypeNames.Key),
-                            ("Except", TypeNames.Source),
-                            ("ExceptBy", TypeNames.Key),
-                            ("GroupBy", TypeNames.Key),
-                            ("GroupJoin", TypeNames.Key),
-                            ("Intersect", TypeNames.Source),
-                            ("IntersectBy", TypeNames.Key),
-                            ("Join", TypeNames.Key),
-                            ("SequenceEqual", TypeNames.Source),
-                            ("ToDictionary", TypeNames.Key),
-                            ("ToHashSet", TypeNames.Source),
-                            ("ToLookup", TypeNames.Key),
-                            ("Union", TypeNames.Source),
-                            ("UnionBy", TypeNames.Key)
-                        }.ToImmutableDictionary(a => a.Item1, a => a.Item2, StringComparer.Ordinal)
-                    )
-                }.ToImmutableDictionary(a => a.Item1, a => a.Item2, StringComparer.Ordinal)
-            ),
-            (
-                "System.Collections.Immutable",
-                new[]
-                {
-                    (
-                        "ImmutableDictionary",
-                        new[]
-                        {
-                            ("Create", TypeNames.Key),
-                            ("CreateRange", TypeNames.Key),
-                            ("CreateBuilder", TypeNames.Key),
-                            ("ToImmutableDictionary", TypeNames.Key)
-                        }.ToImmutableDictionary(a => a.Item1, a => a.Item2, StringComparer.Ordinal)
-                    ),
-                    (
-                        "ImmutableHashSet",
-                        new[]
-                        {
-                            ("Create", TypeNames.T),
-                            ("CreateRange", TypeNames.T),
-                            ("CreateBuilder", TypeNames.T),
-                            ("ToImmutableHashSet", TypeNames.Source)
-                        }.ToImmutableDictionary(a => a.Item1, a => a.Item2, StringComparer.Ordinal)
-                    )
-                }.ToImmutableDictionary(a => a.Item1, a => a.Item2, StringComparer.Ordinal)
-            ),
-            (
-                "System.Collections.Frozen",
-                new[]
-                {
-                    (
-                        "FrozenDictionary",
-                        new[]
-                        {
-                            ("ToFrozenDictionary", TypeNames.Key)
-                        }.ToImmutableDictionary(a => a.Item1, a => a.Item2, StringComparer.Ordinal)
-                    ),
-                    (
-                        "FrozenSet",
-                        new[]
-                        {
-                            ("ToFrozenSet", TypeNames.T)
-                        }.ToImmutableDictionary(a => a.Item1, a => a.Item2, StringComparer.Ordinal)
-                    )
-                }.ToImmutableDictionary(a => a.Item1, a => a.Item2, StringComparer.Ordinal)
-            ),
-            (
-                "Microsoft.EntityFrameworkCore",
-                new[]
-                {
-                    (
-                        "EntityFrameworkQueryableExtensions",
-                        new[]
-                        {
-                            ("ToDictionaryAsync", TypeNames.Key),
-                            ("ToHashSetAsync", TypeNames.Key)
-                        }.ToImmutableDictionary(a => a.Item1, a => a.Item2, StringComparer.Ordinal)
-                    )
-                }.ToImmutableDictionary(a => a.Item1, a => a.Item2, StringComparer.Ordinal)
-            )
-        }.ToImmutableDictionary(a => a.Item1, a => a.Item2, StringComparer.Ordinal);
-
-    private static readonly ImmutableDictionary<string, ImmutableDictionary<string, ImmutableDictionary<int, string>>>
-        GenericKeyByGenericTypeCountByTypeNameByNameSpace =
-            new[]
-            {
-                (
-                    "System.Collections.Generic",
-                    new[]
-                    {
-                        (
-                            "Dictionary",
-                            new[]
-                            {
-                                (
-                                    2, TypeNames.Key
-                                )
-                            }.ToImmutableDictionary(a => a.Item1, a => a.Item2)
-                        ),
-                        (
-                            "HashSet",
-                            new[]
-                            {
-                                (
-                                    1, TypeNames.T
-                                )
-                            }.ToImmutableDictionary(a => a.Item1, a => a.Item2)
-                        ),
-                        (
-                            "OrderedDictionary",
-                            new[]
-                            {
-                                (
-                                    2, TypeNames.Key
-                                )
-                            }.ToImmutableDictionary(a => a.Item1, a => a.Item2)
-                        ),
-                        (
-                            "SortedDictionary",
-                            new[]
-                            {
-                                (
-                                    2, TypeNames.Key
-                                )
-                            }.ToImmutableDictionary(a => a.Item1, a => a.Item2)
-                        )
-                    }.ToImmutableDictionary(a => a.Item1, a => a.Item2, StringComparer.Ordinal)
-                )
-            }.ToImmutableDictionary(a => a.Item1, a => a.Item2, StringComparer.Ordinal);
-
     public static string? GetKeyParameterNameForInvocation(string containingTypeNamespaceName,
                                                            string containingTypeName, string methodName)
     {
@@ -187,4 +45,141 @@ internal static class GenericKeyParameterNameProvider
         public const string Source = "TSource";
         public const string T = "T";
     }
+
+    // @formatter:off
+    private static readonly ImmutableDictionary<string, ImmutableDictionary<string, ImmutableDictionary<string, string>>> GenericKeyByMethodNameByContainingTypeByContainingTypeNameSpace =
+        ImmutableDictionary
+           .CreateBuilder<string, ImmutableDictionary<string, ImmutableDictionary<string, string>>>()
+           .AddFluent(
+                "System.Linq",
+                ImmutableDictionary
+                   .CreateBuilder<string, ImmutableDictionary<string, string>>()
+                   .AddFluent(
+                        "Enumerable",
+                        ImmutableDictionary
+                           .CreateBuilder<string, string>()
+                           .AddFluent("AggregateBy", TypeNames.Key)
+                           .AddFluent("Contains", TypeNames.Source)
+                           .AddFluent("CountBy", TypeNames.Source)
+                           .AddFluent("Distinct", TypeNames.Source)
+                           .AddFluent("DistinctBy", TypeNames.Key)
+                           .AddFluent("Except", TypeNames.Source)
+                           .AddFluent("ExceptBy", TypeNames.Key)
+                           .AddFluent("GroupBy", TypeNames.Key)
+                           .AddFluent("GroupJoin", TypeNames.Key)
+                           .AddFluent("Intersect", TypeNames.Source)
+                           .AddFluent("IntersectBy", TypeNames.Key)
+                           .AddFluent("Join", TypeNames.Key)
+                           .AddFluent("SequenceEqual", TypeNames.Source)
+                           .AddFluent("ToDictionary", TypeNames.Key)
+                           .AddFluent("ToHashSet", TypeNames.Source)
+                           .AddFluent("ToLookup", TypeNames.Key)
+                           .AddFluent("Union", TypeNames.Source)
+                           .AddFluent("UnionBy", TypeNames.Key)
+                           .ToImmutable()
+                    )
+                   .ToImmutable()
+            )
+           .AddFluent(
+                "System.Collections.Immutable",
+                ImmutableDictionary
+                   .CreateBuilder<string, ImmutableDictionary<string, string>>()
+                   .AddFluent(
+                        "ImmutableDictionary",
+                        ImmutableDictionary.
+                            CreateBuilder<string, string>()
+                           .AddFluent("Create", TypeNames.Key)
+                           .AddFluent("CreateRange", TypeNames.Key)
+                           .AddFluent("CreateBuilder", TypeNames.Key)
+                           .AddFluent("ToImmutableDictionary", TypeNames.Key)
+                           .ToImmutable()
+                    )
+                   .AddFluent(
+                        "ImmutableHashSet",
+                        ImmutableDictionary
+                           .CreateBuilder<string, string>()
+                           .AddFluent("Create", TypeNames.T)
+                           .AddFluent("CreateRange", TypeNames.T)
+                           .AddFluent("CreateBuilder", TypeNames.T)
+                           .AddFluent("ToImmutableHashSet", TypeNames.Source)
+                           .ToImmutable()
+                    )
+                   .ToImmutable()
+            )
+           .AddFluent(
+                "System.Collections.Frozen",
+                ImmutableDictionary
+                    .CreateBuilder<string, ImmutableDictionary<string, string>>()
+                   .AddFluent(
+                        "FrozenDictionary",
+                        ImmutableDictionary
+                           .CreateBuilder<string, string>()
+                           .AddFluent("ToFrozenDictionary", TypeNames.Key)
+                           .ToImmutable()
+                    )
+                   .AddFluent(
+                        "FrozenSet",
+                        ImmutableDictionary
+                           .CreateBuilder<string, string>()
+                           .AddFluent("ToFrozenSet", TypeNames.T)
+                           .ToImmutable()
+                    )
+                   .ToImmutable()
+            )
+           .AddFluent(
+                "Microsoft.EntityFrameworkCore",
+                ImmutableDictionary
+                   .CreateBuilder<string, ImmutableDictionary<string, string>>()
+                   .AddFluent(
+                        "EntityFrameworkQueryableExtensions",
+                        ImmutableDictionary
+                           .CreateBuilder<string, string>()
+                           .AddFluent("ToDictionaryAsync", TypeNames.Key)
+                           .AddFluent("ToHashSetAsync", TypeNames.Key)
+                           .ToImmutable()
+                    )
+                   .ToImmutable()
+            )
+           .ToImmutable();
+
+    private static readonly ImmutableDictionary<string, ImmutableDictionary<string, ImmutableDictionary<int, string>>>
+        GenericKeyByGenericTypeCountByTypeNameByNameSpace =
+            ImmutableDictionary
+               .CreateBuilder<string, ImmutableDictionary<string, ImmutableDictionary<int, string>>>()
+               .AddFluent(
+                    "System.Collections.Generic",
+                    ImmutableDictionary
+                       .CreateBuilder<string, ImmutableDictionary<int, string>>()
+                       .AddFluent(
+                            "Dictionary",
+                            ImmutableDictionary
+                               .CreateBuilder<int, string>()
+                               .AddFluent(2, TypeNames.Key)
+                               .ToImmutable()
+                        )
+                       .AddFluent(
+                            "HashSet",
+                            ImmutableDictionary
+                               .CreateBuilder<int, string>()
+                               .AddFluent(1, TypeNames.T)
+                               .ToImmutable()
+                        )
+                       .AddFluent(
+                            "OrderedDictionary",
+                            ImmutableDictionary
+                               .CreateBuilder<int, string>()
+                               .AddFluent(2, TypeNames.Key)
+                               .ToImmutable()
+                        )
+                       .AddFluent(
+                            "SortedDictionary",
+                            ImmutableDictionary
+                               .CreateBuilder<int, string>()
+                               .AddFluent(2, TypeNames.Key)
+                               .ToImmutable()
+                        )
+                       .ToImmutable()
+                )
+               .ToImmutable();
+    // @formatter:on
 }
