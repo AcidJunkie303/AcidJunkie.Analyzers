@@ -21,4 +21,7 @@ internal static class Program
 
         static IEnumerable<int> GetNumbers() => Enumerable.Range(1, 10).ToList();
     }
+
+    private static string? GetStringValue() => null;
+    private static int? GetNullableValue() => null;
 }
