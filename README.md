@@ -26,7 +26,7 @@ To enable logging, set the following property to true in the `.editorconfig` fil
 
 ```
 [*.cs]
-AcidJunkie_Analyzers.is_logging_enabled = value
+AcidJunkie_Analyzers.is_logging_enabled = < None | Duration | Full >
 ```
 
 | Value    | Description                                                       |
