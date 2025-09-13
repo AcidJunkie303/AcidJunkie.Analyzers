@@ -1,36 +1,37 @@
 ﻿<Solution>
-    <Folder Name="/1. Solution Items/">
-        <File Path="..\README.md"/>
-        <File Path="..\STATUS.md"/>
-        <File Path=".editorconfig"/>
-        <File Path="Directory.Build.props"/>
-        <File Path="BannedSymbols.txt"/>
-        <File Path="..\.github\workflows\ci.yml"/>
-        <File Path="Directory.Build.targets"/>
-    </Folder>
-    <Folder Name="/1. Solution Items/Rules/">
-        <File Path="..\docs\Rules\AJ0001.md"/>
-        <File Path="..\docs\Rules\AJ0002.md"/>
-        <File Path="..\docs\Rules\AJ0003.md"/>
-        <File Path="..\docs\Rules\AJ0004.md"/>
-        <File Path="..\docs\Rules\AJ0005.md"/>
-        <File Path="..\docs\Rules\AJ0006.md"/>
-        <File Path="..\docs\Rules\AJ0007.md"/>
-        <File Path="..\docs\Rules\AJ0008.md"/>
-        <File Path="..\docs\Rules\AJ0009.md"/>
-        <File Path="..\docs\Rules\AJ0010.md"/>
-        <File Path="..\docs\Rules\AJ9999.md"/>
-    </Folder>
-    <Folder Name="/2. Analyzers/">
-        <Project Path="AcidJunkie.Analyzers.CodeFixers\AcidJunkie.Analyzers.CodeFixers.csproj" Type="Classic C#"/>
-        <Project Path="AcidJunkie.Analyzers.Pack\AcidJunkie.Analyzers.Pack.csproj" Type="Classic C#"/>
-        <Project Path="AcidJunkie.Analyzers\AcidJunkie.Analyzers.csproj"/>
-    </Folder>
-    <Folder Name="/3. Tests/">
-        <Project Path="AcidJunkie.Analyzers.Tests\AcidJunkie.Analyzers.Tests.csproj"/>
-    </Folder>
-    <Folder Name="/4. Playgrounds/">
-        <Project Path="Playground2\Playground2.csproj" Type="Classic C#"/>
-        <Project Path="Playground\Playground.csproj" Type="Classic C#"/>
-    </Folder>
+  <Folder Name="/1. Solution Items/">
+    <File Path="..\README.md" />
+    <File Path="..\STATUS.md" />
+    <File Path=".editorconfig" />
+    <File Path="Directory.Build.props" />
+    <File Path="BannedSymbols.txt" />
+    <File Path="..\.github\workflows\ci.yml" />
+    <File Path="Directory.Build.targets" />
+  </Folder>
+  <Folder Name="/1. Solution Items/Rules/">
+    <File Path="..\docs\Rules\AJ0001.md" />
+    <File Path="..\docs\Rules\AJ0002.md" />
+    <File Path="..\docs\Rules\AJ0003.md" />
+    <File Path="..\docs\Rules\AJ0004.md" />
+    <File Path="..\docs\Rules\AJ0005.md" />
+    <File Path="..\docs\Rules\AJ0006.md" />
+    <File Path="..\docs\Rules\AJ0007.md" />
+    <File Path="..\docs\Rules\AJ0008.md" />
+    <File Path="..\docs\Rules\AJ0009.md" />
+    <File Path="..\docs\Rules\AJ0010.md" />
+    <File Path="..\docs\Rules\AJ9999.md" />
+    <File Path="..\docs\Rules\AJ0011.md" />
+  </Folder>
+  <Folder Name="/2. Analyzers/">
+    <Project Path="AcidJunkie.Analyzers.CodeFixers\AcidJunkie.Analyzers.CodeFixers.csproj" Type="Classic C#" />
+    <Project Path="AcidJunkie.Analyzers.Pack\AcidJunkie.Analyzers.Pack.csproj" Type="Classic C#" />
+    <Project Path="AcidJunkie.Analyzers\AcidJunkie.Analyzers.csproj" />
+  </Folder>
+  <Folder Name="/3. Tests/">
+    <Project Path="AcidJunkie.Analyzers.Tests\AcidJunkie.Analyzers.Tests.csproj" />
+  </Folder>
+  <Folder Name="/4. Playgrounds/">
+    <Project Path="Playground2\Playground2.csproj" Type="Classic C#" />
+    <Project Path="Playground\Playground.csproj" Type="Classic C#" />
+  </Folder>
 </Solution>

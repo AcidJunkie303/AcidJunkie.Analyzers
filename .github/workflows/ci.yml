@@ -27,7 +27,7 @@ jobs:
       - name: Set Environment Variables
         run: |
           echo "ASSEMBLY_VERSION=1.0.0-${GITHUB_RUN_NUMBER}" >> $GITHUB_ENV
-          echo "NUGET_VERSION=1.0.0-prerelease.${GITHUB_RUN_NUMBER}" >> $GITHUB_ENV
+          echo "NUGET_VERSION=1.0.0.${GITHUB_RUN_NUMBER}" >> $GITHUB_ENV
 
       - name: Show Environment Variables
         run: |

@@ -18,6 +18,7 @@ Source: https://github.com/AcidJunkie303/AcidJunkie.Analyzers
 | [AJ0008](https://github.com/AcidJunkie303/AcidJunkie.Analyzers/blob/main/docs/Rules/AJ0008.md) | Performance             | General          |    ⚠️    |      ❌       | Do not await Task.FromResult()                                                   | 
 | [AJ0009](https://github.com/AcidJunkie303/AcidJunkie.Analyzers/blob/main/docs/Rules/AJ0009.md) | Readability / Clarity   | General          |    ⚠️    |      ❌       | Lambda variable declaration hides outer lambda variable that share the same name | 
 | [AJ0010](https://github.com/AcidJunkie303/AcidJunkie.Analyzers/blob/main/docs/Rules/AJ0010.md) | Readability             | General          |    ⚠️    |      ❌       | Declare constants at the top of the method                                       | 
+| [AJ0011](https://github.com/AcidJunkie303/AcidJunkie.Analyzers/blob/main/docs/Rules/AJ0010.md) | Intention               | General          |    ⚠️    |      ❌       | Use is or is not for null-comparison                                             | 
 | [AJ9999](https://github.com/AcidJunkie303/AcidJunkie.Analyzers/blob/main/docs/Rules/AJ9999.md) | Analyzer Error          | General          |    ⚠️    |      ❌       | Unexpected error in AcidJunkie.Analyzers                                         | 
 
 # Logging
@@ -26,7 +27,7 @@ To enable logging, set the following property to true in the `.editorconfig` fil
 
 ```
 [*.cs]
-AcidJunkie_Analyzers.is_logging_enabled = < None | Duration | Full >
+AcidJunkie_Analyzers.is_logging_enabled = None | Duration | Full
 ```
 
 | Value    | Description                                                       |
