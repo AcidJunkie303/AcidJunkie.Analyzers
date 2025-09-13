@@ -10,11 +10,11 @@ public sealed class DefaultLoggerTests
     public void WriteLine_ShouldContainAllInformation()
     {
         // arrange
-        var sut = new DefaultLogger<DefaultLoggerTests>();
+        var sut = new DefaultLogger<DefaultLoggerTests>(LogLevel.Full);
         EnsureLogFileIsDeleted();
 
         // act
-        sut.WriteLine(static () => "test1");
+        sut.WriteLine(LogLevel.Full, "test1");
 
         // assert
         var logFileContent = GetLogFileContent();
@@ -28,13 +28,13 @@ public sealed class DefaultLoggerTests
 
     [SuppressMessage("Dunno", "MA0045:Do not use blocking calls in a sync method (need to make calling method async)", Justification = "We're in non-async context here")]
     private static string GetLogFileContent() =>
-        File.ReadAllText(DefaultLogger.LogFilePath);
+        File.ReadAllText(DefaultLogger.FilePath);
 
     private static void EnsureLogFileIsDeleted()
     {
-        if (File.Exists(DefaultLogger.LogFilePath))
+        if (File.Exists(DefaultLogger.FilePath))
         {
-            File.Delete(DefaultLogger.LogFilePath);
+            File.Delete(DefaultLogger.FilePath);
         }
     }
 }

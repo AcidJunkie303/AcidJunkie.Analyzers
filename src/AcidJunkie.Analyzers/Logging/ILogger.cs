@@ -1,5 +1,4 @@
 using System.Diagnostics.CodeAnalysis;
-using System.Runtime.CompilerServices;
 
 namespace AcidJunkie.Analyzers.Logging;
 
@@ -7,6 +6,6 @@ namespace AcidJunkie.Analyzers.Logging;
 internal interface ILogger<TContext>
     where TContext : class
 {
+    LogLevel LogLevel { get; }
     bool IsLoggingEnabled { get; }
-    void WriteLine(Func<string> messageFactory, [CallerMemberName] string memberName = "");
 }

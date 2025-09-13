@@ -6,12 +6,12 @@ namespace AcidJunkie.Analyzers.Extensions;
 
 internal static class SyntaxNodeAnalysisContextExtensions
 {
-    public static ILogger<TAnalyzer> CreateLogger<TAnalyzer>(this in SyntaxNodeAnalysisContext analysisContext)
+    public static ILogger<TAnalyzer>? CreateLogger<TAnalyzer>(this in SyntaxNodeAnalysisContext analysisContext)
         where TAnalyzer : class
         => LoggerFactory.CreateLogger<TAnalyzer>(analysisContext);
 
     [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Used to get the type argument for the logger")]
-    public static ILogger<TAnalyzer> CreateLogger<TAnalyzer>(this in SyntaxNodeAnalysisContext analysisContext, TAnalyzer _)
+    public static ILogger<TAnalyzer>? CreateLogger<TAnalyzer>(this in SyntaxNodeAnalysisContext analysisContext, TAnalyzer _)
         where TAnalyzer : class
         => LoggerFactory.CreateLogger<TAnalyzer>(analysisContext);
 

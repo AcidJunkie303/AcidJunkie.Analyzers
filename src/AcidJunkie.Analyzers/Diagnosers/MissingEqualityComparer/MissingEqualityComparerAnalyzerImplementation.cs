@@ -112,20 +112,20 @@ internal sealed class MissingEqualityComparerAnalyzerImplementation : SyntaxNode
         var keyTypeParameterName = GetKeyTypeParameterName();
         if (keyTypeParameterName is null)
         {
-            Logger.WriteLine(() => $"Unable to determine generic type parameter name for invocation of '{owningTypeNameSpace}.{owningTypeName}.{methodName}'");
+            Logger.WriteLine(LogLevel.Full, $"Unable to determine generic type parameter name for invocation of '{owningTypeNameSpace}.{owningTypeName}.{methodName}'");
             return;
         }
 
         var keyType = invocationExpression.GetTypeForTypeParameter(Context.SemanticModel, keyTypeParameterName, Context.CancellationToken);
         if (keyType is null)
         {
-            Logger.WriteLine(() => "Unable to determine key type parameter type");
+            Logger.WriteLine(LogLevel.Full, "Unable to determine key type parameter type");
             return;
         }
 
         if (keyType.IsValueType)
         {
-            Logger.WriteLine(() => $"Key type for '{owningTypeNameSpace}.{owningTypeName}.{methodName}' is {keyType.GetFullName()} which is a struct.");
+            Logger.WriteLine(LogLevel.Full, $"Key type for '{owningTypeNameSpace}.{owningTypeName}.{methodName}' is {keyType.GetFullName()} which is a struct.");
             return; // Value types use structural comparison
         }
 
@@ -136,7 +136,7 @@ internal sealed class MissingEqualityComparerAnalyzerImplementation : SyntaxNode
 
         if (IsAnyParameterEqualityComparer(keyType, invocationExpression.ArgumentList))
         {
-            Logger.WriteLine(() => "Found equality comparer argument");
+            Logger.WriteLine(LogLevel.Full, "Found equality comparer argument");
             return;
         }
 
@@ -153,13 +153,13 @@ internal sealed class MissingEqualityComparerAnalyzerImplementation : SyntaxNode
     {
         if (!keyType.IsGetHashCodeOverridden())
         {
-            Logger.WriteLine(() => $"Key type {keyType.GetFullName()} does not override {nameof(GetHashCode)}()");
+            Logger.WriteLine(LogLevel.Full, $"Key type {keyType.GetFullName()} does not override {nameof(GetHashCode)}()");
             return false;
         }
 
         if (!keyType.IsEqualsOverridden() && !keyType.IsSpecificEqualsOverridden())
         {
-            Logger.WriteLine(() => $"Key type {keyType.GetFullName()} does not override {nameof(Equals)}()");
+            Logger.WriteLine(LogLevel.Full, $"Key type {keyType.GetFullName()} does not override {nameof(Equals)}()");
             return false;
         }
 
@@ -195,39 +195,39 @@ internal sealed class MissingEqualityComparerAnalyzerImplementation : SyntaxNode
         var keyTypeParameterName = GetKeyTypeParameterName();
         if (keyTypeParameterName is null)
         {
-            Logger.WriteLine(() => $"Unable to determine generic type parameter name for the creation of type '{objectTypeBeingCreated.GetFullName()}'");
+            Logger.WriteLine(LogLevel.Full, $"Unable to determine generic type parameter name for the creation of type '{objectTypeBeingCreated.GetFullName()}'");
             return;
         }
 
         var keyParameterIndex = objectTypeBeingCreated.TypeParameters.IndexOf(a => a.Name.EqualsOrdinal(keyTypeParameterName));
         if (keyParameterIndex < 0)
         {
-            Logger.WriteLine(() => $"Unable to determine the index of the key type parameter for type {objectTypeBeingCreated.GetFullName()}");
+            Logger.WriteLine(LogLevel.Full, $"Unable to determine the index of the key type parameter for type {objectTypeBeingCreated.GetFullName()}");
             return;
         }
 
         if (objectTypeBeingCreated.TypeArguments.Length != objectTypeBeingCreated.TypeParameters.Length)
         {
-            Logger.WriteLine(() => $"Found mismatch between type argument count and type parameter count for {objectTypeBeingCreated.GetFullName()} which should not be the case!");
+            Logger.WriteLine(LogLevel.Full, $"Found mismatch between type argument count and type parameter count for {objectTypeBeingCreated.GetFullName()} which should not be the case!");
             return;
         }
 
         var keyType = objectTypeBeingCreated.TypeArguments[keyParameterIndex];
         if (keyType.IsValueType)
         {
-            Logger.WriteLine(() => $"Key type for {objectTypeBeingCreated.GetFullName()} is {keyType.GetFullName()} which is a struct.");
+            Logger.WriteLine(LogLevel.Full, $"Key type for {objectTypeBeingCreated.GetFullName()} is {keyType.GetFullName()} which is a struct.");
             return; // Value types use structural comparison
         }
 
         if (keyType.ImplementsGenericEquatable() && keyType.IsGetHashCodeOverridden())
         {
-            Logger.WriteLine(() => $"Key type {keyType.GetFullName()} does implement IEquatable<{keyType.GetFullName()}> and does override {nameof(GetHashCode)}() as well");
+            Logger.WriteLine(LogLevel.Full, $"Key type {keyType.GetFullName()} does implement IEquatable<{keyType.GetFullName()}> and does override {nameof(GetHashCode)}() as well");
             return;
         }
 
         if (IsAnyParameterEqualityComparer(keyType, argumentList))
         {
-            Logger.WriteLine(() => "No parameter is a equality comparer");
+            Logger.WriteLine(LogLevel.Full, "No parameter is a equality comparer");
             return;
         }
 

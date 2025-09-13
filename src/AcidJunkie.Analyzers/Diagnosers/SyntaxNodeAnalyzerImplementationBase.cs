@@ -7,7 +7,7 @@ namespace AcidJunkie.Analyzers.Diagnosers;
 internal abstract class SyntaxNodeAnalyzerImplementationBase<TImplementation>
     where TImplementation : class
 {
-    protected ILogger<TImplementation> Logger { get; }
+    protected ILogger<TImplementation>? Logger { get; }
     protected SyntaxNodeAnalysisContext Context { get; }
 
     protected SyntaxNodeAnalyzerImplementationBase(in SyntaxNodeAnalysisContext context)
