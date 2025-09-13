@@ -32,13 +32,13 @@ internal sealed class ParameterOrderingAnalyzerImplementation : SyntaxNodeAnalyz
         var parameterList = (ParameterListSyntax)Context.Node;
         if (parameterList.Parameters.Count == 0)
         {
-            Logger.WriteLine(() => "No parameters");
+            Logger.WriteLine(LogLevel.Full, "No parameters");
             return;
         }
 
         if (parameterList.Parent is not (MethodDeclarationSyntax or ClassDeclarationSyntax or ConstructorDeclarationSyntax))
         {
-            Logger.WriteLine(() => "Node parent is not a method declaration, class declaration or constructor declaration node");
+            Logger.WriteLine(LogLevel.Full, "Node parent is not a method declaration, class declaration or constructor declaration node");
             return;
         }
 

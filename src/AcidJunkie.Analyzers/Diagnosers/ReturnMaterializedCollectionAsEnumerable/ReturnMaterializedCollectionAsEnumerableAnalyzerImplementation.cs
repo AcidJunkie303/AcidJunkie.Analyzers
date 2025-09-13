@@ -45,7 +45,7 @@ internal sealed class ReturnMaterializedCollectionAsEnumerableAnalyzerImplementa
         var actualReturnedType = Context.SemanticModel.GetTypeInfo(firstNonCastExpression).Type;
         if (actualReturnedType is null)
         {
-            Logger.WriteLine(() => "Unable to determine the actual return type of the expression");
+            Logger.WriteLine(LogLevel.Full, "Unable to determine the actual return type of the expression");
             return;
         }
 
@@ -62,7 +62,7 @@ internal sealed class ReturnMaterializedCollectionAsEnumerableAnalyzerImplementa
         var returnStatement = (ReturnStatementSyntax)Context.Node;
         if (returnStatement.Expression is null)
         {
-            Logger.WriteLine(() => "return statement has no expression");
+            Logger.WriteLine(LogLevel.Full, "return statement has no expression");
             return;
         }
 
@@ -70,14 +70,14 @@ internal sealed class ReturnMaterializedCollectionAsEnumerableAnalyzerImplementa
         var actualReturnedType = Context.SemanticModel.GetTypeInfo(firstNonCastExpression).Type;
         if (actualReturnedType is null)
         {
-            Logger.WriteLine(() => "Unable to determine the actual return type of the expression");
+            Logger.WriteLine(LogLevel.Full, "Unable to determine the actual return type of the expression");
             return;
         }
 
         var containingMethodOrLocalFunction = GetContainingMethodOrLocalFunction(returnStatement);
         if (containingMethodOrLocalFunction is null)
         {
-            Logger.WriteLine(() => "Unable to determine method the return statement belongs to");
+            Logger.WriteLine(LogLevel.Full, "Unable to determine method the return statement belongs to");
             return;
         }
 
@@ -127,13 +127,13 @@ internal sealed class ReturnMaterializedCollectionAsEnumerableAnalyzerImplementa
         var declaredReturnType = Context.SemanticModel.GetTypeInfo(methodOrFunction.ReturnType, Context.CancellationToken).Type;
         if (declaredReturnType is null)
         {
-            Logger.WriteLine(() => "Unable to determine the return type syntax of the method");
+            Logger.WriteLine(LogLevel.Full, "Unable to determine the return type syntax of the method");
             return;
         }
 
         if (!IsEnumerable(declaredReturnType))
         {
-            Logger.WriteLine(() => "Method return type is not IEnumerable or IEnumerable<T>");
+            Logger.WriteLine(LogLevel.Full, "Method return type is not IEnumerable or IEnumerable<T>");
             return;
         }
 
@@ -144,7 +144,7 @@ internal sealed class ReturnMaterializedCollectionAsEnumerableAnalyzerImplementa
 
         if (!actualReturnedType.DoesImplementWellKnownCollectionInterface())
         {
-            Logger.WriteLine(() => $"Return type {actualReturnedType.GetFullName()} does is or does not implement any well known collection interfaces");
+            Logger.WriteLine(LogLevel.Full, $"Return type {actualReturnedType.GetFullName()} does is or does not implement any well known collection interfaces");
             return;
         }
 
@@ -156,13 +156,13 @@ internal sealed class ReturnMaterializedCollectionAsEnumerableAnalyzerImplementa
     {
         if (IsOverrideOrNewModifier(containingMethod))
         {
-            Logger.WriteLine(() => "Method has an override or new modifier");
+            Logger.WriteLine(LogLevel.Full, "Method has an override or new modifier");
             return true;
         }
 
         if (IsInterfaceImplementation(containingMethod))
         {
-            Logger.WriteLine(() => "Method is an interface implementation");
+            Logger.WriteLine(LogLevel.Full, "Method is an interface implementation");
             return true;
         }
 

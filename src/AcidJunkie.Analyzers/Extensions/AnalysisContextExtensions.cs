@@ -21,7 +21,7 @@ internal static class AnalysisContextExtensions
 #pragma warning restore RS0030
     }
 
-    public static void RegisterSyntaxNodeActionAndCheck<TAnalyzer>(this AnalysisContext context, Action<SyntaxNodeAnalysisContext, ILogger<TAnalyzer>> action, params SyntaxKind[] syntaxKinds)
+    public static void RegisterSyntaxNodeActionAndCheck<TAnalyzer>(this AnalysisContext context, Action<SyntaxNodeAnalysisContext, ILogger<TAnalyzer>?> action, params SyntaxKind[] syntaxKinds)
         where TAnalyzer : DiagnosticAnalyzer
     {
 #pragma warning disable RS0030 // this is banned but this is the extension method to replace it
@@ -31,21 +31,22 @@ internal static class AnalysisContextExtensions
         void InvokeActionChecked(SyntaxNodeAnalysisContext ctx)
         {
             var logger = ctx.CreateLogger<TAnalyzer>();
-            logger.WriteLine(() => $"Start analyzing {ctx.Node}");
             var stopwatch = Stopwatch.StartNew();
 
             try
             {
                 action(ctx, logger);
                 var durationMs = Math.Round(stopwatch.Elapsed.TotalMilliseconds, 2);
-                logger.WriteLine(() => $"Completed analysis. Duration {durationMs}ms");
+                ctx
+                   .CreateLogger<TAnalyzer>()
+                   .WriteLine(LogLevel.Duration, $"Completed analysis. Duration {durationMs}ms");
             }
 #pragma warning disable CA1031 // we need to catch everything
             catch (Exception ex)
 #pragma warning restore CA1031
             {
                 var durationMs = Math.Round(stopwatch.Elapsed.TotalMilliseconds, 2);
-                logger.WriteLine(() => $"Unhandled exception occurred after {durationMs}ms. {ex}");
+                logger.WriteLine(LogLevel.Full, $"Unhandled exception occurred after {durationMs}ms. {ex}");
                 ctx.ReportDiagnostic(Diagnostic.Create(CommonRules.UnhandledError.Rule, location: null));
             }
         }
@@ -64,21 +65,24 @@ internal static class AnalysisContextExtensions
             var analyze = getAnalyzeMethod(analyzer);
 
             var logger = ctx.CreateLogger<TAnalyzer>();
-            logger.WriteLine(() => $"Start analyzing {ctx.Node}");
+            logger.WriteLine(LogLevel.Full, $"Start analyzing {ctx.Node}");
+
             var stopwatch = Stopwatch.StartNew();
 
             try
             {
                 analyze();
                 var durationMs = Math.Round(stopwatch.Elapsed.TotalMilliseconds, 2);
-                logger.WriteLine(() => $"Completed analysis. Duration {durationMs}ms");
+                ctx
+                   .CreateLogger<TAnalyzer>()
+                   .WriteLine(LogLevel.Duration, $"Completed analysis. Duration {durationMs}ms");
             }
 #pragma warning disable CA1031 // we need to catch everything
             catch (Exception ex)
 #pragma warning restore CA1031
             {
                 var durationMs = Math.Round(stopwatch.Elapsed.TotalMilliseconds, 2);
-                logger.WriteLine(() => $"Unhandled exception occurred after {durationMs}ms. {ex}");
+                logger.WriteLine(LogLevel.Full, $"Unhandled exception occurred after {durationMs}ms. {ex}");
                 ctx.ReportDiagnostic(Diagnostic.Create(CommonRules.UnhandledError.Rule, location: null));
             }
         }

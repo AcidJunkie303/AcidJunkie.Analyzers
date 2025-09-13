@@ -32,38 +32,38 @@ internal sealed class TaskCreationWithMaterializedCollectionAsEnumerableAnalyzer
 
         if (Context.SemanticModel.GetSymbolInfo(invocation, Context.CancellationToken).Symbol is not IMethodSymbol methodSymbol)
         {
-            Logger.WriteLine(() => "Unable to get IMethodSymbol from invocation");
+            Logger.WriteLine(LogLevel.Full, "Unable to get IMethodSymbol from invocation");
             return;
         }
 
         if (!methodSymbol.Name.EqualsOrdinal(nameof(Task.FromResult)))
         {
-            Logger.WriteLine(() => $"Method name is not {nameof(Task.FromResult)}");
+            Logger.WriteLine(LogLevel.Full, $"Method name is not {nameof(Task.FromResult)}");
             return;
         }
 
         if (!IsTaskType(methodSymbol.ContainingType))
         {
-            Logger.WriteLine(() => "Containing type is not Task or ValueTask");
+            Logger.WriteLine(LogLevel.Full, "Containing type is not Task or ValueTask");
             return;
         }
 
         if (!IsFromResultMethod(methodSymbol, out var taskType))
         {
-            Logger.WriteLine(() => $"Method name is not {nameof(Task.FromResult)}");
+            Logger.WriteLine(LogLevel.Full, $"Method name is not {nameof(Task.FromResult)}");
             return;
         }
 
         if (!taskType.IsEnumerable())
         {
-            Logger.WriteLine(() => "Task generic parameter type is not or does not implement IEnumerable or IEnumerable<T>");
+            Logger.WriteLine(LogLevel.Full, "Task generic parameter type is not or does not implement IEnumerable or IEnumerable<T>");
             return;
         }
 
         var argument = invocation.ArgumentList.Arguments.FirstOrDefault();
         if (argument is null)
         {
-            Logger.WriteLine(() => "Invocation doesn't seem to have any arguments");
+            Logger.WriteLine(LogLevel.Full, "Invocation doesn't seem to have any arguments");
             return;
         }
 
@@ -72,13 +72,13 @@ internal sealed class TaskCreationWithMaterializedCollectionAsEnumerableAnalyzer
         var actualType = Context.SemanticModel.GetTypeInfo(firstNonCastExpression, Context.CancellationToken).Type;
         if (actualType is null)
         {
-            Logger.WriteLine(() => "Unable to determine the expression return type");
+            Logger.WriteLine(LogLevel.Full, "Unable to determine the expression return type");
             return;
         }
 
         if (!actualType.DoesImplementWellKnownCollectionInterface())
         {
-            Logger.WriteLine(() => $"{actualType.GetFullName()} doesn't seem to be or implement a well-known collection interface");
+            Logger.WriteLine(LogLevel.Full, $"{actualType.GetFullName()} doesn't seem to be or implement a well-known collection interface");
             return;
         }
 

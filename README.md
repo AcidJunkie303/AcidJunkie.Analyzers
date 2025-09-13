@@ -26,8 +26,14 @@ To enable logging, set the following property to true in the `.editorconfig` fil
 
 ```
 [*.cs]
-AcidJunkie_Analyzers.is_logging_enabled = true
+AcidJunkie_Analyzers.is_logging_enabled = < None | Duration | Full >
 ```
+
+| Value    | Description                                                       |
+|:---------|:------------------------------------------------------------------|
+| None     | Logging is disabled                                               |  
+| Duration | Only log the duration it took for each analyzer to analyze a node |
+| Full     | Full logging                                                      |
 
 Please be aware that logging will slow down the analysis by several factors. It should only be used for debugging
 purposes.
