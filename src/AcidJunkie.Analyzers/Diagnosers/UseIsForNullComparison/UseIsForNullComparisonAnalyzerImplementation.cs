@@ -3,6 +3,7 @@
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using AcidJunkie.Analyzers.Configuration;
+using AcidJunkie.Analyzers.Extensions;
 using AcidJunkie.Analyzers.Support;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -45,10 +46,33 @@ internal sealed class UseIsForNullComparisonAnalyzerImplementation : SyntaxNodeA
             return;
         }
 
+        if (IsWithinQueryableWhere(equalsExpression))
+        {
+            return;
+        }
+
         var isOrIsNot = equalsExpression.IsKind(SyntaxKind.EqualsExpression) ? "is" : "is not";
         var intention = equalsExpression.IsKind(SyntaxKind.EqualsExpression) ? "null" : "not null";
 
         Context.ReportDiagnostic(Diagnostic.Create(DiagnosticRules.Default.Rule, equalsExpression.OperatorToken.GetLocation(), isOrIsNot, intention, equalsExpression.OperatorToken.Text));
+    }
+
+    private bool IsWithinQueryableWhere(BinaryExpressionSyntax binaryExpression)
+    {
+        return binaryExpression
+              .Ancestors()
+              .OfType<InvocationExpressionSyntax>()
+              .Any(IsQueryableWhere);
+
+        bool IsQueryableWhere(InvocationExpressionSyntax invocationExpression)
+        {
+            if (Context.SemanticModel.GetSymbolInfo(invocationExpression).Symbol is not IMethodSymbol methodSymbol)
+            {
+                return false;
+            }
+
+            return methodSymbol.Name.EqualsOrdinal("Where") && methodSymbol.ContainingType.ToDisplayString().EqualsOrdinal("System.Linq.Queryable");
+        }
     }
 
     internal static class DiagnosticRules

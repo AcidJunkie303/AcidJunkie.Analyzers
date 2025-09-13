@@ -30,6 +30,27 @@ public sealed class UseIsForNullComparisonAnalyzerTests(ITestOutputHelper testOu
         return ValidateAsync(code);
     }
 
+    [Fact]
+    public Task WhenIsInQueryableWhere_ThenOk()
+    {
+        const string code = """
+                            using System.Linq;
+
+                            public static class Test
+                            {
+                                public static void DoSomething( string value)
+                                {
+                                    var _ = GetQueryable().Where(a => a == null);
+                                }
+
+                                private static IQueryable<string> GetQueryable()
+                                   => new string[0].AsQueryable();
+                            }
+                            """;
+
+        return ValidateAsync(code);
+    }
+
     [Theory]
     [InlineData(true, "var isNull = value {|AJ0011:==|} null;")]
     [InlineData(false, "var isNull = value == null;")]
