@@ -1,5 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
-using AcidJunkie.Analyzers.Tests.Helpers;
+using AcidJunkie.Analyzers.CodeFixers.Tests.Helpers;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Xunit.Abstractions;
@@ -11,12 +11,12 @@ public abstract class CodeFixTestBase<TAnalyzer, TCodeFixProvider>
     where TAnalyzer : DiagnosticAnalyzer, new()
     where TCodeFixProvider : CodeFixProvider, new()
 {
+    protected ITestOutputHelper TestOutputHelper { get; }
+
     protected CodeFixTestBase(ITestOutputHelper testOutputHelper)
     {
         TestOutputHelper = testOutputHelper;
     }
-
-    protected ITestOutputHelper TestOutputHelper { get; }
 
     internal CSharpCodeFixProviderTestBuilder<TAnalyzer, TCodeFixProvider> CreateTestBuilder() => CSharpCodeFixProviderTestBuilder.Create<TAnalyzer, TCodeFixProvider>(TestOutputHelper);
 }

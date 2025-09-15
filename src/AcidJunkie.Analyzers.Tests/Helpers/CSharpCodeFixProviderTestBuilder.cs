@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using AcidJunkie.Analyzers.Extensions;
+using AcidJunkie.Analyzers.Tests.Helpers;
 using AcidJunkie.Analyzers.Tests.Runtime;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeFixes;
@@ -10,7 +11,7 @@ using Microsoft.CodeAnalysis.Testing;
 using Microsoft.CodeAnalysis.Text;
 using Xunit.Abstractions;
 
-namespace AcidJunkie.Analyzers.Tests.Helpers;
+namespace AcidJunkie.Analyzers.CodeFixers.Tests.Helpers;
 
 internal static class CSharpCodeFixProviderTestBuilder
 {
