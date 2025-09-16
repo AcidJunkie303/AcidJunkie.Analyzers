@@ -1,6 +1,6 @@
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
-using AcidJunkie.Analyzers.Configuration.Aj0002;
+using AcidJunkie.Analyzers.Configuration;
 using AcidJunkie.Analyzers.Extensions;
 using AcidJunkie.Analyzers.Support;
 using Microsoft.CodeAnalysis;
@@ -33,11 +33,11 @@ internal sealed class EnforceEntityFrameworkTrackingTypeAnalyzerImplementation :
         "AsNoTracking"
     }.ToImmutableHashSet(StringComparer.Ordinal);
 
-    private readonly Aj0002Configuration _configuration;
+    private readonly IAnalyzerConfiguration _configuration;
 
     public EnforceEntityFrameworkTrackingTypeAnalyzerImplementation(in SyntaxNodeAnalysisContext context) : base(context)
     {
-        _configuration = Aj0002ConfigurationProvider.Instance.GetConfiguration(context);
+        _configuration = GenericConfigurationProvider.GetConfiguration(context, DiagnosticRules.Default.DiagnosticId);
     }
 
     [SuppressMessage("Critical Code Smell", "S134:Control flow statements \"if\", \"switch\", \"for\", \"foreach\", \"while\", \"do\"  and \"try\" should not be nested too deeply")]
@@ -51,56 +51,41 @@ internal sealed class EnforceEntityFrameworkTrackingTypeAnalyzerImplementation :
         }
 
         var memberAccessExpression = (MemberAccessExpressionSyntax)Context.Node;
-        if (!IsDbSetType(memberAccessExpression, out var dbContextType, out _))
+        if (!IsDbSetType(memberAccessExpression, out var dbContextType))
         {
             return;
         }
 
-        Lazy<IReadOnlyDictionary<string, IReadOnlyList<INamedTypeSymbol>>> entitiesOfDbContextByNamespaceNameLazy =
-            new(() => GetEntitiesOfDbContextByNamespaceName(dbContextType));
-
-        var currentExpression = memberAccessExpression.Parent;
-        while (currentExpression is not null)
+        if (DoesMethodChainSpecifyTrackingType(memberAccessExpression))
         {
-            if (currentExpression is MemberAccessExpressionSyntax memberAccess)
+            return;
+        }
+
+        var topmostInvocationExpression = GetTopmostInvocationExpression(memberAccessExpression);
+        if (topmostInvocationExpression is null)
+        {
+            return;
+        }
+
+        if (topmostInvocationExpression.Expression is MemberAccessExpressionSyntax invocationTarget)
+        {
+            var isIgnoredMethodName = IgnoredDbSetMethodNames.Contains(invocationTarget.Name.Identifier.Text);
+            if (isIgnoredMethodName)
             {
-                currentExpression = memberAccess.Parent;
-                continue;
+                return; // For Update, Add, Remove etc. we don't care about tracking
             }
+        }
 
-            if (currentExpression is InvocationExpressionSyntax invocation)
-            {
-                if (invocation.Expression is MemberAccessExpressionSyntax invokedMember)
-                {
-                    var methodName = invokedMember.Name.Identifier.Text;
-                    var isTrackingMethod = TrackingMethodNames.Contains(methodName);
-                    if (isTrackingMethod)
-                    {
-                        return; // we found an AsTracking or AsNoTracking method. So we're good
-                    }
+        var returnType = Context.SemanticModel.GetTypeInfo(topmostInvocationExpression).Type;
+        if (returnType is null || returnType.SpecialType == SpecialType.System_Void)
+        {
+            return;
+        }
 
-                    var isIgnoredMethodName = IgnoredDbSetMethodNames.Contains(methodName);
-                    if (isIgnoredMethodName)
-                    {
-                        return; // For Update, Add, Remove etc. we don't care about tracking
-                    }
-                }
-
-                if (_configuration.Mode != Mode.Strict)
-                {
-                    if (IsSelectStatement(invocation, out var resultType))
-                    {
-                        if (IsEntityTypeOrContainsEntityProperties(resultType, entitiesOfDbContextByNamespaceNameLazy.Value))
-                        {
-                            break; // the select returns an entity. So we abort and report the diagnostic
-                        }
-
-                        return; // if the select statement does not return an entity, we're good
-                    }
-                }
-            }
-
-            currentExpression = currentExpression.Parent;
+        var entitiesOfDbContextByNamespace = GetEntitiesOfDbContextByNamespaceName(dbContextType);
+        if (!IsEntityTypeOrContainsEntityProperties(returnType, entitiesOfDbContextByNamespace))
+        {
+            return;
         }
 
         // If no AsTracking or AsNoTracking was found in the chain, raise a diagnostic
@@ -132,7 +117,12 @@ internal sealed class EnforceEntityFrameworkTrackingTypeAnalyzerImplementation :
 
         visitedTypes.Add(type);
 
-        if (type.IsEnumerable(out var elementType) && IsEntityTypeOrContainsEntityProperties(elementType, entityTypesByNamespaceName, visitedTypes))
+        if (type.IsEnumerable(out var enumerableElementType) && IsEntityTypeOrContainsEntityProperties(enumerableElementType, entityTypesByNamespaceName, visitedTypes))
+        {
+            return true;
+        }
+
+        if (type.IsQueryable(out var queryableElementType) && IsEntityTypeOrContainsEntityProperties(queryableElementType, entityTypesByNamespaceName, visitedTypes))
         {
             return true;
         }
@@ -144,50 +134,61 @@ internal sealed class EnforceEntityFrameworkTrackingTypeAnalyzerImplementation :
         return properties.Any(property => IsEntityTypeOrContainsEntityProperties(property.Type, entityTypesByNamespaceName, visitedTypes));
     }
 
-    private bool IsSelectStatement(InvocationExpressionSyntax invocationExpression, [NotNullWhen(true)] out ITypeSymbol? resultType)
+    private static InvocationExpressionSyntax? GetTopmostInvocationExpression(MemberAccessExpressionSyntax memberAccessExpression)
     {
-        resultType = null;
+        SyntaxNode current = memberAccessExpression;
+        InvocationExpressionSyntax? topmostInvocationExpression = null;
 
-        if (invocationExpression.Expression is not MemberAccessExpressionSyntax memberAccessExpression)
+        while (true)
         {
-            return false;
+            switch (current)
+            {
+                case InvocationExpressionSyntax invocation:
+                    topmostInvocationExpression = invocation;
+                    current = invocation.Parent;
+                    continue;
+
+                case MemberAccessExpressionSyntax memberAccess:
+                    current = memberAccess.Parent;
+                    continue;
+
+                default:
+                    return topmostInvocationExpression;
+            }
         }
-
-        if (!memberAccessExpression.Name.Identifier.Text.EqualsOrdinal("Select"))
-        {
-            return false;
-        }
-
-        if (Context.SemanticModel.GetSymbolInfo(memberAccessExpression).Symbol is not IMethodSymbol methodSymbol)
-        {
-            return false;
-        }
-
-        if (!methodSymbol.IsExtensionMethod
-            || !methodSymbol.ContainingType.Name.EqualsOrdinal("Queryable")
-            || !methodSymbol.ContainingType.GetFullNamespace().EqualsOrdinal("System.Linq"))
-        {
-            return false;
-        }
-
-        if (Context.SemanticModel.GetTypeInfo(invocationExpression).Type is not INamedTypeSymbol typeInfo)
-        {
-            return false;
-        }
-
-        if (typeInfo.Arity != 1 || !typeInfo.Name.EqualsOrdinal("IQueryable") || !typeInfo.GetFullNamespace().EqualsOrdinal("System.Linq"))
-        {
-            return false;
-        }
-
-        resultType = typeInfo.TypeArguments[0];
-
-        return true;
     }
 
-    private bool IsDbSetType(MemberAccessExpressionSyntax memberAccessExpression, [NotNullWhen(true)] out INamedTypeSymbol? dbContextType, [NotNullWhen(true)] out INamedTypeSymbol? entityType)
+    private static bool DoesMethodChainSpecifyTrackingType(MemberAccessExpressionSyntax memberAccessExpression)
     {
-        entityType = null;
+        SyntaxNode current = memberAccessExpression;
+
+        while (true)
+        {
+            switch (current)
+            {
+                case InvocationExpressionSyntax invocation:
+                    current = invocation.Parent;
+                    continue;
+
+                case MemberAccessExpressionSyntax memberAccess:
+                    var methodName = memberAccess.Name.Identifier.Text;
+                    var isTrackingMethod = TrackingMethodNames.Contains(methodName);
+                    if (isTrackingMethod)
+                    {
+                        return true; // we found an AsTracking or AsNoTracking method. So we're good
+                    }
+
+                    current = memberAccess.Parent;
+                    continue;
+
+                default:
+                    return false;
+            }
+        }
+    }
+
+    private bool IsDbSetType(MemberAccessExpressionSyntax memberAccessExpression, [NotNullWhen(true)] out INamedTypeSymbol? dbContextType)
+    {
         dbContextType = null;
 
         if (Context.SemanticModel.GetTypeInfo(memberAccessExpression).Type is not INamedTypeSymbol memberType)
@@ -206,8 +207,7 @@ internal sealed class EnforceEntityFrameworkTrackingTypeAnalyzerImplementation :
         }
 
         dbContextType = Context.SemanticModel.GetTypeInfo(identifierName).Type as INamedTypeSymbol;
-        entityType = memberType.TypeArguments[0] as INamedTypeSymbol;
-        return dbContextType is not null && entityType is not null;
+        return dbContextType is not null && memberType.TypeArguments[0] is INamedTypeSymbol;
     }
 
     private Dictionary<string, IReadOnlyList<INamedTypeSymbol>> GetEntitiesOfDbContextByNamespaceName(INamedTypeSymbol dbContextType)
@@ -249,8 +249,8 @@ internal sealed class EnforceEntityFrameworkTrackingTypeAnalyzerImplementation :
             private const string Category = "Intention";
             public const string DiagnosticId = "AJ0002";
             public static readonly string HelpLinkUri = HelpLinkFactory.CreateForDiagnosticId(DiagnosticId);
-            public static readonly LocalizableString Title = "Specify AsTracking or AsNoTracking when querying entity framework";
-            public static readonly LocalizableString MessageFormat = "Specify AsTracking or AsNoTracking when querying entity framework";
+            public static readonly LocalizableString Title = "Specify the Entity Framework tracking type";
+            public static readonly LocalizableString MessageFormat = "Specify `AsTracking` or `AsNoTracking` when obtaining entities from entity framework";
             public static readonly LocalizableString Description = MessageFormat;
             public static readonly DiagnosticDescriptor Rule = new(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, true, Description, HelpLinkUri);
         }

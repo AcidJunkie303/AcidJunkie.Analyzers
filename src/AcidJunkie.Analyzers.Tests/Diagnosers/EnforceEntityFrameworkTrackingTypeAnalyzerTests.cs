@@ -9,89 +9,74 @@ public sealed class EnforceEntityFrameworkTrackingTypeAnalyzerTests(ITestOutputH
     : TestBase<EnforceEntityFrameworkTrackingTypeAnalyzer>(testOutputHelper)
 {
     [Theory]
-    [InlineData(true, "Strict", ".AsTracking()")]
-    [InlineData(true, "Strict", ".AsNoTracking()")]
-    [InlineData(false, "Strict", "")]
-    [InlineData(true, "Relaxed", ".AsTracking()")]
-    [InlineData(true, "Relaxed", ".AsNoTracking()")]
-    [InlineData(false, "Relaxed", "")]
-    public async Task Theory_ReturningEntity(bool isOk, string mode, string trackingPart)
+    [InlineData("dbContext.Entities.AsTracking()")]
+    [InlineData("dbContext.Entities.AsNoTracking()")]
+    [InlineData("{|AJ0002:dbContext.Entities|}")]
+    public async Task Theory_ReturningEntity(string insertionCode)
     {
-        var entityPart = isOk ? "dbContext.Entities" : "{|AJ0002:dbContext.Entities|}";
         var code = $"""
                     using var dbContext = new TestContext();
-                    {entityPart}{trackingPart}.ToList();
+                    {insertionCode}.ToList();
                     """;
 
-        await RunTestAsync(code, mode);
+        await RunTestAsync(code);
+    }
+
+    [Fact]
+    public async Task WithoutTrackingType_WhenNotReturningAnyEntity_ThenOk()
+    {
+        const string code = """
+                            using var dbContext = new TestContext();
+                            dbContext.Entities.Select(a=>a.Id).ToList();
+                            """;
+
+        await RunTestAsync(code);
+    }
+
+    [Fact]
+    public async Task WhenReturningAnonymousTypeWithSubPropertyOfEntityType_ThenDiagnose()
+    {
+        const string code = """
+                            using var dbContext = new TestContext();
+                            {|AJ0002:dbContext.Entities|}.Select(a=> new { Id = a.Id, Sub = new { MyEntity = a } }).ToList();
+                            """;
+
+        await RunTestAsync(code);
+    }
+
+    [Fact]
+    public async Task WhenReturningDictionaryContainingEntity_ThenDiagnose()
+    {
+        const string code = """
+                            using var dbContext = new TestContext();
+                            {|AJ0002:dbContext.Entities|}.ToDictionary(a => a.Id, a => a);
+                            """;
+
+        await RunTestAsync(code);
+    }
+
+    [Fact]
+    public async Task WhenReturningDictionaryNotContainingEntity_ThenOk()
+    {
+        const string code = """
+                            using var dbContext = new TestContext();
+                            dbContext.Entities.ToDictionary(a => a.Id, a => a.Name);
+                            """;
+
+        await RunTestAsync(code);
     }
 
     [Theory]
-    [InlineData(true, "Strict", ".AsTracking()")]
-    [InlineData(true, "Strict", ".AsNoTracking()")]
-    [InlineData(false, "Strict", "")]
-    [InlineData(true, "Relaxed", ".AsTracking()")]
-    [InlineData(true, "Relaxed", ".AsNoTracking()")]
-    [InlineData(false, "Relaxed", "")]
-    public async Task Theory_NotReturningEntity(bool isOk, string mode, string trackingPart)
+    [InlineData(true, "{|AJ0002:dbContext.Entities|}")]
+    [InlineData(false, "dbContext.Entities")]
+    public async Task Theory_IsEnabled(bool isEnabled, string entityPart)
     {
-        var entityPart = isOk ? "dbContext.Entities" : "{|AJ0002:dbContext.Entities|}";
-        var code = $"""
-                    using var dbContext = new TestContext();
-                    {entityPart}{trackingPart}.Select(a=>a.Id).ToList();
-                    """;
-
-        await RunTestAsync(code, mode);
-    }
-
-    [Theory]
-    [InlineData(true, "Strict", ".AsTracking()")]
-    [InlineData(true, "Strict", ".AsNoTracking()")]
-    [InlineData(false, "Strict", "")]
-    [InlineData(true, "Relaxed", ".AsTracking()")]
-    [InlineData(true, "Relaxed", ".AsNoTracking()")]
-    [InlineData(false, "Relaxed", "")]
-    public async Task Theory_ReturningAnonymousTypeWithSubPropertyOfEntityType(bool isOk, string mode, string trackingPart)
-    {
-        var entityPart = isOk ? "dbContext.Entities" : "{|AJ0002:dbContext.Entities|}";
-        var code = $$"""
-                     using var dbContext = new TestContext();
-                     {{entityPart}}{{trackingPart}}.Select(a=> new { Id = a.Id, Sub = new { MyEntity = a } }).ToList();
-                     """;
-
-        await RunTestAsync(code, mode);
-    }
-
-    [Theory]
-    [InlineData(true, "Strict", ".AsTracking()")]
-    [InlineData(true, "Strict", ".AsNoTracking()")]
-    [InlineData(false, "Strict", "")]
-    [InlineData(true, "Relaxed", ".AsTracking()")]
-    [InlineData(true, "Relaxed", ".AsNoTracking()")]
-    [InlineData(false, "Relaxed", "")]
-    public async Task Theory_ReturningAnonymousTypeWithEntityCollectionProperty(bool isOk, string mode, string trackingPart)
-    {
-        var entityPart = isOk ? "dbContext.Entities" : "{|AJ0002:dbContext.Entities|}";
-        var code = $$"""
-                     using var dbContext = new TestContext();
-                     {{entityPart}}{{trackingPart}}.Select(a=> new { Entities = a.ProjectionEntities.ToList() }).ToList();
-                     """;
-
-        await RunTestAsync(code, mode);
-    }
-
-    [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
-    public async Task Theory_IsEnabled(bool isEnabled)
-    {
-        var entityPart = isEnabled ? "{|AJ0002:dbContext.Entities|}" : "dbContext.Entities";
         var code = $$"""
                      using var dbContext = new TestContext();
                      {{entityPart}}.ToList();
                      """;
 
-        await RunTestAsync(code, "Strict", isEnabled);
+        await RunTestAsync(code, isEnabled);
     }
 
     [Theory]
@@ -114,7 +99,7 @@ public sealed class EnforceEntityFrameworkTrackingTypeAnalyzerTests(ITestOutputH
                      {{part}};
                      """;
 
-        await RunTestAsync(code, "Strict", true);
+        await RunTestAsync(code, true);
     }
 
     private static string CreateTestCode(string insertionCode)
@@ -163,18 +148,15 @@ public sealed class EnforceEntityFrameworkTrackingTypeAnalyzerTests(ITestOutputH
                  """;
     }
 
-    private static string CreateModeConfigurationLine(string mode) => $"dotnet_diagnostic.AJ0002.mode = {mode}";
+    private Task RunTestAsync(string insertionCode)
+        => RunTestAsync(insertionCode, true);
 
-    private Task RunTestAsync(string insertionCode, string mode)
-        => RunTestAsync(insertionCode, mode, true);
-
-    private async Task RunTestAsync(string insertionCode, string mode, bool isEnabled)
+    private async Task RunTestAsync(string insertionCode, bool isEnabled)
     {
         var code = CreateTestCode(insertionCode);
 
         await CreateTesterBuilder()
              .WithTestCode(code)
-             .WithEditorConfigLine(CreateModeConfigurationLine(mode))
              .SetEnabled(isEnabled, "AJ0002")
              .WithNugetPackage("Microsoft.EntityFrameworkCore", "9.0.8")
              .Build()

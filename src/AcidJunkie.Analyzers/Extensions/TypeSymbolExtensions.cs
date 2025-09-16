@@ -228,7 +228,35 @@ internal static class TypeSymbolExtensions
             return false;
         }
 
-        if (!typeSymbol.IsContainedInNamespace("System.Collections.Generic") || !typeSymbol.Name.EqualsOrdinal("IEnumerable"))
+        if (!typeSymbol.Name.EqualsOrdinal("IEnumerable") || !typeSymbol.IsContainedInNamespace("System.Collections.Generic"))
+        {
+            return false;
+        }
+
+        ofType = namedTypeSymbol.TypeArguments[0];
+        return true;
+    }
+
+    public static bool IsQueryable(this ITypeSymbol typeSymbol)
+        => typeSymbol is INamedTypeSymbol namedTypeSymbol
+           && namedTypeSymbol.Name.EqualsOrdinal("IQueryable")
+           && namedTypeSymbol.ContainingNamespace.ToString().EqualsOrdinal("System.Linq");
+
+    public static bool IsQueryable(this ITypeSymbol typeSymbol, [NotNullWhen(true)] out ITypeSymbol? ofType)
+    {
+        ofType = null;
+
+        if (typeSymbol is not INamedTypeSymbol namedTypeSymbol)
+        {
+            return false;
+        }
+
+        if (namedTypeSymbol.Arity != 1)
+        {
+            return false;
+        }
+
+        if (!typeSymbol.Name.EqualsOrdinal("IQueryable") || !typeSymbol.IsContainedInNamespace("System.Linq"))
         {
             return false;
         }
