@@ -19,7 +19,6 @@ internal static class Program
         var xxx = Enumerable.Range(0, 10)
                             .Select(a => Enumerable.Range(0, 10).Select(a => a))
                             .ToList();
-
         static IEnumerable<int> GetNumbers() => Enumerable.Range(1, 10).ToList();
     }
 

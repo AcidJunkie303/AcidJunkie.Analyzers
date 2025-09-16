@@ -87,7 +87,7 @@ internal sealed class UseIsForNullComparisonAnalyzerImplementation : SyntaxNodeA
             private const string Category = "Intention";
             public const string DiagnosticId = "AJ0011";
             public static readonly string HelpLinkUri = HelpLinkFactory.CreateForDiagnosticId(DiagnosticId);
-            public static readonly LocalizableString Title = "Use is or is not for null-comparison";
+            public static readonly LocalizableString Title = "Use `is` or `is not` for null-comparison";
             public static readonly LocalizableString MessageFormat = "Use `{0}` to compare for `{1}` instead of `{2}`";
             public static readonly LocalizableString Description = MessageFormat;
             public static readonly DiagnosticDescriptor Rule = new(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, true, Description, HelpLinkUri);
